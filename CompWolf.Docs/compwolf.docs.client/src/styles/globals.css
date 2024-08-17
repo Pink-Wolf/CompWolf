@@ -1,0 +1,86 @@
+:root {
+    --mainColor: #000;
+    --secondaryColor: #333;
+    --background: #EEE;
+    --secondaryBackground: #BBB;
+    --activeColor: #000;
+    --activeSecondaryColor: #181818;
+    --activeBackground: #DDD;
+    --activeSecondaryBackground: #888;
+    color: var(--mainColor);
+    background: var(--background);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 0 0;
+}
+h1 {
+    font-size: 1.5em;
+}
+
+h2 {
+    font-size: 1.25em;
+}
+
+h3 {
+    font-size: 1.125em;
+}
+
+h4 {
+    font-size: 1.0625em;
+}
+
+h5 {
+    font-size: 1.03125em;
+}
+
+h6 {
+    font-size: 1.015625em;
+}
+
+ul, ol {
+    margin: 0 0 0 0;
+}
+
+section {
+    margin: .5em 0 0 0;
+}
+
+p {
+    margin: 0;
+}
+blockquote {
+    border-left: 4px solid;
+    border-color: var(--secondaryBackground);
+    margin: 0;
+    padding: 4px 0 4px 16px;
+}
+
+.warning {
+    --background: #FF8;
+    --secondaryBackground: #CC2;
+    --activeBackground: #EE4;
+    --activeSecondaryBackground: #AA0;
+    background: var(--background);
+}
+
+table, table > * > * > * {
+    border: 1px solid;
+    border-collapse: collapse;
+    border-color: var(--secondaryBackground);
+}
+
+textarea {
+    width: 100%;
+    height: 3lh;
+}
+
+input, textarea, select {
+    display: block;
+}
+
+.inputContainer {
+    margin-left: .25em;
+    padding-left: .6em;
+    border-left: .15em solid;
+}

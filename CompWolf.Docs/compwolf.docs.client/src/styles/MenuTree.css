@@ -1,0 +1,33 @@
+.menuTree {
+    color: var(--secondaryColor);
+    background: var(--secondaryBackground);
+    padding: 0;
+    border: 1px solid;
+    border-collapse: collapse;
+}
+.menuTree > li {
+    display: inline-block;
+    padding: .25em .5em .25em .5em;
+    position: relative;
+}
+.menuTree > li > .menuTree {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 100%;
+    left: 0%;
+    transition: all .25s ease;
+}
+.menuTree > li > .menuTree > li > .menuTree {
+    display: inline;
+    top: 0%;
+    left: 100%;
+}
+.menuTree > li:hover > .menuTree {
+    visibility: visible;
+    opacity: 1;
+}
+.menuTree > li > .menuTree > li {
+    width: 100%;
+    box-sizing: border-box;
+}

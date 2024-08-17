@@ -1,0 +1,27 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "Vulkan_LIBRARY",
+          "value": "${projectDir}/extern/VulkanSDK/Lib/vulkan-1.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Vulkan_INCLUDE_DIR",
+          "value": "${projectDir}/extern/VulkanSDK/Include",
+          "type": "PATH"
+        }
+      ]
+    }
+  ]
+}

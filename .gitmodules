@@ -1,0 +1,6 @@
+[submodule "CompWolf.Programs/extern/glfw"]
+	path = CompWolf.Programs/extern/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "CompWolf.Programs/extern/googletest"]
+	path = CompWolf.Programs/extern/googletest
+	url = https://github.com/google/googletest.git

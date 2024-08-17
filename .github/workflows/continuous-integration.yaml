@@ -1,0 +1,67 @@
+name: Continous Integration of CompWolf.Programs
+
+on:
+  push:
+    paths: 'CompWolf.Programs/**'
+jobs:
+  core:
+    name: Test CompWolf.Core
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Build
+      working-directory: "CompWolf.Programs/Core"
+      run: |
+        chmod +x ./build.sh
+        ./build.sh
+
+    - name: Test
+      working-directory: "CompWolf.Programs/Core/build/"
+      run: ./CompWolf.Core.Tests
+  graphics-core:
+    name: Test CompWolf.Graphics.Core
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install Dependency - glfw
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with: 
+        packages: libwayland-dev libxkbcommon-dev xorg-dev libglfw3
+    - name: Install Dependency - vulkan
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with: 
+        packages: libvulkan-dev
+    - name: Install Dependency - shaderc (restore)
+      id: cache-glslc
+      uses: actions/cache@v4
+      with:
+        path: glslc
+        key: ${{ runner.os }}-glslc
+    - name: Install Dependency - shaderc (install)
+      if: steps.cache-glslc.outputs.cache-hit != 'true'
+      run: |
+        curl https://storage.googleapis.com/shaderc/artifacts/prod/graphics_shader_compiler/shaderc/linux/continuous_gcc_release/464/20240808-171722/install.tgz -o shaderc.tgz
+        tar -xf shaderc.tgz install/bin/glslc
+        sudo mv install/bin/glslc glslc
+    - name: Install Dependency - shaderc (position)
+      run: sudo cp glslc /bin/glslc
+        
+
+
+    - name: Build
+      working-directory: "CompWolf.Programs/Graphics.Core"
+      run: |
+        chmod +x ./build.sh
+        ./build.sh
+
+    - name: Test
+      working-directory: "CompWolf.Programs/Graphics.Core/build/"
+      run: ./CompWolf.Graphics.Core.Tests

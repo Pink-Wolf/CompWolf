@@ -1,0 +1,71 @@
+# Based on https://github.com/actions/starter-workflows/blob/main/pages/nextjs.yml
+
+name: Deploy Docs to Pages
+
+on:
+  push:
+    branches: main
+    paths: 'CompWolf.Docs/**'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-docs:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        cache: 'npm'
+        cache-dependency-path: 'CompWolf.Docs/compwolf.docs.client/package-lock.json'
+    - name: Setup pages
+      uses: actions/configure-pages@v5
+      with:
+        static_site_generator: next
+        
+    - name: Restore client Cache
+      uses: actions/cache@v4
+      with:
+        path: CompWolf.Docs/compwolf.docs.client/.next/cache
+        key: client-${{hashFiles('CompWolf.Docs/compwolf.docs.client/package-lock.json')}}-${{hashFiles('CompWolf.Docs/compwolf.docs.client/src/**')}}
+        restore-keys: |
+          client-${{hashFiles('CompWolf.Docs/compwolf.docs.client/package-lock.json')}}-
+      
+    - name: Build Database Server
+      run: dotnet build CompWolf.Docs/CompWolf.Docs.Server/
+    - name: Install Docs Client Dependencies
+      run: npm ci
+      working-directory: CompWolf.Docs/compwolf.docs.client/
+
+    - name: Start Database Server
+      run: dotnet run --project CompWolf.Docs/CompWolf.Docs.Server/ --launch-profile https &
+    - name: Build Docs Client
+      run: npm run build
+      working-directory: CompWolf.Docs/compwolf.docs.client/
+    - name: Upload Docs
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: CompWolf.Docs/compwolf.docs.client/out/
+
+  deploy:
+    name: Deploy Docs to Pages
+    environment:
+      name: github-pages
+      url: ${{steps.pages-deployment.outputs.page_url}}
+    runs-on: ubuntu-latest
+    needs: build-docs
+    steps:
+      - name: Deploy Pages
+        id: pages-deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,4 @@
+﻿{
+  "description": "The following code creates an environment, uses it to create a window, and then keeps them alive until the window is closed.",
+  "code": "simple_window.cpp"
+}

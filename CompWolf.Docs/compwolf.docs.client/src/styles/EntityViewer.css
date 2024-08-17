@@ -1,0 +1,36 @@
+* {
+    white-space: pre-wrap;
+    tab-size: 4;
+}
+
+.memberTable {
+    width: 100%;
+}
+.memberTable th {
+    text-align: inherit;
+}
+.memberTable tr > *:first-child {
+    width: 16em;
+}
+
+.declaration * {
+    margin: 0;
+}
+
+#Declaration {
+    display: block;
+    margin: .5em 0 .5em 0;
+}
+
+#Declarations {
+    padding-left: 1em;
+}
+
+#saveInformation {
+    font-size: 2em;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: var(--secondaryBackground);
+    padding: 0 .1em .1em .1em;
+}
