@@ -57,11 +57,17 @@ export default function ClassEditor(parameters) {
 			<Input field="constructor" type="container"
 				setter={setData} value={data} disabled={disabled}
 				inputs={(x, setter) => {
-					return FunctionEditor({
-						data: x,
-						setData: setter,
-						disabled: disabled
-					})
+					return (
+						<Fragment>
+							<Input field="copyable" type="checkbox"
+								value={data} setter={setdata} disabled={disabled} />
+							<Input field="movable" type="checkbox"
+								value={data} setter={setdata} disabled={disabled} />
+
+							<FunctionEditor data={x} setData={setter}
+								disabled={disabled} />
+						</Fragment>
+					)
 				}}
 			/>
 
