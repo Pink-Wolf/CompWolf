@@ -4,7 +4,6 @@ import { useState } from "react"
 import { postProject } from "@/lib/api/getEntity"
 import Input, { SubmitInput } from "@/lib/Input"
 import { Reference } from "@/lib/CodeComponents"
-import FormattedText from "@/lib/FormattedText"
 
 export default function ApiEditorPage(parameters) {
 	const [data, setData] = useState(parameters.data)
@@ -48,7 +47,7 @@ export default function ApiEditorPage(parameters) {
 				{data.projects.map((x, i) => {
 					return (
 						<li key={i}>
-							<Reference path={`/editor/api/${x.name}`}>{x.name}</Reference>: <FormattedText>{x.briefDescription}</FormattedText>
+							<Reference path={`/editor/api/${x.name}`}>{x.name}</Reference>: {x.briefDescription}
 						</li>
 					)
 				})}

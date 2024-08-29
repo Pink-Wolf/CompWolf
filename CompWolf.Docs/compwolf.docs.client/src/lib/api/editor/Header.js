@@ -4,7 +4,6 @@ import { useState } from "react"
 import { postHeader, postEntity } from "@/lib/api/getEntity"
 import Input, { SubmitInput } from "@/lib/Input"
 import { Reference } from "@/lib/CodeComponents"
-import FormattedText from "@/lib/FormattedText"
 import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export default function HeaderEditor(parameters) {
@@ -100,7 +99,7 @@ export default function HeaderEditor(parameters) {
 				{data.entities.map((x, i) => {
 					return (
 						<li key={i}>
-							<Reference path={`/editor/api/${data.project}/${data.header}/${betterEncodeURIComponent(x.name)}`}>{x.name}</Reference>: <FormattedText>{x.briefDescription}</FormattedText>
+							<Reference path={`/editor/api/${data.project}/${data.header}/${betterEncodeURIComponent(x.name)}`}>{x.name}</Reference>: {x.briefDescription}
 						</li>
 					)
 				})}

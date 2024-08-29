@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import { postHeader } from "@/lib/api/getEntity"
 import Input, { SubmitInput } from "@/lib/Input"
 import { Reference } from "@/lib/CodeComponents"
-import FormattedText from "@/lib/FormattedText"
 import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export const defaultBaseEntity = {

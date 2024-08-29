@@ -4,7 +4,6 @@ import { useState } from "react"
 import { postProject, postHeader } from "@/lib/api/getEntity"
 import Input, { SubmitInput } from "@/lib/Input"
 import { Reference } from "@/lib/CodeComponents"
-import FormattedText from "@/lib/FormattedText"
 
 export default function ProjectEditor(parameters) {
 	const [data, _setData] = useState({
@@ -94,7 +93,7 @@ export default function ProjectEditor(parameters) {
 				{data.headers.map((x, i) => {
 					return (
 						<li key={i}>
-							<Reference path={`/editor/api/${data.project}/${x.name}`}>{x.name}</Reference>: <FormattedText>{x.briefDescription}</FormattedText>
+							<Reference path={`/editor/api/${data.project}/${x.name}`}>{x.name}</Reference>: {x.briefDescription}
 						</li>
 					)
 				})}

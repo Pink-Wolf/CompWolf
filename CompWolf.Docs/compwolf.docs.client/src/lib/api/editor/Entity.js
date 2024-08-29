@@ -4,8 +4,6 @@ import { Fragment, useState } from "react"
 import { postEntity } from "@/lib/api/getEntity"
 import Input, { SubmitInput } from "@/lib/Input"
 import { Reference } from "@/lib/CodeComponents"
-import FormattedText from "@/lib/FormattedText"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 import MutableTypeEditor from "./entities/MutableType"
 import { defaultBaseEntity } from "./entities/BaseEntity"
