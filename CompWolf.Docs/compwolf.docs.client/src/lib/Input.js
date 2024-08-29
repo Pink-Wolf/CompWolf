@@ -17,6 +17,11 @@ function SelectInput({ value, setter, disabled, options }) {
         </select>
     )
 }
+function CheckboxInput({ value, setter, disabled }) {
+    return (
+        <input type="checkbox" checked={value} disabled={disabled} onChange={(e) => setter(e.target.checked)} />
+    )
+}
 
 function ArrayInput({ value, setter, disabled, forEach, newValue = () => "" }) {
     return (
@@ -54,11 +59,14 @@ export default function Input(props) {
             break
         case "select": InputComponent = SelectInput
             break
+        case "boolCheckbox": InputComponent = CheckboxInput
+            break;
         case "array": InputComponent = ArrayInput
             multipleInputs = true
             break
         case "container": InputComponent = InputContainer
             multipleInputs = true
+            break;
         default: break
     }
 

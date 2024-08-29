@@ -9,6 +9,8 @@ export function toClassType(data) {
 	return {
 		baseClasses: [],
 		templateParameters: [],
+		copyable: true,
+		movable: true,
 		constructor: toFunctionType(defaultBaseEntity),
 		memberGroups: [],
 		...toDeclarationType(data)
@@ -59,10 +61,10 @@ export default function ClassEditor(parameters) {
 				inputs={(x, setter) => {
 					return (
 						<Fragment>
-							<Input field="copyable" type="checkbox"
-								value={data} setter={setdata} disabled={disabled} />
-							<Input field="movable" type="checkbox"
-								value={data} setter={setdata} disabled={disabled} />
+							<Input field="copyable" type="boolCheckbox"
+								value={data} setter={setData} disabled={disabled} />
+							<Input field="movable" type="boolCheckbox"
+								value={data} setter={setData} disabled={disabled} />
 
 							<FunctionEditor data={x} setData={setter}
 								disabled={disabled} />
