@@ -65,7 +65,7 @@ export default function ClassViewer({ data }) {
 				</table>
 			</section>
 			
-			<section hidden={is_empty(data.memberGroups) && !data.hasOwnProperty("constructor")} id="MemberFunctions">
+			<section hidden={is_empty(data.memberGroups) && is_empty(data.constructor?.overloads)} id="MemberFunctions">
 				<h2>Members</h2>
 				<table className="memberTable">
 					<thead>
@@ -75,14 +75,14 @@ export default function ClassViewer({ data }) {
 						</tr>
 					</thead>
 					<tbody>
-						<tr hidden={!data.hasOwnProperty("constructor")}>
+						<tr hidden={is_empty(data.constructor?.overloads)}>
 							<td>
 								<Reference path={`${dataPath}/${betterEncodeURIComponent(data.name)}`}>
 									(constructors)
 								</Reference>
 							</td>
 							<td>
-								{data.constructor?.briefDescription}
+								<FormattedText>{data.constructor?.briefDescription}</FormattedText>
 							</td>
 						</tr>
 						{data.memberGroups?.map((x, i) => {

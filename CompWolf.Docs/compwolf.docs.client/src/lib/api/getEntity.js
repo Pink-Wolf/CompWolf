@@ -77,19 +77,19 @@ export async function formatRawEntity(data) {
         case `class`: {
             if (returnVal.hasOwnProperty("constructor")) {
                 if (returnVal.copyable && returnVal.movable) {
-                    returnVal.constructor.briefDescription = `${returnVal.name} is copyable and movable.`
+                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is copyable and movable.`
                 }
                 else if (returnVal.copyable && !returnVal.movable) {
-                    returnVal.constructor.briefDescription = `${returnVal.name} is copyable, but not movable.`
-                    returnVal.constructor.detailedDescription.push(`${returnVal.name} is not movable.`)
+                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is copyable, but not movable.`
+                    returnVal.constructor.detailedDescription.push(`[[${returnVal.name}]] is not movable.`)
                 }
                 else if (!returnVal.copyable && returnVal.movable) {
-                    returnVal.constructor.briefDescription = `${returnVal.name} is not copyable, but is movable.`
-                    returnVal.constructor.detailedDescription.push(`${returnVal.name} is not copyable.`)
+                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is not copyable, but is movable.`
+                    returnVal.constructor.detailedDescription.push(`[[${returnVal.name}]] is not copyable.`)
                 }
                 else if (!returnVal.copyable && !returnVal.movable) {
-                    returnVal.constructor.briefDescription = `${returnVal.name} is not copyable nor movable.`
-                    returnVal.constructor.detailedDescription.push(`${returnVal.name} is not copyable nor movable.`)
+                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is not copyable nor movable.`
+                    returnVal.constructor.detailedDescription.push(`[[${returnVal.name}]] is not copyable nor movable.`)
                 }
             }
 
