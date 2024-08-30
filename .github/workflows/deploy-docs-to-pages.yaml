@@ -5,7 +5,9 @@ name: Deploy Docs to Pages
 on:
   push:
     branches: main
-    paths: 'CompWolf.Docs/**'
+    paths:
+      - '.github/workflows/deploy-docs-to-pages.yaml'
+      - 'CompWolf.Docs/**'
 permissions:
   contents: read
   pages: write

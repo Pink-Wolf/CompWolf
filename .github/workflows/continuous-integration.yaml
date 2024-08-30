@@ -2,7 +2,9 @@ name: Continous Integration of CompWolf.Programs
 
 on:
   push:
-    paths: 'CompWolf.Programs/**'
+    paths:
+      - '.github/workflows/continuous-integration.yaml'
+      - 'CompWolf.Programs/**'
 jobs:
   core:
     name: Test CompWolf.Core
