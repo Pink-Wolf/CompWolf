@@ -50,6 +50,8 @@ jobs:
 
     - name: Start Database Server
       run: dotnet run --project CompWolf.Docs/CompWolf.Docs.Server/ --launch-profile https &
+    - name: Print overview (for debugging this action)
+      run: curl -sk https://localhost:7112/api/overview | node -p "JSON.stringify(JSON.parse(require('fs').readFileSync(0)), 0, 1)"
     - name: Build Docs Client
       run: npm run build
       working-directory: CompWolf.Docs/compwolf.docs.client/
