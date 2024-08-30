@@ -5,7 +5,7 @@ const DATABASE_URL = `https://localhost:7112/`
 async function getJson(path) {
     const response = await fetch(path, {
         method: 'GET',
-        cache: (process.env.INCLUDE_API_EDITOR == "1") ? `no-cache` : `default`,
+        cache: `no-cache`,
         headers: {
             'Content-Type': 'application/json',
         },
