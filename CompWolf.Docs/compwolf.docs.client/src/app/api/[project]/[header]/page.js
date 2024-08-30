@@ -19,6 +19,12 @@ export default async function HeaderPage({ params }) {
     return <HeaderViewer data={data} />
 }
 
+export async function generateMetadata({params}) {
+    return {
+        title: `${params.header}`,
+    }
+}
+
 export async function generateStaticParams() {
     const overview = await getOverview()
 

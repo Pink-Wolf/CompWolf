@@ -52,6 +52,13 @@ function getMembers(entity, members) {
         ]
     })
 }
+
+export async function generateMetadata({params}) {
+    return {
+        title: `${params.members[params.members.length-1]}`,
+    }
+}
+
 export async function generateStaticParams() {
     const overview = await getOverview()
 

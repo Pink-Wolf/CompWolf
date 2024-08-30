@@ -1,6 +1,5 @@
 import EntityEditor from "@/lib/api/editor/Entity"
 import { getOverview, getEntityRaw } from "@/lib/api/getEntity"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export default async function EntityEditorPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
@@ -11,6 +10,12 @@ export default async function EntityEditorPage({ params }) {
     const data = await getEntityRaw(project, header, entity)
 
     return <EntityEditor data={data} />
+}
+
+export async function generateMetadata({params}) {
+    return {
+        title: `${params.entity} (editor)`,
+    }
 }
 
 import { generateStaticParams as _generateStaticParams } from "@/app/api/[project]/[header]/[entity]/page"

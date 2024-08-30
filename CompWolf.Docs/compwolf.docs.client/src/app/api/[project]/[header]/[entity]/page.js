@@ -13,6 +13,12 @@ export default async function EntityPage({ params }) {
     return <EntityViewer data={data} />
 }
 
+export async function generateMetadata({params}) {
+    return {
+        title: `${params.entity}`,
+    }
+}
+
 export async function generateStaticParams() {
     const overview = await getOverview()
 

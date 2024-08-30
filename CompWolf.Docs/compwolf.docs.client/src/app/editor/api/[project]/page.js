@@ -1,6 +1,5 @@
 import { getProject, getOverview } from "@/lib/api/getEntity"
 import ProjectEditor from "@/lib/api/editor/Project"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export default async function ProjectEditorPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
@@ -15,6 +14,12 @@ export default async function ProjectEditorPage({ params }) {
     }
 
     return <ProjectEditor data={data} />
+}
+
+export async function generateMetadata({params}) {
+    return {
+        title: `${params.project} (editor)`,
+    }
 }
 
 import { generateStaticParams as _generateStaticParams } from "@/app/api/[project]/page"

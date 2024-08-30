@@ -17,6 +17,12 @@ export default async function ProjectPage({ params }) {
     return <ProjectViewer data={data} />
 }
 
+export async function generateMetadata({params}) {
+    return {
+        title: `${params.project}`,
+    }
+}
+
 export async function generateStaticParams() {
     const overview = await getOverview()
 

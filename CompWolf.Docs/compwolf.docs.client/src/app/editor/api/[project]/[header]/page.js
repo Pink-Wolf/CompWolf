@@ -1,6 +1,5 @@
 import { getHeader, getOverview } from "@/lib/api/getEntity"
 import HeaderEditor from "@/lib/api/editor/Header"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export default async function HeaderEditorPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
@@ -17,6 +16,12 @@ export default async function HeaderEditorPage({ params }) {
     }
 
     return <HeaderEditor data={data} />
+}
+
+export async function generateMetadata({params}) {
+    return {
+        title: `${params.header} (editor)`,
+    }
 }
 
 import { generateStaticParams as _generateStaticParams } from "@/app/api/[project]/[header]/page"
