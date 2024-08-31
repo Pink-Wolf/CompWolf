@@ -3,15 +3,14 @@ import FormattedText from "@/lib/FormattedText"
 import BaseEntityViewer from "./BaseEntity"
 import { Fragment } from "react"
 
-export default function VariableViewer(params) {
+export default function DeclarationEntityViewer(params) {
+	const is_empty = (x) => { return x == undefined || x.length == 0 }
 
 	return BaseEntityViewer({
 		...params,
 		top: <Fragment>
-			<p id="Declaration">
-				<Declaration>{params.data.declaration}</Declaration>
-			</p>
 			{params.top}
+			<Declaration id="Declaration">{params.data.declaration}</Declaration>
 		</Fragment>
 	})
 }

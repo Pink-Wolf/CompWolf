@@ -1,8 +1,8 @@
 import { Fragment } from "react"
 import { Declaration, Reference, SimpleReference } from "@/lib/CodeComponents"
 import FormattedText from "@/lib/FormattedText"
-import BaseEntityViewer from "./BaseEntity"
 import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
+import DeclarationEntityViewer from "./DeclarationEntity"
 
 export default function ClassViewer({ data }) {
 	const is_empty = (x) => { return x == undefined || x.length == 0 }
@@ -21,7 +21,7 @@ export default function ClassViewer({ data }) {
 	}
 
 	return (
-		<BaseEntityViewer data={data} top={
+		<DeclarationEntityViewer data={data} top={
 			<Fragment>
 				<small hidden={is_empty(data.baseClasses)}>
 					Inherits from: {
@@ -36,9 +36,6 @@ export default function ClassViewer({ data }) {
 						</ul>
 					}
 				</small>
-				<big id="Declaration">
-					<Declaration>{data.declaration}</Declaration>
-				</big>
 			</Fragment>
 		}>
 			<section hidden={is_empty(data.templateParameters)}>
@@ -114,6 +111,6 @@ export default function ClassViewer({ data }) {
 					</tbody>
 				</table>
 			</section>
-		</BaseEntityViewer>
+		</DeclarationEntityViewer>
 	)
 }

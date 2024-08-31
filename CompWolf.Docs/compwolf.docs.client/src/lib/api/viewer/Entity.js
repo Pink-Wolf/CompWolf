@@ -1,5 +1,5 @@
 import ClassViewer from "./entities/Class"
-import DeclarationViewer from "./entities/DeclarationEntity"
+import DeclarationEntityViewer from "./entities/DeclarationEntity"
 import EnumViewer from "./entities/Enum"
 import FunctionViewer from "./entities/Function"
 
@@ -9,6 +9,6 @@ export default function EntityViewer({ data }) {
 		case `class`: return <ClassViewer data={data} />
 		case `function`: return <FunctionViewer data={data} />
 		case `enum`: return <EnumViewer data={data} />
-		default: return <DeclarationViewer data={data} />
+		default: return <DeclarationEntityViewer data={data} />
     }
 }
