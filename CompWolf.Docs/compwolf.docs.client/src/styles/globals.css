@@ -78,7 +78,9 @@ textarea {
 input, textarea, select {
     display: block;
 }
-
+input:not([type]), input[type=text] {
+    width: 100%;
+}
 .inputContainer {
     margin-left: .25em;
     padding-left: .6em;
