@@ -67,7 +67,7 @@ export default function ClassEditor(parameters) {
 								value={data} setter={setData} disabled={disabled} />
 
 							<FunctionEditor data={x} setData={setter}
-								disabled={disabled} />
+								disabled={disabled} immutableName />
 						</Fragment>
 					)
 				}}
