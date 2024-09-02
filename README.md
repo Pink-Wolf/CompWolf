@@ -10,13 +10,13 @@ CompWolf uses Vulkan (for communicating with the GPU), GLFW (for creating window
 
 ### Installation Guide
 
-Warning: These installation guides have yet to be tested, and so may be wrong.
-
 #### Linux Mint
 
 Get GLFW by running the command "sudo apt install libglfw3".
 Get Vulkan by running the command "sudo apt install libvulkan-dev".
-Get shaderc, which includes glslc, from: https://github.com/google/shaderc/blob/main/downloads.md
+
+Get shaderc, which includes glslc, from: https://github.com/google/shaderc/blob/main/downloads.md.
+You should be able to find glslc at "install/bin/glslc". Move this under the "/bin/"-directory on your machine.
 
 You should now be able to build the programs.
 Try going to CompWolf.Programs and run "./build.sh" to build the projects.
@@ -24,10 +24,9 @@ You may need to first run the command "chmod +x ./build.sh" to be able to run bu
 
 #### Windows
 
-Install GLFW from: https://www.glfw.org/download.html
-Install the Vulkan SDK from: https://vulkan.lunarg.com/
+Install the Vulkan SDK from: https://vulkan.lunarg.com/.
 
-Where you installed the VulkanSDK, you should find two directories "Include" and "Lib"; copy them to "CompWolf.Programs/exern/VulkanSDK"
+Where you installed the VulkanSDK, you should find two directories "Include" and "Lib"; copy them to "CompWolf.Programs/exern/VulkanSDK".
 Where you installed the VulkanSDK, you should find a file "glslc.exe" in the directory "Bin"; copy it to "CompWolf.Programs/exern/VulkanSDK".
 
 You should now be able to build the programs.
