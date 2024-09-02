@@ -79,7 +79,7 @@ textarea {
     height: 3lh;
 }
 
-input, textarea, select {
+input, textarea, select, button {
     display: block;
 }
 input:not([type]), input[type=text] {

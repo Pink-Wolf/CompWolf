@@ -30,6 +30,9 @@ export default function BaseEntityEditor({
 
 	return (
 		<section>
+			<button type="button" onClick={() => navigator.clipboard.writeText(JSON.stringify(data))}>Copy</button>
+			<button type="button" onClick={async () => setData(JSON.parse(await navigator.clipboard.readText()))}>Paste</button>
+
 			{top}
 
 			{
