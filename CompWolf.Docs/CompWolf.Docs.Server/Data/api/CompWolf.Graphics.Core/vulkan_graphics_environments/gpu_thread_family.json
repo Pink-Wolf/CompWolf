@@ -37,12 +37,12 @@
       "name": "",
       "items": [
         {
-          "declaration": "vulkan_handle::queue queue;",
+          "declaration": "gpu_work_type_set work_types;",
           "type": "variable",
           "warnings": [],
-          "briefDescription": "The [[vulkan_handle::queue]] representing the thread.",
+          "briefDescription": "The type of work the threads can do.",
           "detailedDescription": [
-            "The [[vulkan_handle::queue]] representing the thread."
+            "The type of work the threads can do."
           ],
           "example": {
             "code": "",
@@ -51,7 +51,7 @@
           "related": [
             "gpu_work_type_set"
           ],
-          "name": "queue"
+          "name": "work_types"
         },
         {
           "overloads": [

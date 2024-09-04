@@ -47,7 +47,7 @@
             "description": ""
           },
           "related": [
-            "gpu_work_type_set"
+            "vulkan_handle::queue"
           ],
           "name": "queue"
         }
