@@ -38,9 +38,9 @@
           "declaration": "using instance = struct instance_t*;",
           "type": "alias",
           "warnings": [],
-          "briefDescription": "Represents a vkInstance.",
+          "briefDescription": "Represents a VkInstance.",
           "detailedDescription": [
-            "Represents a vkInstance."
+            "Represents a VkInstance."
           ],
           "example": {
             "code": "",
@@ -53,9 +53,9 @@
           "declaration": "using physical_device = struct physical_device_t*;",
           "type": "alias",
           "warnings": [],
-          "briefDescription": "Represents a vkPhysicalDevice.",
+          "briefDescription": "Represents a VkPhysicalDevice.",
           "detailedDescription": [
-            "Represents a vkPhysicalDevice."
+            "Represents a VkPhysicalDevice."
           ],
           "example": {
             "code": "",
@@ -68,9 +68,9 @@
           "declaration": "using device = struct device_t*;",
           "type": "alias",
           "warnings": [],
-          "briefDescription": "Represents a vkDevice.",
+          "briefDescription": "Represents a VkDevice.",
           "detailedDescription": [
-            "Represents a vkDevice."
+            "Represents a VkDevice."
           ],
           "example": {
             "code": "",
@@ -78,6 +78,21 @@
           },
           "related": [],
           "name": "device"
+        },
+        {
+          "declaration": "using queue = struct queue_t*;",
+          "type": "alias",
+          "warnings": [],
+          "briefDescription": "Represents a VkQueue.",
+          "detailedDescription": [
+            "Represents a VkQueue."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [],
+          "name": "queue"
         }
       ]
     }
