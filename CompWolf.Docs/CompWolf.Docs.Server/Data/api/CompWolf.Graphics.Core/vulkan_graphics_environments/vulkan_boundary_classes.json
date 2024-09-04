@@ -1,1 +1,40 @@
-{"baseClasses":["graphics_boundary_classes"],"templateParameters":[],"copyable":true,"movable":true,"constructor":{"overloads":[],"exceptions":[],"type":"undefined","warnings":[],"declaration":"","briefDescription":"","detailedDescription":[],"example":{"code":"","description":""},"related":[]},"memberGroups":[],"declaration":"struct vulkan_boundary_classes;","namespace":"compwolf::vulkan","type":"class","warnings":[],"briefDescription":"Contains Vulkan-implementations of [[graphics_boundary_classes]].","detailedDescription":["Contains Vulkan-implementations of [[graphics_boundary_classes]], to be used by [[vulkan_graphics_environment]]"],"example":{"code":"","description":""},"related":["vulkan_graphics_environment","vulkan_gpu_connection"],"name":"vulkan_boundary_classes"}
+{
+  "namespace": "compwolf::vulkan",
+  "type": "class",
+  "warnings": [],
+  "declaration": "struct vulkan_boundary_classes;",
+  "briefDescription": "Contains Vulkan-implementations of [[graphics_boundary_classes]].",
+  "detailedDescription": [
+    "Contains Vulkan-implementations of [[graphics_boundary_classes]], to be used by [[vulkan_graphics_environment]]"
+  ],
+  "example": {
+    "code": "",
+    "description": ""
+  },
+  "related": [
+    "vulkan_graphics_environment",
+    "vulkan_gpu_connection"
+  ],
+  "baseClasses": [
+    "graphics_boundary_classes"
+  ],
+  "templateParameters": [],
+  "copyable": true,
+  "movable": true,
+  "constructor": {
+    "overloads": [],
+    "exceptions": [],
+    "type": "undefined",
+    "warnings": [],
+    "declaration": "",
+    "briefDescription": "",
+    "detailedDescription": [],
+    "example": {
+      "code": "",
+      "description": ""
+    },
+    "related": []
+  },
+  "memberGroups": [],
+  "name": "vulkan_boundary_classes"
+}

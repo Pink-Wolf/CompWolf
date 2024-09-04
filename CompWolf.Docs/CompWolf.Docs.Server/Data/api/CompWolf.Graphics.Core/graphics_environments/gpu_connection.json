@@ -1,1 +1,80 @@
-{"namespace":"compwolf","type":"class","warnings":[],"declaration":"class gpu_connection;","briefDescription":"Boundary class for a GPU.","detailedDescription":["Boundary class for a GPU.\nShould be constructed by a [[graphics_environment]]."],"example":{"code":"","description":""},"related":[],"baseClasses":["basic_freeable"],"templateParameters":[],"copyable":false,"movable":true,"constructor":{"overloads":[{"declaration":"gpu_connection()","description":"Constructs a freed [[gpu_connection]].\nSee [[freeable]] for more information."},{"declaration":"gpu_connection(gpu_work_type_set work_types)","description":"Constructs a [[gpu_connection]] that can do the given type of work."}],"exceptions":[],"type":"undefined","warnings":[],"declaration":"","briefDescription":"","detailedDescription":["[[gpu_connection]]s should be constructed by a [[graphics_environment]]."],"example":{"code":"","description":""},"related":["graphics_environment","gpu_work_type_set"]},"memberGroups":[{"name":"Accessors","items":[{"overloads":[{"declaration":"auto work_types() const noexcept -> gpu_work_type_set"}],"exceptions":[],"type":"function","warnings":[],"declaration":"","briefDescription":"Returns the type of work the GPU can do.","detailedDescription":["Returns the type of work the GPU can do."],"example":{"code":"","description":""},"related":["gpu_work_type_set"],"name":"work_types"}]}],"name":"gpu_connection"}
+{
+  "namespace": "compwolf",
+  "type": "class",
+  "warnings": [],
+  "declaration": "class gpu_connection;",
+  "briefDescription": "Boundary class for a GPU.",
+  "detailedDescription": [
+    "Boundary class for a GPU.\nShould be constructed by a [[graphics_environment]]."
+  ],
+  "example": {
+    "code": "",
+    "description": ""
+  },
+  "related": [],
+  "baseClasses": [
+    "basic_freeable"
+  ],
+  "templateParameters": [],
+  "copyable": false,
+  "movable": true,
+  "constructor": {
+    "overloads": [
+      {
+        "declaration": "gpu_connection()",
+        "description": "Constructs a freed [[gpu_connection]].\nSee [[freeable]] for more information."
+      },
+      {
+        "declaration": "gpu_connection(gpu_work_type_set work_types)",
+        "description": "Constructs a [[gpu_connection]] that can do the given type of work."
+      }
+    ],
+    "exceptions": [],
+    "type": "undefined",
+    "warnings": [],
+    "declaration": "",
+    "briefDescription": "",
+    "detailedDescription": [
+      "[[gpu_connection]]s should be constructed by a [[graphics_environment]]."
+    ],
+    "example": {
+      "code": "",
+      "description": ""
+    },
+    "related": [
+      "graphics_environment",
+      "gpu_work_type_set"
+    ]
+  },
+  "memberGroups": [
+    {
+      "name": "Accessors",
+      "items": [
+        {
+          "overloads": [
+            {
+              "declaration": "auto work_types() const noexcept -> gpu_work_type_set"
+            }
+          ],
+          "exceptions": [],
+          "type": "function",
+          "warnings": [],
+          "declaration": "",
+          "briefDescription": "Returns the type of work the GPU can do.",
+          "detailedDescription": [
+            "Returns the type of work the GPU can do."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [
+            "gpu_work_type_set"
+          ],
+          "name": "work_types"
+        }
+      ]
+    }
+  ],
+  "name": "gpu_connection"
+}

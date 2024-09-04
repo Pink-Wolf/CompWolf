@@ -19,7 +19,7 @@ async function postJson(path, data) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data, null, 2),
     })
     if (!response.ok) throw new Error(`Could not post data to ${path}\n${response.status}: ${response.statusText}`)
     return await response.json()

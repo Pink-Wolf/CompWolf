@@ -1,1 +1,139 @@
-{"namespace":"compwolf","type":"class","warnings":[],"declaration":"template<typename Buffer, typename Shader, typename Window, typename Brush, typename Gpu> struct graphics_boundary_classes;","briefDescription":"Contains the boundary classes used to communicate with the GPU in a [[graphics_environment]].","detailedDescription":[],"example":{"code":"","description":""},"related":["graphics_environment"],"baseClasses":[],"templateParameters":[{"name":"Buffer","description":"The boundary class representing memory on a GPU."},{"name":"Shader","description":"The boundary class representing code on a GPU."},{"name":"Window","description":"The boundary class representing a window on a GPU."},{"name":"Brush","description":"The boundary class representing a collection of shaders that can be used to draw objects with."},{"name":"Gpu","description":"The boundary class representing a GPU.\nMust be a subclass of [[gpu_connection]]."}],"copyable":true,"movable":true,"constructor":{"overloads":[],"exceptions":[],"type":"undefined","warnings":[],"declaration":"","briefDescription":"","detailedDescription":[],"example":{"code":"","description":""},"related":[]},"memberGroups":[{"name":"","items":[{"declaration":"","type":"alias","warnings":[],"briefDescription":"The boundary class representing memory on a GPU.","detailedDescription":["The boundary class representing memory on a GPU."],"example":{"code":"","description":""},"related":[],"name":"buffer_type"},{"declaration":"","type":"alias","warnings":[],"briefDescription":"The boundary class representing code on a GPU.","detailedDescription":["The boundary class representing code on a GPU."],"example":{"code":"","description":""},"related":[],"name":"shader_type"},{"declaration":"","type":"alias","warnings":[],"briefDescription":"The boundary class representing a window on a GPU.","detailedDescription":["The boundary class representing a window on a GPU."],"example":{"code":"","description":""},"related":[],"name":"window_type"},{"declaration":"","type":"alias","warnings":[],"briefDescription":"The boundary class representing a collection of shaders that can be used to draw objects with.","detailedDescription":["The boundary class representing a collection of shaders that can be used to draw objects with."],"example":{"code":"","description":""},"related":[],"name":"brush_type"},{"declaration":"","type":"alias","warnings":[],"briefDescription":"The boundary class representing a GPU.","detailedDescription":["The boundary class representing a GPU.\nThis is a subclass of [[gpu_connection]]."],"example":{"code":"","description":""},"related":["gpu_connection"],"name":"gpu_type"}]}],"name":"graphics_boundary_classes"}
+{
+  "namespace": "compwolf",
+  "type": "class",
+  "warnings": [],
+  "declaration": "template<typename Buffer, typename Shader, typename Window, typename Brush, typename Gpu> struct graphics_boundary_classes;",
+  "briefDescription": "Contains the boundary classes used to communicate with the GPU in a [[graphics_environment]].",
+  "detailedDescription": [],
+  "example": {
+    "code": "",
+    "description": ""
+  },
+  "related": [
+    "graphics_environment"
+  ],
+  "baseClasses": [],
+  "templateParameters": [
+    {
+      "name": "Buffer",
+      "description": "The boundary class representing memory on a GPU."
+    },
+    {
+      "name": "Shader",
+      "description": "The boundary class representing code on a GPU."
+    },
+    {
+      "name": "Window",
+      "description": "The boundary class representing a window on a GPU."
+    },
+    {
+      "name": "Brush",
+      "description": "The boundary class representing a collection of shaders that can be used to draw objects with."
+    },
+    {
+      "name": "Gpu",
+      "description": "The boundary class representing a GPU.\nMust be a subclass of [[gpu_connection]]."
+    }
+  ],
+  "copyable": true,
+  "movable": true,
+  "constructor": {
+    "overloads": [],
+    "exceptions": [],
+    "type": "undefined",
+    "warnings": [],
+    "declaration": "",
+    "briefDescription": "",
+    "detailedDescription": [],
+    "example": {
+      "code": "",
+      "description": ""
+    },
+    "related": []
+  },
+  "memberGroups": [
+    {
+      "name": "",
+      "items": [
+        {
+          "declaration": "",
+          "type": "alias",
+          "warnings": [],
+          "briefDescription": "The boundary class representing memory on a GPU.",
+          "detailedDescription": [
+            "The boundary class representing memory on a GPU."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [],
+          "name": "buffer_type"
+        },
+        {
+          "declaration": "",
+          "type": "alias",
+          "warnings": [],
+          "briefDescription": "The boundary class representing code on a GPU.",
+          "detailedDescription": [
+            "The boundary class representing code on a GPU."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [],
+          "name": "shader_type"
+        },
+        {
+          "declaration": "",
+          "type": "alias",
+          "warnings": [],
+          "briefDescription": "The boundary class representing a window on a GPU.",
+          "detailedDescription": [
+            "The boundary class representing a window on a GPU."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [],
+          "name": "window_type"
+        },
+        {
+          "declaration": "",
+          "type": "alias",
+          "warnings": [],
+          "briefDescription": "The boundary class representing a collection of shaders that can be used to draw objects with.",
+          "detailedDescription": [
+            "The boundary class representing a collection of shaders that can be used to draw objects with."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [],
+          "name": "brush_type"
+        },
+        {
+          "declaration": "",
+          "type": "alias",
+          "warnings": [],
+          "briefDescription": "The boundary class representing a GPU.",
+          "detailedDescription": [
+            "The boundary class representing a GPU.\nThis is a subclass of [[gpu_connection]]."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [
+            "gpu_connection"
+          ],
+          "name": "gpu_type"
+        }
+      ]
+    }
+  ],
+  "name": "graphics_boundary_classes"
+}

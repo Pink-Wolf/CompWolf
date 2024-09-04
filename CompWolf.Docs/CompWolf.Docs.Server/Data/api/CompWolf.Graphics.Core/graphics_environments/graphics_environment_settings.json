@@ -1,1 +1,75 @@
-{"namespace":"compwolf","type":"class","warnings":[],"declaration":"struct graphics_environment_settings;","briefDescription":"Aggregate parameter for [[graphics_environment]]'s constructor.","detailedDescription":["Aggregate parameter for [[graphics_environment]]'s constructor."],"example":{"code":"","description":""},"related":["graphics_environment"],"baseClasses":[],"templateParameters":[],"copyable":true,"movable":true,"constructor":{"overloads":[],"exceptions":[],"type":"undefined","warnings":[],"declaration":"","briefDescription":"","detailedDescription":[],"example":{"code":"","description":""},"related":[]},"memberGroups":[{"name":"","items":[{"declaration":"std::string program_name;","type":"variable","warnings":[],"briefDescription":"The name of the program.","detailedDescription":["The name of the program.\nFor example, when communicating with a computer's GPUs, the [[graphics_environment]] may be asked the name of the program; this is its answer."],"example":{"code":"","description":""},"related":[],"name":"program_name"},{"declaration":"program_version program_version = {0, 0, 0};","type":"variable","warnings":[],"briefDescription":"The version of the program.","detailedDescription":["The version of the program.\nFor example, when communicating with a computer's GPUs, the [[graphics_environment]] may be asked the version of the program; this is its answer."],"example":{"code":"","description":""},"related":["program_version"],"name":"program_version"}]}],"name":"graphics_environment_settings"}
+{
+  "namespace": "compwolf",
+  "type": "class",
+  "warnings": [],
+  "declaration": "struct graphics_environment_settings;",
+  "briefDescription": "Aggregate parameter for [[graphics_environment]]'s constructor.",
+  "detailedDescription": [
+    "Aggregate parameter for [[graphics_environment]]'s constructor."
+  ],
+  "example": {
+    "code": "",
+    "description": ""
+  },
+  "related": [
+    "graphics_environment"
+  ],
+  "baseClasses": [],
+  "templateParameters": [],
+  "copyable": true,
+  "movable": true,
+  "constructor": {
+    "overloads": [],
+    "exceptions": [],
+    "type": "undefined",
+    "warnings": [],
+    "declaration": "",
+    "briefDescription": "",
+    "detailedDescription": [],
+    "example": {
+      "code": "",
+      "description": ""
+    },
+    "related": []
+  },
+  "memberGroups": [
+    {
+      "name": "",
+      "items": [
+        {
+          "declaration": "std::string program_name;",
+          "type": "variable",
+          "warnings": [],
+          "briefDescription": "The name of the program.",
+          "detailedDescription": [
+            "The name of the program.\nFor example, when communicating with a computer's GPUs, the [[graphics_environment]] may be asked the name of the program; this is its answer."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [],
+          "name": "program_name"
+        },
+        {
+          "declaration": "program_version program_version = {0, 0, 0};",
+          "type": "variable",
+          "warnings": [],
+          "briefDescription": "The version of the program.",
+          "detailedDescription": [
+            "The version of the program.\nFor example, when communicating with a computer's GPUs, the [[graphics_environment]] may be asked the version of the program; this is its answer."
+          ],
+          "example": {
+            "code": "",
+            "description": ""
+          },
+          "related": [
+            "program_version"
+          ],
+          "name": "program_version"
+        }
+      ]
+    }
+  ],
+  "name": "graphics_environment_settings"
+}
