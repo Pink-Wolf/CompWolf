@@ -18,7 +18,13 @@ export default function EntityEditor(parameters) {
 
 	const [isSaved, setIsSaved] = useState(true)
 	function setData(x) {
-		_setData(x)
+		_setData({
+			...x,
+			project: data.project,
+			header: data.header,
+			entity: data.entity,
+			owners: data.owners,
+		})
 		setIsSaved(false)
 	}
 
@@ -31,6 +37,7 @@ export default function EntityEditor(parameters) {
 			header: header,
 			entity: entity,
 			owners: owners,
+			name: name,
 			...output
 		} = data
 		console.log(output)
