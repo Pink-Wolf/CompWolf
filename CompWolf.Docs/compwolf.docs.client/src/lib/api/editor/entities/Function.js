@@ -18,7 +18,8 @@ export default function FunctionEditor(parameters) {
 	return BaseEntityEditor({
 		...parameters,
 		top: <Fragment>
-			<Input field="overloads" type="array"
+			<h3>Declarations</h3>
+			<Input field="overloads" label="" type="array"
 				setter={setData} value={data} disabled={disabled}
 				forEach={(x, i, setter) => {
 					return (

@@ -17,7 +17,8 @@ export default function EnumEditor(parameters) {
 	return DeclarationEditor({
 		...parameters,
 		children: <Fragment>
-			<Input field="values" type="array"
+			<h3>Values</h3>
+			<Input field="values" label="" type="array"
 				setter={setData} value={data} disabled={disabled}
 				forEach={(x, i, setter) => {
 					return (

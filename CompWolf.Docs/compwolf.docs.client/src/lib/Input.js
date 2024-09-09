@@ -1,31 +1,39 @@
-function BasicInput({ type, value, setter, disabled }) {
+function BasicInput({ type, value, setter, disabled, ...props }) {
     return (
-        <input type={type} value={value} disabled={disabled} onChange={(e) => setter(e.target.value)} />
+        <input {...props} type={type} value={value} disabled={disabled}
+            onChange={(e) => setter(e.target.value)}
+        />
     )
 }
-function TextAreaInput({ value, setter, disabled }) {
+function TextAreaInput({ value, setter, disabled, ...props }) {
     return (
-        <textarea value={value} disabled={disabled} onChange={(e) => setter(e.target.value)} />
+        <textarea {...props} value={value} disabled={disabled}
+            onChange={(e) => setter(e.target.value)}
+        />
     )
 }
-function SelectInput({ value, setter, disabled, options }) {
+function SelectInput({ value, setter, disabled, options, ...props }) {
     return (
-        <select value={value} disabled={disabled} onChange={(e) => setter(e.target.value)}>
+        <select {...props} value={value} disabled={disabled}
+            onChange={(e) => setter(e.target.value)}
+        >
             {options?.map((option, optionI) => {
                 return <option key={optionI} value={option.value ?? option}>{option.name ?? option}</option>
             })}
         </select>
     )
 }
-function CheckboxInput({ value, setter, disabled }) {
+function CheckboxInput({ value, setter, disabled, ...props }) {
     return (
-        <input type="checkbox" checked={value} disabled={disabled} onChange={(e) => setter(e.target.checked)} />
+        <input {...props} type="checkbox" checked={value} disabled={disabled}
+            onChange={(e) => setter(e.target.checked)}
+        />
     )
 }
 
-function ArrayInput({ value, setter, disabled, forEach, newValue = () => "" }) {
+function ArrayInput({ value, setter, disabled, forEach, newValue = () => "", ...props }) {
     return (
-        <ul>
+        <ul {...props}>
             {value?.map((x, i) => {
                 return (
                     <li key={i}>
@@ -43,18 +51,18 @@ function ArrayInput({ value, setter, disabled, forEach, newValue = () => "" }) {
     )
 }
 
-export function InputContainer({ value, field, setter, inputs }) {
+export function InputContainer({ value, field, setter, inputs, ...props }) {
     return (
-        <section className="inputContainer">
+        <section {...props} className="inputContainer">
             { inputs(value, setter) }
         </section>
     )
 }
 
-export default function Input(props) {
+export default function Input({ type, value, setter, label, field, ...props }) {
     var InputComponent = BasicInput
     var multipleInputs = false
-    switch (props.type) {
+    switch (type) {
         case "textarea": InputComponent = TextAreaInput
             break
         case "select": InputComponent = SelectInput
@@ -70,24 +78,24 @@ export default function Input(props) {
         default: break
     }
 
-    const label = props.label ?? (props.field
-        ? `${props.field[0].toUpperCase() + props.field.slice(1).replace(/([A-Z]+)/g, ' $1')}:`
+    label = label ?? (field
+        ? `${field[0].toUpperCase() + field.slice(1).replace(/([A-Z]+)/g, ' $1')}:`
         : ""
     )
 
-    const hasField = typeof props.field !== `undefined`
+    const hasField = typeof field !== `undefined`
 
     const internalProps = {
         ...props,
         setter: hasField
-            ? (x) => props.setter({ ...props.value, [props.field]: x })
-            : props.setter,
+            ? (x) => setter({ ...value, [field]: x })
+            : setter,
         value: hasField
-            ? props.value[props.field]
-            : props.value
+            ? value[field]
+            : value
     }
 
-    if (multipleInputs) return <section>{label}
+    if (multipleInputs) return <section className="labelSection">{label}
         <InputComponent {...internalProps} />
     </section>
 

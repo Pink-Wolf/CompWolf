@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, useState } from "react"
 import Input from "@/lib/Input"
 import DeclarationEditor, { toDeclarationType } from "./DeclarationEntity"
 import FunctionEditor, { toFunctionType } from "./Function"
@@ -26,6 +26,9 @@ export default function ClassEditor(parameters) {
 	const setData = parameters.setData
 	const disabled = parameters.disabled
 
+	const [visibleConstructor, setVisibleConstructor] = useState(false)
+	const [visibleMember, setVisibleMember] = useState([])
+
 	return DeclarationEditor({
 		...parameters,
 		top: <Fragment>
@@ -37,10 +40,8 @@ export default function ClassEditor(parameters) {
 					)
 				}}
 			/>
-
-		</Fragment>,
-		children: <Fragment>
-			<Input field="templateParameters" type="array"
+			<h3>Template Parameters</h3>
+			<Input field="templateParameters" label="" type="array"
 				setter={setData} value={data} disabled={disabled}
 				forEach={(x, i, setter) => {
 					return (
@@ -56,18 +57,25 @@ export default function ClassEditor(parameters) {
 				}}
 			/>
 
+		</Fragment>,
+		children: <Fragment>
+
 			<Input field="constructor" type="container"
 				setter={setData} value={data} disabled={disabled}
 				inputs={(x, setter) => {
 					return (
 						<Fragment>
-							<Input field="copyable" type="boolCheckbox"
-								value={data} setter={setData} disabled={disabled} />
-							<Input field="movable" type="boolCheckbox"
-								value={data} setter={setData} disabled={disabled} />
+							<Input type="boolCheckbox" label="Visible:"
+								value={visibleConstructor} setter={setVisibleConstructor} />
+							{!visibleConstructor ? null : <Fragment>
+								<Input field="copyable" type="boolCheckbox"
+									value={data} setter={setData} disabled={disabled} />
+								<Input field="movable" type="boolCheckbox"
+									value={data} setter={setData} disabled={disabled} />
 
-							<FunctionEditor data={x} setData={setter}
-								disabled={disabled} immutableName />
+								<FunctionEditor data={x} setData={setter}
+									disabled={disabled} immutableName />
+							</Fragment>}
 						</Fragment>
 					)
 				}}
@@ -84,10 +92,17 @@ export default function ClassEditor(parameters) {
 							<Input field="items" type="array"
 								setter={setter} value={x} disabled={disabled}
 								forEach={(x, i, setter) => {
-									return MutableTypeEditor({
-										data: x, setData: setter,
-										disabled: disabled
-									})
+									return (
+										<Fragment>
+											<h1>{x.name}</h1>
+											<Input type="boolCheckbox" field={x.name} label="Details:"
+												value={visibleMember} setter={setVisibleMember} />
+											{!visibleMember[x.name] ? null : <Fragment>
+												<MutableTypeEditor data={x} setData={setter}
+													disabled={disabled} />
+											</Fragment>}
+										</Fragment>
+									)
 								}}
 								newValue={() => {
 									return toMutableTypeType({

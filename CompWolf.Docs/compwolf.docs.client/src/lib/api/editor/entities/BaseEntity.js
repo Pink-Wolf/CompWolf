@@ -41,6 +41,8 @@ export default function BaseEntityEditor({
 				/>
 			}
 
+			<h3>Description</h3>
+
 			<Input field="briefDescription" type="textarea"
 				setter={setData} value={data} disabled={disabled}
 			/>
@@ -56,7 +58,9 @@ export default function BaseEntityEditor({
 				}}
 			/>
 
-			<Input field="warnings" type="array"
+			<h3>Warnings</h3>
+
+			<Input field="warnings" label="" type="array"
 				setter={setData} value={data} disabled={disabled}
 				forEach={(x, i, setter) => {
 					return (
@@ -68,6 +72,17 @@ export default function BaseEntityEditor({
 			/>
 
 			{children}
+
+			<h3>Other</h3>
+
+			<Input field="related" type="array"
+				setter={setData} value={data} disabled={disabled}
+				forEach={(x, i, setter) => {
+					return (
+						<Input value={x} setter={setter} disabled={disabled} />
+					)
+				}}
+			/>
 
 			<Input field="example" type="container"
 				setter={setData} value={data}
@@ -81,15 +96,6 @@ export default function BaseEntityEditor({
 								value={x} setter={setter} disabled={disabled}
 							/>
 						</Fragment>
-					)
-				}}
-			/>
-
-			<Input field="related" type="array"
-				setter={setData} value={data} disabled={disabled}
-				forEach={(x, i, setter) => {
-					return (
-						<Input value={x} setter={setter} disabled={disabled} />
 					)
 				}}
 			/>

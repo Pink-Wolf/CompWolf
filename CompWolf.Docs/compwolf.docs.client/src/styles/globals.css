@@ -79,8 +79,11 @@ textarea {
     height: 3lh;
 }
 
-input, textarea, select, button {
-    display: block;
+label, #labelSection {
+    display: flex;
+}
+label > :not([type="checkbox"]), #labelSection > * {
+    flex: 1;
 }
 input:not([type]), input[type=text] {
     width: 100%;

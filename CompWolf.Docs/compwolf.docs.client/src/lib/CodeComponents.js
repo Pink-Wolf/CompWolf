@@ -28,11 +28,10 @@ export function CodeViewer({ children }) {
 		</SyntaxHighlighter>
 	)
 }
-export function Declaration(props) {
-	const {children, ...restProps} = props
+export function Declaration({ children, ...props }) {
 
 	return (
-		<big className="declaration" {...restProps}>
+		<big className="declaration" {...props}>
 			<CodeViewer>
 				{children}
 			</CodeViewer>

@@ -10,7 +10,7 @@ export default function DeclarationEntityViewer(params) {
 		...params,
 		top: <Fragment>
 			{params.top}
-			<Declaration id="Declaration">{params.data.declaration}</Declaration>
+			<Declaration>{params.data.declaration}</Declaration>
 		</Fragment>
 	})
 }

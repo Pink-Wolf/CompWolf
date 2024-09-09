@@ -18,7 +18,8 @@ export default function DeclarationEditor(params) {
 		...params,
 		top: <Fragment>
 			{params.top}
-			<Input field="declaration"
+			<h3>Declaration</h3>
+			<Input field="declaration" label="" id="Declaration"
 				setter={setData} value={data} disabled={disabled}
 			/>
 		</Fragment>
