@@ -83,7 +83,7 @@ export default function ClassEditor(parameters) {
 
 			<Input field="memberGroups" type="array"
 				setter={setData} value={data} disabled={disabled}
-				forEach={(x, i, setter) => {
+				forEach={(x, groupI, setter) => {
 					return (
 						<Fragment>
 							<Input field="name"
@@ -91,13 +91,14 @@ export default function ClassEditor(parameters) {
 							/>
 							<Input field="items" type="array"
 								setter={setter} value={x} disabled={disabled}
-								forEach={(x, i, setter) => {
+								forEach={(x, itemI, setter) => {
+									const fieldIndex = `${groupI}.${itemI}`
 									return (
 										<Fragment>
 											<h1>{x.name}</h1>
-											<Input type="boolCheckbox" field={x.name} label="Details:"
+											<Input type="boolCheckbox" field={fieldIndex} label="Details:"
 												value={visibleMember} setter={setVisibleMember} />
-											{!visibleMember[x.name] ? null : <Fragment>
+											{!visibleMember[fieldIndex] ? null : <Fragment>
 												<MutableTypeEditor data={x} setData={setter}
 													disabled={disabled} />
 											</Fragment>}
