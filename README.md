@@ -26,8 +26,8 @@ You may need to first run the command "chmod +x ./build.sh" to be able to run bu
 
 Install the Vulkan SDK from: https://vulkan.lunarg.com/.
 
-Where you installed the VulkanSDK, you should find two directories "Include" and "Lib"; copy them to "CompWolf.Programs/exern/VulkanSDK".
-Where you installed the VulkanSDK, you should find a file "glslc.exe" in the directory "Bin"; copy it to "CompWolf.Programs/exern/VulkanSDK".
+Where you installed the VulkanSDK, you should find two directories "Include" and "Lib"; copy them to "CompWolf.Programs/extern/VulkanSDK".
+Where you installed the VulkanSDK, you should find a file "glslc.exe" in the directory "Bin"; copy it to "CompWolf.Programs/extern/VulkanSDK".
 
 You should now be able to build the programs.
 Try opening CompWolf.Programs in Visual Studio and build the project.
