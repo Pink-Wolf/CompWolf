@@ -85,8 +85,8 @@ export default function ClassViewer({ data }) {
 						{data.memberGroups?.map((x, i) => {
 							return (
 								<Fragment key={i}>
-									<tr hidden={is_empty(data.baseClasses)}>
-										<td colSpan="2" hidden={is_empty(x.name) && is_empty(x.description)}>
+									<tr hidden={is_empty(x.name) && is_empty(x.description)}>
+										<td colSpan="2">
 											<h3>{x.name}</h3>
 											<div>
 												<FormattedText>{x.description}</FormattedText>
