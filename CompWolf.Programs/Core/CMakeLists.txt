@@ -14,7 +14,7 @@ set(SOURCES
 set(RESOURCES
 )
 set(TESTS
-    "tests/test.cpp"
+    "tests/enum_bitset.cpp"
 )
 
 

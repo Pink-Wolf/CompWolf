@@ -1,0 +1,2 @@
+// Contains compwolf::enum_bitset, a set of an enum's values.
+#include "private/other/enum_bitset.hpp"
