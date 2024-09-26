@@ -13,7 +13,7 @@ using simple_bitset = compwolf::enum_bitset<simple_enum>;
 TEST(EnumBitset, inherits_bitset) {
 	auto result = std::derived_from<
 		simple_bitset,
-		std::bitset<(std::size_t)simple_enum::size>
+		std::bitset<(std::size_t)simple_enum::size + 1>
 	>;
 	EXPECT_TRUE(result);
 }
@@ -65,6 +65,12 @@ TEST(EnumBitset, set) {
 	EXPECT_EQ(value[simple_enum::c], true);
 	EXPECT_EQ(value.count(), 1);
 }
+TEST(EnumBitset, set_size) {
+	simple_bitset value;
+	value.set(simple_enum::size);
+	EXPECT_EQ(value[simple_enum::size], true);
+	EXPECT_EQ(value.count(), 1);
+}
 TEST(EnumBitset, set_false) {
 	simple_bitset value("1111");
 	value.set(simple_enum::c, false);
@@ -110,4 +116,20 @@ TEST(EnumBitset, flip_chain) {
 	EXPECT_EQ(value[simple_enum::c], false);
 	EXPECT_EQ(value[simple_enum::d], false);
 	EXPECT_EQ(value.count(), 2);
+}
+
+using subset_bitset = compwolf::enum_bitset<simple_enum, 3>;
+TEST(EnumBitset, specified_size_inheritance) {
+	auto result = std::derived_from<
+		subset_bitset,
+		std::bitset<3>
+	>;
+	EXPECT_TRUE(result);
+}
+using subset_bitset = compwolf::enum_bitset<simple_enum, 3>;
+TEST(EnumBitset, specified_size_set) {
+	subset_bitset value;
+	value.set(simple_enum::b);
+	EXPECT_EQ(value[simple_enum::b], true);
+	EXPECT_EQ(value.count(), 1);
 }
