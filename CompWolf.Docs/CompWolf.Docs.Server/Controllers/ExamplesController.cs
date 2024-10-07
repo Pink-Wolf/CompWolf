@@ -8,7 +8,7 @@ namespace CompWolf.Docs.Server.Controllers
     [Route("[controller]")]
     public class ExamplesController : ControllerBase
     {
-        public ApiDatabase Database = new();
+        public DocumentationDatabase Database = new();
 
         [HttpGet("{name}")]
         [ProducesResponseType(200)]

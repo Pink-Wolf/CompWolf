@@ -1,6 +1,8 @@
 import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 const DATABASE_URL = `https://localhost:7112/`
+const EXAMPLE_URL = `${DATABASE_URL}examples/`
+const API_DOCS_URL = `${DATABASE_URL}api/docs/`
 
 async function getJson(path) {
     const response = await fetch(path, {
@@ -26,12 +28,12 @@ async function postJson(path, data) {
 }
 
 export async function getExample(name) {
-    const example = await getJson(`${DATABASE_URL}examples/${name}`)
+    const example = await getJson(`${EXAMPLE_URL}${name}`)
     return example
 }
 
 export async function getProject(project) {
-    const data = await getJson(`${DATABASE_URL}api/${project}`)
+    const data = await getJson(`${API_DOCS_URL}${project}`)
     if (data == null) return null
     return {
         ...data,
@@ -39,11 +41,11 @@ export async function getProject(project) {
     }
 }
 export async function postProject(project, data) {
-    return await postJson(`${DATABASE_URL}api/${project}`, data)
+    return await postJson(`${API_DOCS_URL}${project}`, data)
 }
 
 export async function getHeader(project, header) {
-    const data = await getJson(`${DATABASE_URL}api/${project}/${header}`)
+    const data = await getJson(`${API_DOCS_URL}${project}/${header}`)
     if (data == null) return null
     return {
         ...data,
@@ -52,11 +54,11 @@ export async function getHeader(project, header) {
     }
 }
 export async function postHeader(project, header, data) {
-    return await postJson(`${DATABASE_URL}api/${project}/${header}`, data)
+    return await postJson(`${API_DOCS_URL}${project}/${header}`, data)
 }
 
 export async function getEntityRaw(project, header, entity) {
-    const data = await getJson(`${DATABASE_URL}api/${project}/${header}/${entity}`)
+    const data = await getJson(`${API_DOCS_URL}${project}/${header}/${entity}`)
     if (data == null) return null
     return {
         ...data,
@@ -121,11 +123,11 @@ export async function getEntity(project, header, entity) {
     return await formatRawEntity(await getEntityRaw(project, header, entity))
 }
 export async function postEntity(project, header, entity, data) {
-    return await postJson(`${DATABASE_URL}api/${project}/${header}/${entity}`, data)
+    return await postJson(`${API_DOCS_URL}${project}/${header}/${entity}`, data)
 }
 
 export async function getOverview() {
-    return await getJson(`${DATABASE_URL}api/overview`)
+    return await getJson(`${DATABASE_URL}api/source`)
 }
 
 export async function getPathTo(name) {
