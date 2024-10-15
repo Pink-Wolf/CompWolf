@@ -11,17 +11,27 @@
         Macro,
     };
 
+    public class SourceDeclaration
+    {
+        public string Description { get; set; } = default!;
+        public string Declaration { get; set; } = default!;
+    }
+
     public class SourceEntity
     {
         public string Name { get; set; } = default!;
         public EntityTypes Type { get; set; } = default!;
         public string BriefDescription { get; set; } = default!;
+        public SourceDeclaration[] Declarations { get; set; } = default!;
         public SourceEntity[] Members { get; set; } = default!;
-    }
-    public class SourceTopEntity : SourceEntity
-    {
+
+        public string ReturnDescription { get; set; } = default!;
+        public Dictionary<string, string> ParameterDescriptions { get; set; } = default!;
+        public string ThrowDescription { get; set; } = default!;
+
         public string Namespace { get; set; } = default!;
     }
+
     public class SourceHeader
     {
         public string Name { get; set; } = default!;

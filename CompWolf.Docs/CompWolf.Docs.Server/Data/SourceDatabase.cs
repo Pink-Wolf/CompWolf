@@ -70,7 +70,7 @@ namespace CompWolf.Docs.Server.Data
                 var searchString = "SUBPROJECTS";
                 parentMakeListData = parentMakeListData[(parentMakeListData.IndexOf(searchString) + searchString.Length)..];
             }
-            parentMakeListData = parentMakeListData[..(parentMakeListData.IndexOf(')') - 1)];
+            parentMakeListData = parentMakeListData[..(parentMakeListData.IndexOf(')'))];
 
             return parentMakeListData.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x[1..(x.Length - 1)])
@@ -133,20 +133,43 @@ namespace CompWolf.Docs.Server.Data
         }
         static IEnumerable<SourceEntity> GetEntities(string text, string namespaceName)
         {
-            foreach (var (entityComment, entityDeclaration, entityBody) in SplitMemberGroupIntoMember(text))
+            foreach (var entityText in SplitMemberGroupIntoMember(text))
             {
+                var entityComment = entityText.Comment;
+                var entityDeclaration = entityText.Declaration;
+                var entityBody = entityText.Body;
+
                 var templateMatch = Regex.Match(entityDeclaration, @"\s*template\s*<");
                 var templateEndIndex = templateMatch.Success
                     ? GetEndOfBracketIndex('<', '>', entityDeclaration, templateMatch.Index)
                     : -1;
                 var noTemplateDeclaration = entityDeclaration[(templateEndIndex + 1)..];
-                var declarationWords = noTemplateDeclaration
+
+                var parameterLessDeclaration = noTemplateDeclaration;
+                bool hasParameters;
+                {
+                    var parameterIndex = parameterLessDeclaration.IndexOf('(');
+                    hasParameters = parameterIndex >= 0;
+                    if (hasParameters)
+                        parameterLessDeclaration = parameterLessDeclaration[..parameterIndex];
+                }
+                var attributeLessDeclaration = parameterLessDeclaration;
+                bool hasAttributes;
+                {
+                    var parameterIndex = parameterLessDeclaration.IndexOf('[');
+                    hasAttributes = parameterIndex >= 0;
+                    if (hasAttributes)
+                        attributeLessDeclaration = parameterLessDeclaration[..parameterIndex]
+                            + parameterLessDeclaration[parameterLessDeclaration.IndexOf(']', parameterIndex)..];
+                }
+
+                var cleanedDeclarationWords = parameterLessDeclaration
                     .Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)
                     .ToList();
 
                 IEnumerable <SourceEntity> nestedEntities = [];
 
-                bool IsType(string type) => declarationWords[0] == type;
+                bool IsType(string type) => cleanedDeclarationWords[0] == type;
                 bool isStruct = IsType("struct");
                 var entityType = isStruct ? EntityTypes.Class
                     : IsType("class") ? EntityTypes.Class
@@ -154,99 +177,262 @@ namespace CompWolf.Docs.Server.Data
                     : IsType("enum") ? EntityTypes.Enum
                     : IsType("using") ? EntityTypes.Alias
                     : IsType("#define") ? EntityTypes.Macro
-                    : noTemplateDeclaration.Contains('(') ? EntityTypes.Function
+                    : hasParameters ? EntityTypes.Function
                     : EntityTypes.Variable;
 
                 if (entityType == EntityTypes.Class)
                 {
                     nestedEntities = SplitIntoMemberGroups(entityBody, isStruct)
-                        .SelectMany(x => GetEntities(x.Value, namespaceName));
+                        .Where(x => x.Key.visibility != "private")
+                        .SelectMany(x => GetEntities(x.Value, namespaceName))
+                        .GroupBy(x => x.Name)
+                        .Select(entityEnumerator =>
+                        {
+                            var entityGroup = entityEnumerator.ToList();
+                            var entity = entityGroup.First();
+
+                            if (entityGroup.Count == 1) return entity;
+
+                            for (int i = 1; string.IsNullOrEmpty(entity.BriefDescription) && i < entityGroup.Count; ++i)
+                            {
+                                entity.BriefDescription = entityGroup[i].BriefDescription;
+                            }
+
+                            entity.Declarations = entityGroup.SelectMany(x => x.Declarations).ToArray();
+
+                            return entity;
+                        });
                 }
 
                 var entityName = entityType switch
                 {
-                    EntityTypes.Class => declarationWords[1].StartsWith('[')
-                        ? declarationWords[2]
-                        : declarationWords[1],
-                    EntityTypes.Function => Regex.Match(noTemplateDeclaration, @"(\S+)\s*\(").Groups[1].Value,
-                    EntityTypes.Macro => declarationWords[1][0..declarationWords[1].IndexOf('(')],
-                    EntityTypes.Alias => declarationWords[1],
-                    EntityTypes.Concept => declarationWords[1],
-                    EntityTypes.Variable => declarationWords[1],
-                    _ => throw new ArgumentOutOfRangeException("Tried deserializing entity of unknown type")
+                    EntityTypes.Class => cleanedDeclarationWords[1],
+                    EntityTypes.Function => cleanedDeclarationWords.Last(),
+                    EntityTypes.Macro => cleanedDeclarationWords.Last(),
+                    EntityTypes.Alias => cleanedDeclarationWords.Last(),
+                    EntityTypes.Concept => cleanedDeclarationWords.Last(),
+                    EntityTypes.Variable => cleanedDeclarationWords.Last(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(text),
+                        "Tried deserializing entity of unknown type")
                 };
 
-                List<string> mainComment = [];
-                Dictionary<string, List<string>> parameterComment = [];
-                List<string> returnComment = [];
-                List<string> throwComment = [];
+                    string mainComment, briefComment, returnComment, throwComment;
+                Dictionary<string, string> parameterComments;
                 {
-                    var commentTarget = mainComment;
-                    foreach (var line in entityComment.Split(Environment.NewLine))
+                    List<string> mainCommentLines = [];
+                    List<string> briefCommentLines = [];
+                    Dictionary<string, List<string>> parameterCommentLines = [];
+                    List<string> returnCommentLines = [];
+                    List<string> throwCommentLines = [];
                     {
-                        var newCommentText = line.TrimStart(' ', '*').TrimEnd();
-                        var sectionMatch = Regex.Match(line, @"^@(\w+)\s");
-                        if (sectionMatch.Success)
+                        var commentTarget = mainCommentLines;
+                        foreach (var line in entityComment.Split(Environment.NewLine))
                         {
-                            newCommentText = newCommentText[sectionMatch.Length..];
-
-                            switch (sectionMatch.Groups[1].Value)
+                            var newCommentText = line.TrimStart(' ', '*').TrimEnd();
+                            var sectionMatch = Regex.Match(line, @"^@(\w+)\s");
+                            if (sectionMatch.Success)
                             {
-                                case "param":
-                                    var splitCommentText = newCommentText.Split(' ', 1);
-                                    newCommentText = splitCommentText[1].TrimStart();
-                                    commentTarget = parameterComment[splitCommentText[0]] = [];
-                                    break;
-                                case "return":
-                                    commentTarget = returnComment;
-                                    break;
-                                case "throws":
-                                    commentTarget = throwComment;
-                                    break;
-                                default:
-                                    throw new FormatException($"Cannot deserialize Javadoc tag {sectionMatch.Groups[1]}");
-                            }
-                        }
+                                newCommentText = newCommentText[sectionMatch.Length..];
 
-                        commentTarget.Add(line.Trim());
+                                switch (sectionMatch.Groups[1].Value)
+                                {
+                                    case "param":
+                                        var splitCommentText = newCommentText.Split(' ', 1);
+                                        newCommentText = splitCommentText[1].TrimStart();
+                                        commentTarget = parameterCommentLines[splitCommentText[0]] = [];
+                                        break;
+                                    case "return":
+                                        commentTarget = returnCommentLines;
+                                        break;
+                                    case "brief":
+                                        commentTarget = briefCommentLines;
+                                        break;
+                                    case "throws":
+                                        commentTarget = throwCommentLines;
+                                        break;
+                                    default:
+                                        throw new FormatException($"Cannot deserialize Javadoc tag {sectionMatch.Groups[1]}");
+                                }
+                            }
+
+                            commentTarget.Add(line.Trim());
+                        }
                     }
+
+                    mainComment = string.Join(Environment.NewLine, mainCommentLines);
+                    briefComment = string.Join(Environment.NewLine, briefCommentLines);
+                    returnComment = string.Join(Environment.NewLine, returnCommentLines);
+                    throwComment = string.Join(Environment.NewLine, throwCommentLines);
+                    parameterComments = parameterCommentLines.Select(x => (x.Key, string.Join(Environment.NewLine, x.Value)))
+                        .ToDictionary();
                 }
 
-                yield return new()
+                switch (entityType)
                 {
-                    Name = entityName,
-                    Type = entityType,
-                    BriefDescription = string.Join(Environment.NewLine, mainComment),
-                    Members = nestedEntities.ToArray(),
-                };
+                    case EntityTypes.Class:
+                    case EntityTypes.Concept:
+                    case EntityTypes.Function:
+                    case EntityTypes.Variable:
+                    case EntityTypes.Enum:
+                    case EntityTypes.Alias:
+                        if (entityDeclaration.EndsWith(';') is false)
+                            entityDeclaration += ';';
+                        break;
+                    default: break;
+                }
+
+
+                if (entityName.Contains("::") is false)
+                {
+                    yield return new()
+                    {
+                        Name = entityName,
+                        Type = entityType,
+                        BriefDescription =  briefComment,
+                        Declarations = [new()
+                        {
+                            Description = mainComment,
+                            Declaration = entityDeclaration,
+                        }],
+                        ReturnDescription = returnComment,
+                        ParameterDescriptions = parameterComments,
+                        ThrowDescription = throwComment,
+                        Members = nestedEntities.ToArray(),
+                        Namespace = namespaceName,
+                    };
+                }
             }
         }
 
-        static IEnumerable<(string comment, string declaration, string body)> SplitMemberGroupIntoMember(string text)
+        class MemberString
         {
-            Match commentMatch;
-            while ((commentMatch = Regex.Match(text, @"\/\*(\*[\s\S]*?)\*\/")).Success)
+            public string Comment { get; set; } = "";
+            public string Declaration { get; set; } = "";
+            public string Body { get; set; } = "";
+        }
+        static IEnumerable<MemberString> SplitMemberGroupIntoMember(string text)
+        {
+            if (string.IsNullOrEmpty(text)) yield break;
+
+            for (int declarationIndex = (text[0] == '{') ? 1 : 0; declarationIndex < text.Length; ++declarationIndex)
             {
-                var commentIndex = commentMatch.Index;
-                var declarationIndex = commentIndex + commentMatch.Length;
-                var bodyIndex = text.IndexOfAny([';', '{'], declarationIndex);
-                var bodyEndIndex = text[bodyIndex] == ';'
-                    ? bodyIndex
-                    : GetEndOfBracketIndex('{', '}', text, bodyIndex);
+                int bodyIndex, endIndex;
+                {
+                    var firstChar = text[declarationIndex];
 
-                var comment = text[commentIndex..(declarationIndex - 1)];
-                var declaration = text[bodyIndex] == ';'
-                    ? text[declarationIndex..bodyIndex]
-                    : text[declarationIndex..(bodyIndex - 1)]
-                ;
-                var body = text[bodyIndex] == ';'
-                    ? ""
-                    : text[bodyIndex..bodyEndIndex]
-                ;
+                    if (char.IsWhiteSpace(firstChar)) continue;
+                    if (firstChar == '{')
+                    {
+                        declarationIndex = GetEndOfBracketIndex('{', '}', text, firstChar);
+                        continue;
+                    }
+                    if (firstChar == '(')
+                    {
+                        declarationIndex = GetEndOfBracketIndex('(', ')', text, firstChar);
+                        continue;
+                    }
+                    if (firstChar == '/')
+                    {
+                        switch (text[declarationIndex + 1])
+                        {
+                            case '/':
+                                declarationIndex = text.IndexOf(Environment.NewLine, declarationIndex + 2);
+                                continue;
+                            case '*':
+                                declarationIndex = text.IndexOf("*/", declarationIndex + 2) + 2;
+                                continue;
+                            default: break;
+                        }
+                    }
 
-                yield return (comment, declaration, body);
+                    bodyIndex = declarationIndex + 1;
+                    var macroMatch = Regex.Match(text[bodyIndex..], @"^\s*#define\s+");
+                    if (macroMatch.Success)
+                    {
+                        bodyIndex += macroMatch.Length;
 
-                text = text[bodyEndIndex..];
+                        var parenthesisMatch = Regex.Match(text[bodyIndex..], @"^\s\(");
+                        if (parenthesisMatch.Success)
+                        {
+                            bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex + parenthesisMatch.Length - 1);
+                        }
+
+                        endIndex = text.IndexOf(Environment.NewLine, bodyIndex);
+                    }
+                    else
+                    {
+                        for (; bodyIndex < text.Length; ++bodyIndex)
+                        {
+                            switch (text[bodyIndex])
+                            {
+                                case ';':
+                                    ++bodyIndex; // no body, so ";" is part of declaration
+                                    break;
+                                case '{': break;
+                                case '=':
+                                    if (Regex.Match(text[..bodyIndex], @"\soperator\s*$").Success)
+                                        continue; // "=" in method name "operator=" is not the end
+                                    else
+                                        break;
+                                case '<':
+                                    bodyIndex = GetEndOfBracketIndex('<', '>', text, bodyIndex);
+                                    continue;
+                                case '(':
+                                    bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex);
+                                    continue;
+                                default: continue;
+                            }
+                            break;
+                        }
+                        if (bodyIndex == text.Length)
+                            throw new FormatException($"Cannot find end of member ${text[declarationIndex..Math.Min(text.Length, declarationIndex + 32)]}...");
+
+                        endIndex = bodyIndex;
+                        if (text[endIndex] == '{') endIndex = GetEndOfBracketIndex('{', '}', text, endIndex);
+                        if (text[endIndex] == '=') endIndex = text.IndexOf(';', bodyIndex + 1) + 1;
+                    }
+                }
+
+                {
+                    MemberString member = new()
+                    {
+                        Comment = text[0..declarationIndex],
+                        Declaration = text[declarationIndex..bodyIndex],
+                        Body = text[bodyIndex..endIndex],
+                    };
+
+                    int previousWordEndIndex;
+                    for (previousWordEndIndex = declarationIndex - 1;
+                        previousWordEndIndex > 0 && char.IsWhiteSpace(text[previousWordEndIndex]);
+                        --previousWordEndIndex)
+                    { }
+
+                    if (previousWordEndIndex > 0)
+                    {
+                        int previousLineIndex = text.LastIndexOf(Environment.NewLine, previousWordEndIndex);
+                        previousLineIndex = previousLineIndex < 0
+                            ? 0
+                            : previousLineIndex + Environment.NewLine.Length;
+                        var firstLine = text[previousLineIndex..(previousWordEndIndex + 1)].TrimStart();
+
+                        if (firstLine.StartsWith("//"))
+                        {
+                            member.Comment = firstLine[2..];
+                        }
+                        else if (text[(previousWordEndIndex - 1)..(previousWordEndIndex + 1)] == "*/")
+                        {
+                            var commentIndex = text.LastIndexOf("/*", previousWordEndIndex - 1);
+                            member.Comment = text[(commentIndex + 1)..(previousWordEndIndex - 1)];
+                        }
+                    }
+
+                    member.Comment = member.Comment.TrimEnd();
+                    member.Declaration = member.Declaration.TrimEnd();
+                    member.Body = member.Body.TrimEnd();
+                    yield return member;
+                }
+
+                declarationIndex = endIndex;
             }
         }
         static IEnumerable<(string, string)> SplitTextIntoNamespaces(string text)
@@ -259,8 +445,7 @@ namespace CompWolf.Docs.Server.Data
             {
                 if (text[i] == '{')
                 {
-                    string namespacePattern = @"namespace\s+([\w\:]+)\s*$";
-                    var namespaceMatch = Regex.Match(text[0..i], namespacePattern);
+                    var namespaceMatch = Regex.Match(text[0..i], @"namespace\s+([\w\:]+)\s*$");
                     if (namespaceMatch.Success)
                     {
                         var name = namespaceMatch.Groups[1].Value;
@@ -301,7 +486,7 @@ namespace CompWolf.Docs.Server.Data
                 .Select(space =>
                 {
                     var name = space.name;
-                    var body = text[space.startIndex..space.paranthesisLevel];
+                    var body = text[(space.startIndex + 1)..space.paranthesisLevel];
                     var subspaces = space.subnamespaces
                         .Select(subspaceName =>
                         {
@@ -338,7 +523,7 @@ namespace CompWolf.Docs.Server.Data
                     {
                         case "{":
                             var newI = GetEndOfBracketIndex("{", "}", textSplit, i);
-                            groups[currentGroup] = string.Join(null, [groups[currentGroup], .. textSplit[i..newI]]);
+                            groups[currentGroup] = string.Join(null, [groups[currentGroup], .. textSplit[i..(newI + 1)]]);
                             i = newI;
                             continue;
                         case "}": break;
@@ -372,6 +557,7 @@ namespace CompWolf.Docs.Server.Data
             return results;
         }
 
+        /// <param name="startIndex"> The index of the start bracket to find the end of. </param>
         static int GetEndOfBracketIndex<Char, String>(Char startBracket, Char endBracket, String text, int startIndex = 0)
             where Char : IEquatable<Char>
             where String : IEnumerable<Char>
@@ -395,5 +581,10 @@ namespace CompWolf.Docs.Server.Data
             }
             throw new FormatException($"Could not find {endBracket} to pair with {startBracket}");
         }
+        /// <param name="startIndex"> The index of the end bracket to find the end of. </param>
+        static int GetEndOfBracketIndexReverse<Char, String>(Char startBracket, Char endBracket, String text, int startIndex)
+            where Char : IEquatable<Char>
+            where String : IEnumerable<Char>
+            => startIndex - GetEndOfBracketIndex(endBracket, startBracket, text.Take(startIndex + 1).Reverse());
     }
 }
