@@ -123,17 +123,20 @@ namespace CompWolf.Docs.Server.Data
             }
 
             var fileData = await File.ReadAllTextAsync(filePath);
-            var data = SplitTextIntoNamespaces(fileData)
-                .SelectMany(x => GetEntities(x.Item2, x.Item1))
+            var data = Namespace.SplitText(fileData)
+                .SelectMany(GetEntitiesFromNamespace)
                 .ToArray();
 
             _entityCache[filePath] = (data, fileTime);
 
             return data;
         }
-        static IEnumerable<SourceEntity> GetEntities(string text, string namespaceName)
+        static IEnumerable<SourceEntity> GetEntitiesFromNamespace(Namespace space)
         {
-            foreach (var entityText in SplitMemberGroupIntoMember(text))
+            var namespaceName = space.Name;
+            var text = space.Text;
+
+            foreach (var entityText in MemberEntity.SplitText(text))
             {
                 var entityComment = entityText.Comment;
                 var entityDeclaration = entityText.Declaration;
@@ -167,7 +170,8 @@ namespace CompWolf.Docs.Server.Data
                     .Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)
                     .ToList();
 
-                IEnumerable <SourceEntity> nestedEntities = [];
+                Dictionary<string, SourceEntity[]> nestedEntities = [];
+                SourceEntity? constructor = null;
 
                 bool IsType(string type) => cleanedDeclarationWords[0] == type;
                 bool isStruct = IsType("struct");
@@ -180,30 +184,6 @@ namespace CompWolf.Docs.Server.Data
                     : hasParameters ? EntityTypes.Function
                     : EntityTypes.Variable;
 
-                if (entityType == EntityTypes.Class)
-                {
-                    nestedEntities = SplitIntoMemberGroups(entityBody, isStruct)
-                        .Where(x => x.Key.visibility != "private")
-                        .SelectMany(x => GetEntities(x.Value, namespaceName))
-                        .GroupBy(x => x.Name)
-                        .Select(entityEnumerator =>
-                        {
-                            var entityGroup = entityEnumerator.ToList();
-                            var entity = entityGroup.First();
-
-                            if (entityGroup.Count == 1) return entity;
-
-                            for (int i = 1; string.IsNullOrEmpty(entity.BriefDescription) && i < entityGroup.Count; ++i)
-                            {
-                                entity.BriefDescription = entityGroup[i].BriefDescription;
-                            }
-
-                            entity.Declarations = entityGroup.SelectMany(x => x.Declarations).ToArray();
-
-                            return entity;
-                        });
-                }
-
                 var entityName = entityType switch
                 {
                     EntityTypes.Class => cleanedDeclarationWords[1],
@@ -212,11 +192,59 @@ namespace CompWolf.Docs.Server.Data
                     EntityTypes.Alias => cleanedDeclarationWords.Last(),
                     EntityTypes.Concept => cleanedDeclarationWords.Last(),
                     EntityTypes.Variable => cleanedDeclarationWords.Last(),
-                    _ => throw new ArgumentOutOfRangeException(nameof(text),
+                    _ => throw new ArgumentOutOfRangeException(nameof(space),
                         "Tried deserializing entity of unknown type")
                 };
 
-                    string mainComment, briefComment, returnComment, throwComment;
+                if (entityType == EntityTypes.Class)
+                {
+                    nestedEntities = MemberGroup.SplitText(entityBody, isStruct)
+                        .Select(x => (x.GroupName, x.TextPerVisibility
+                                .Where(x => x.Key != "private")
+                                .SelectMany(x => GetEntitiesFromNamespace(new()
+                                {
+                                    Name = namespaceName,
+                                    Text = x.Value,
+                                })
+                                    .Select(Value => (x.Key, Value)))
+                                .GroupBy(x => x.Value.Name)
+                                .Select(entityEnumerator =>
+                                {
+                                    var entityGroup = entityEnumerator.ToList();
+                                    var entity = entityGroup.First().Value;
+
+                                    if (entityGroup.Count == 1) return entity;
+
+                                    for (int i = 1; string.IsNullOrEmpty(entity.BriefDescription) && i < entityGroup.Count; ++i)
+                                    {
+                                        entity.BriefDescription = entityGroup[i].Value.BriefDescription;
+                                    }
+
+                                    entity.Declarations = entityGroup.SelectMany(x => x.Value.Declarations).ToArray();
+
+                                    if (entityGroup.First().Key == "protected")
+                                        foreach (var declaration in entity.Declarations)
+                                            declaration.Protected = true;
+
+                                    return entity;
+                                })
+                                .ToArray()
+                            ))
+                            .ToDictionary();
+
+                    if (nestedEntities.TryGetValue("constructors", out var constructors))
+                    {
+                        nestedEntities.Remove("constructors");
+                        constructor = CombineEntities(constructors);
+                        if (constructor is not null)
+                        {
+                            constructor.Name = entityName;
+                            constructor.Type = EntityTypes.Function;
+                        }
+                    }
+                }
+
+                string mainComment, briefComment, returnComment, throwComment;
                 Dictionary<string, string> parameterComments;
                 {
                     List<string> mainCommentLines = [];
@@ -294,271 +322,292 @@ namespace CompWolf.Docs.Server.Data
                             Description = mainComment,
                             Declaration = entityDeclaration,
                         }],
+                        Namespace = namespaceName,
+                        Constructors = constructor,
+                        Members = nestedEntities,
                         ReturnDescription = returnComment,
                         ParameterDescriptions = parameterComments,
                         ThrowDescription = throwComment,
-                        Members = nestedEntities.ToArray(),
-                        Namespace = namespaceName,
                     };
                 }
             }
         }
 
-        class MemberString
+        public class MemberEntity
         {
             public string Comment { get; set; } = "";
             public string Declaration { get; set; } = "";
             public string Body { get; set; } = "";
-        }
-        static IEnumerable<MemberString> SplitMemberGroupIntoMember(string text)
-        {
-            if (string.IsNullOrEmpty(text)) yield break;
 
-            for (int declarationIndex = (text[0] == '{') ? 1 : 0; declarationIndex < text.Length; ++declarationIndex)
+            public static IEnumerable<MemberEntity> SplitText(string text)
             {
-                int bodyIndex, endIndex;
+                if (string.IsNullOrEmpty(text)) yield break;
+
+                for (int declarationIndex = (text[0] == '{') ? 1 : 0; declarationIndex < text.Length; ++declarationIndex)
                 {
-                    var firstChar = text[declarationIndex];
+                    int bodyIndex, endIndex;
+                    {
+                        var firstChar = text[declarationIndex];
 
-                    if (char.IsWhiteSpace(firstChar)) continue;
-                    if (firstChar == '{')
-                    {
-                        declarationIndex = GetEndOfBracketIndex('{', '}', text, firstChar);
-                        continue;
-                    }
-                    if (firstChar == '(')
-                    {
-                        declarationIndex = GetEndOfBracketIndex('(', ')', text, firstChar);
-                        continue;
-                    }
-                    if (firstChar == '/')
-                    {
-                        switch (text[declarationIndex + 1])
+                        if (char.IsWhiteSpace(firstChar)) continue;
+                        if (firstChar == '{')
                         {
-                            case '/':
-                                declarationIndex = text.IndexOf(Environment.NewLine, declarationIndex + 2);
-                                continue;
-                            case '*':
-                                declarationIndex = text.IndexOf("*/", declarationIndex + 2) + 2;
-                                continue;
-                            default: break;
+                            declarationIndex = GetEndOfBracketIndex('{', '}', text, firstChar);
+                            continue;
                         }
-                    }
-
-                    bodyIndex = declarationIndex + 1;
-                    var macroMatch = Regex.Match(text[bodyIndex..], @"^\s*#define\s+");
-                    if (macroMatch.Success)
-                    {
-                        bodyIndex += macroMatch.Length;
-
-                        var parenthesisMatch = Regex.Match(text[bodyIndex..], @"^\s\(");
-                        if (parenthesisMatch.Success)
+                        if (firstChar == '(')
                         {
-                            bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex + parenthesisMatch.Length - 1);
+                            declarationIndex = GetEndOfBracketIndex('(', ')', text, firstChar);
+                            continue;
                         }
-
-                        endIndex = text.IndexOf(Environment.NewLine, bodyIndex);
-                    }
-                    else
-                    {
-                        for (; bodyIndex < text.Length; ++bodyIndex)
+                        if (firstChar == '/')
                         {
-                            switch (text[bodyIndex])
+                            switch (text[declarationIndex + 1])
                             {
-                                case ';':
-                                    ++bodyIndex; // no body, so ";" is part of declaration
-                                    break;
-                                case '{': break;
-                                case '=':
-                                    if (Regex.Match(text[..bodyIndex], @"\soperator\s*$").Success)
-                                        continue; // "=" in method name "operator=" is not the end
-                                    else
-                                        break;
-                                case '<':
-                                    bodyIndex = GetEndOfBracketIndex('<', '>', text, bodyIndex);
+                                case '/':
+                                    declarationIndex = text.IndexOf(Environment.NewLine, declarationIndex + 2);
                                     continue;
-                                case '(':
-                                    bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex);
+                                case '*':
+                                    declarationIndex = text.IndexOf("*/", declarationIndex + 2) + 2;
                                     continue;
-                                default: continue;
+                                default: break;
                             }
-                            break;
                         }
-                        if (bodyIndex == text.Length)
-                            throw new FormatException($"Cannot find end of member ${text[declarationIndex..Math.Min(text.Length, declarationIndex + 32)]}...");
 
-                        endIndex = bodyIndex;
-                        if (text[endIndex] == '{') endIndex = GetEndOfBracketIndex('{', '}', text, endIndex);
-                        if (text[endIndex] == '=') endIndex = text.IndexOf(';', bodyIndex + 1) + 1;
-                    }
-                }
-
-                {
-                    MemberString member = new()
-                    {
-                        Comment = text[0..declarationIndex],
-                        Declaration = text[declarationIndex..bodyIndex],
-                        Body = text[bodyIndex..endIndex],
-                    };
-
-                    int previousWordEndIndex;
-                    for (previousWordEndIndex = declarationIndex - 1;
-                        previousWordEndIndex > 0 && char.IsWhiteSpace(text[previousWordEndIndex]);
-                        --previousWordEndIndex)
-                    { }
-
-                    if (previousWordEndIndex > 0)
-                    {
-                        int previousLineIndex = text.LastIndexOf(Environment.NewLine, previousWordEndIndex);
-                        previousLineIndex = previousLineIndex < 0
-                            ? 0
-                            : previousLineIndex + Environment.NewLine.Length;
-                        var firstLine = text[previousLineIndex..(previousWordEndIndex + 1)].TrimStart();
-
-                        if (firstLine.StartsWith("//"))
+                        bodyIndex = declarationIndex + 1;
+                        var macroMatch = Regex.Match(text[bodyIndex..], @"^\s*#define\s+");
+                        if (macroMatch.Success)
                         {
-                            member.Comment = firstLine[2..];
+                            bodyIndex += macroMatch.Length;
+
+                            var parenthesisMatch = Regex.Match(text[bodyIndex..], @"^\s\(");
+                            if (parenthesisMatch.Success)
+                            {
+                                bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex + parenthesisMatch.Length - 1);
+                            }
+
+                            endIndex = text.IndexOf(Environment.NewLine, bodyIndex);
                         }
-                        else if (text[(previousWordEndIndex - 1)..(previousWordEndIndex + 1)] == "*/")
+                        else
                         {
-                            var commentIndex = text.LastIndexOf("/*", previousWordEndIndex - 1);
-                            member.Comment = text[(commentIndex + 1)..(previousWordEndIndex - 1)];
+                            for (; bodyIndex < text.Length; ++bodyIndex)
+                            {
+                                switch (text[bodyIndex])
+                                {
+                                    case ';':
+                                        ++bodyIndex; // no body, so ";" is part of declaration
+                                        break;
+                                    case '{': break;
+                                    case '=':
+                                        if (Regex.Match(text[..bodyIndex], @"\soperator\s*$").Success)
+                                            continue; // "=" in method name "operator=" is not the end
+                                        else
+                                            break;
+                                    case '<':
+                                        bodyIndex = GetEndOfBracketIndex('<', '>', text, bodyIndex);
+                                        continue;
+                                    case '(':
+                                        bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex);
+                                        continue;
+                                    default: continue;
+                                }
+                                break;
+                            }
+                            if (bodyIndex == text.Length)
+                                throw new FormatException($"Cannot find end of member ${text[declarationIndex..Math.Min(text.Length, declarationIndex + 32)]}...");
+
+                            endIndex = bodyIndex;
+                            if (text[endIndex] == '{') endIndex = GetEndOfBracketIndex('{', '}', text, endIndex);
+                            if (text[endIndex] == '=') endIndex = text.IndexOf(';', bodyIndex + 1) + 1;
                         }
                     }
 
-                    member.Comment = member.Comment.TrimEnd();
-                    member.Declaration = member.Declaration.TrimEnd();
-                    member.Body = member.Body.TrimEnd();
-                    yield return member;
-                }
+                    {
+                        MemberEntity member = new()
+                        {
+                            Comment = text[0..declarationIndex],
+                            Declaration = text[declarationIndex..bodyIndex],
+                            Body = text[bodyIndex..endIndex],
+                        };
 
-                declarationIndex = endIndex;
+                        int previousWordEndIndex;
+                        for (previousWordEndIndex = declarationIndex - 1;
+                            previousWordEndIndex > 0 && char.IsWhiteSpace(text[previousWordEndIndex]);
+                            --previousWordEndIndex)
+                        { }
+
+                        if (previousWordEndIndex > 0)
+                        {
+                            int previousLineIndex = text.LastIndexOf(Environment.NewLine, previousWordEndIndex);
+                            previousLineIndex = previousLineIndex < 0
+                                ? 0
+                                : previousLineIndex + Environment.NewLine.Length;
+                            var firstLine = text[previousLineIndex..(previousWordEndIndex + 1)].TrimStart();
+
+                            if (firstLine.StartsWith("//"))
+                            {
+                                member.Comment = firstLine[2..];
+                            }
+                            else if (text[(previousWordEndIndex - 1)..(previousWordEndIndex + 1)] == "*/")
+                            {
+                                var commentIndex = text.LastIndexOf("/*", previousWordEndIndex - 1);
+                                member.Comment = text[(commentIndex + 1)..(previousWordEndIndex - 1)];
+                            }
+                        }
+
+                        member.Comment = member.Comment.TrimEnd();
+                        member.Declaration = member.Declaration.TrimEnd();
+                        member.Body = member.Body.TrimEnd();
+                        yield return member;
+                    }
+
+                    declarationIndex = endIndex;
+                }
             }
         }
-        static IEnumerable<(string, string)> SplitTextIntoNamespaces(string text)
+
+        public class MemberGroup
         {
-            //After search, paranthesisLevel becomes endIndex
-            LinkedList<(string name, int startIndex, int paranthesisLevel, List<string> subnamespaces)> namespaceData = [];
-            int namespaceWithoutEndCount = 0;
+            public string GroupName { get; set; } = "";
+            public Dictionary<string, string> TextPerVisibility { get; set; } = [];
 
-            for (int i = text.IndexOf('{'); i >= 0; i = text.IndexOfAny(['{', '}'], i + 1))
+            public static IEnumerable<MemberGroup> SplitText(string text, bool publicByDefault)
             {
-                if (text[i] == '{')
+                var visibilityPattern = @"(public|protected|private):";
+                Dictionary<string, string> groups = [];
                 {
-                    var namespaceMatch = Regex.Match(text[0..i], @"namespace\s+([\w\:]+)\s*$");
-                    if (namespaceMatch.Success)
-                    {
-                        var name = namespaceMatch.Groups[1].Value;
-                        if (namespaceWithoutEndCount > 0)
-                        {
-                            name = $"{namespaceData.Last!.Value.name}::{name}";
-                            namespaceData.Last!.ValueRef.subnamespaces.Add(name);
-                        }
+                    var textSplit = Regex.Split(text, @"({)|(})|" + visibilityPattern + @"\s*\/\/\s*(.+)");
 
-                        namespaceData.AddLast((name, i, 0, []));
-                        ++namespaceWithoutEndCount;
+                    var currentGroup = "";
+                    groups.Add(currentGroup, (publicByDefault ? "public:" : "private:") + textSplit[2]);
+
+                    for (int i = 3; i < textSplit.Length; ++i)
+                    {
+                        switch (textSplit[i])
+                        {
+                            case "{":
+                                var newI = GetEndOfBracketIndex("{", "}", textSplit, i);
+                                groups[currentGroup] = string.Join(null, [groups[currentGroup], .. textSplit[i..(newI + 1)]]);
+                                i = newI;
+                                continue;
+                            case "}": break;
+                            default:
+                                var visibility = textSplit[i];
+                                currentGroup = textSplit[++i].Trim();
+                                var body = textSplit[++i];
+                                groups[currentGroup] = visibility + ':' + body;
+                                continue;
+                        }
+                        break;
+                    }
+                }
+
+                return groups
+                    .Select(text =>
+                    {
+                        var result = new MemberGroup()
+                        {
+                            GroupName = text.Key,
+                            TextPerVisibility = new(),
+                        };
+                        result.TextPerVisibility.Add("public", "");
+                        result.TextPerVisibility.Add("protected", "");
+                        result.TextPerVisibility.Add("private", "");
+
+                        var sections = Regex.Split(text.Value, visibilityPattern);
+                        for (int i = 1; i < sections.Length; i += 2)
+                        {
+                            var sectionVisibility = sections[i];
+                            var sectionBody = sections[i + 1];
+                            result.TextPerVisibility[sectionVisibility] += sectionBody;
+                        }
+                        return result;
+                    });
+            }
+        }
+        public class Namespace
+        {
+            public string Name { get; set; } = "";
+            public string Text { get; set; } = "";
+
+            public static IEnumerable<Namespace> SplitText(string text)
+            {
+                //After search, paranthesisLevel becomes endIndex
+                LinkedList<(string name, int startIndex, int paranthesisLevel, List<string> subnamespaces)> namespaceData = [];
+                int namespaceWithoutEndCount = 0;
+
+                for (int i = text.IndexOf('{'); i >= 0; i = text.IndexOfAny(['{', '}'], i + 1))
+                {
+                    if (text[i] == '{')
+                    {
+                        var namespaceMatch = Regex.Match(text[0..i], @"namespace\s+([\w\:]+)\s*$");
+                        if (namespaceMatch.Success)
+                        {
+                            var name = namespaceMatch.Groups[1].Value;
+                            if (namespaceWithoutEndCount > 0)
+                            {
+                                name = $"{namespaceData.Last!.Value.name}::{name}";
+                                namespaceData.Last!.ValueRef.subnamespaces.Add(name);
+                            }
+
+                            namespaceData.AddLast((name, i, 0, []));
+                            ++namespaceWithoutEndCount;
+                        }
+                        else
+                        {
+                            if (namespaceWithoutEndCount > 0)
+                                ++namespaceData.Last!.ValueRef.paranthesisLevel;
+                        }
                     }
                     else
                     {
-                        if (namespaceWithoutEndCount > 0)
-                            ++namespaceData.Last!.ValueRef.paranthesisLevel;
-                    }
-                }
-                else
-                {
-                    if (namespaceData.Last != null)
-                    {
-                        --namespaceData.Last.ValueRef.paranthesisLevel;
-                        var (name, startIndex, paranthesisLevel, subnamespaces) = namespaceData.Last.Value;
-                        if (paranthesisLevel < 0)
+                        if (namespaceData.Last != null)
                         {
-                            namespaceData.AddFirst((name, startIndex, i, subnamespaces));
-                            namespaceData.RemoveLast();
-                            --namespaceWithoutEndCount;
+                            --namespaceData.Last.ValueRef.paranthesisLevel;
+                            var (name, startIndex, paranthesisLevel, subnamespaces) = namespaceData.Last.Value;
+                            if (paranthesisLevel < 0)
+                            {
+                                namespaceData.AddFirst((name, startIndex, i, subnamespaces));
+                                namespaceData.RemoveLast();
+                                --namespaceWithoutEndCount;
+                            }
                         }
                     }
                 }
-            }
-            if (namespaceWithoutEndCount > 0)
-                throw new FormatException($"Could not find end of namespace (}})");
+                if (namespaceWithoutEndCount > 0)
+                    throw new FormatException($"Could not find end of namespace (}})");
 
-            return namespaceData
-                .Select(space =>
-                {
-                    var name = space.name;
-                    var body = text[(space.startIndex + 1)..space.paranthesisLevel];
-                    var subspaces = space.subnamespaces
-                        .Select(subspaceName =>
+                return namespaceData
+                    .Select(space =>
+                    {
+                        var name = space.name;
+                        var body = text[(space.startIndex + 1)..space.paranthesisLevel];
+                        var subspaces = space.subnamespaces
+                            .Select(subspaceName =>
+                            {
+                                var subspace = namespaceData.First(x => x.name == subspaceName);
+                                return (subspace.startIndex, subspace.paranthesisLevel);
+                            }
+                        );
+                        var indexOffset = space.startIndex;
+                        foreach (var (startIndex, endIndex) in subspaces)
                         {
-                            var subspace = namespaceData.First(x => x.name == subspaceName);
-                            return (subspace.startIndex, subspace.paranthesisLevel);
+                            var start = startIndex - indexOffset;
+                            var end = endIndex - indexOffset;
+                            body = body[0..start] + body[end..];
+                            indexOffset += endIndex - startIndex;
                         }
-                    );
-                    var indexOffset = space.startIndex;
-                    foreach (var (startIndex, endIndex) in subspaces)
-                    {
-                        var start = startIndex - indexOffset;
-                        var end = endIndex - indexOffset;
-                        body = body[0..start] + body[end..];
-                        indexOffset += endIndex - startIndex;
-                    }
-                    return (name, body);
-                });
-
-        }
-        static Dictionary<(string groupName, string visibility), string> SplitIntoMemberGroups
-            (string text, bool publicByDefault)
-        {
-            var visibilityPattern = @"(public|protected|private):";
-            Dictionary<string, string> groups = [];
-            {
-                var textSplit = Regex.Split(text, @"({)|(})|" + visibilityPattern + @"\s*\/\/\s*(.+)");
-
-                var currentGroup = "";
-                groups.Add(currentGroup, (publicByDefault ? "public:" : "private:") + textSplit[2]);
-
-                for (int i = 3; i < textSplit.Length; ++i)
-                {
-                    switch (textSplit[i])
-                    {
-                        case "{":
-                            var newI = GetEndOfBracketIndex("{", "}", textSplit, i);
-                            groups[currentGroup] = string.Join(null, [groups[currentGroup], .. textSplit[i..(newI + 1)]]);
-                            i = newI;
-                            continue;
-                        case "}": break;
-                        default:
-                            var visibility = textSplit[i];
-                            currentGroup = textSplit[++i].Trim();
-                            var body = textSplit[++i];
-                            groups[currentGroup] = visibility + ':' + body;
-                            continue;
-                    }
-                    break;
-                }
+                        return new Namespace()
+                        {
+                            Name = name,
+                            Text = body,
+                        };
+                    });
             }
-
-            Dictionary<(string groupName, string visibility), string> results = [];
-            foreach (var (groupName, groupBody) in groups)
-            {
-                results[(groupName, "public")] = "";
-                results[(groupName, "protected")] = "";
-                results[(groupName, "private")] = "";
-
-                var sections = Regex.Split(groupBody, visibilityPattern);
-                for (int i = 1; i < sections.Length; i += 2)
-                {
-                    var sectionVisibility = sections[i];
-                    var sectionBody = sections[i + 1];
-                    results[(groupName, sectionVisibility)] += sectionBody;
-                }
-            }
-
-            return results;
         }
 
         /// <param name="startIndex"> The index of the start bracket to find the end of. </param>
-        static int GetEndOfBracketIndex<Char, String>(Char startBracket, Char endBracket, String text, int startIndex = 0)
+        public static int GetEndOfBracketIndex<Char, String>(Char startBracket, Char endBracket, String text, int startIndex = 0)
             where Char : IEquatable<Char>
             where String : IEnumerable<Char>
         {
@@ -582,9 +631,39 @@ namespace CompWolf.Docs.Server.Data
             throw new FormatException($"Could not find {endBracket} to pair with {startBracket}");
         }
         /// <param name="startIndex"> The index of the end bracket to find the end of. </param>
-        static int GetEndOfBracketIndexReverse<Char, String>(Char startBracket, Char endBracket, String text, int startIndex)
+        public static int GetEndOfBracketIndexReverse<Char, String>(Char startBracket, Char endBracket, String text, int startIndex)
             where Char : IEquatable<Char>
             where String : IEnumerable<Char>
             => startIndex - GetEndOfBracketIndex(endBracket, startBracket, text.Take(startIndex + 1).Reverse());
+
+        public static SourceEntity? CombineEntities(IEnumerable<SourceEntity> entities)
+        {
+            var entityEnumerable = entities.GetEnumerator();
+            if (entityEnumerable.MoveNext() is false)
+                return null;
+            SourceEntity result = entityEnumerable.Current;
+
+            switch (result.Type)
+            {
+                case EntityTypes.Function: break;
+                default:
+                    throw new NotImplementedException($"Cannot combine entities of type {result.Type}");
+            }
+
+            while (entityEnumerable.MoveNext())
+            {
+                var nextResult = entityEnumerable.Current;
+
+                result.BriefDescription += nextResult.BriefDescription;
+                result.ReturnDescription += nextResult.ReturnDescription;
+                result.ThrowDescription += nextResult.ThrowDescription;
+                result.Declarations = [.. result.Declarations, .. nextResult.Declarations];
+                foreach (var x in nextResult.ParameterDescriptions)
+                    if (result.ParameterDescriptions.ContainsKey(x.Key) is false)
+                        result.ParameterDescriptions[x.Key] = x.Value;
+            }
+
+            return result;
+        }
     }
 }

@@ -3,6 +3,7 @@ import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 const DATABASE_URL = `https://localhost:7112/`
 const EXAMPLE_URL = `${DATABASE_URL}examples/`
 const API_DOCS_URL = `${DATABASE_URL}api/docs/`
+const API_SOURCE_URL = `${DATABASE_URL}api/source/`
 
 async function getJson(path) {
     const response = await fetch(path, {
@@ -32,43 +33,72 @@ export async function getExample(name) {
     return example
 }
 
-export async function getProject(project) {
-    const data = await getJson(`${API_DOCS_URL}${project}`)
-    if (data == null) return null
-    return {
-        ...data,
-        project: project,
-    }
-}
-export async function postProject(project, data) {
-    return await postJson(`${API_DOCS_URL}${project}`, data)
+export async function getRawSource() {
+    return await getJson(API_SOURCE_URL);
 }
 
-export async function getHeader(project, header) {
-    const data = await getJson(`${API_DOCS_URL}${project}/${header}`)
-    if (data == null) return null
-    return {
-        ...data,
-        project: project,
-        header: header,
-    }
+export async function getRawProject(name) {
+    return (await getJson(`${API_DOCS_URL}${name}`))
+        ?? {}
 }
-export async function postHeader(project, header, data) {
-    return await postJson(`${API_DOCS_URL}${project}/${header}`, data)
+export async function getProject(name) {
+    var source = getRawSource()
+        .projects.find(x => x.name == name);
+    var docs = await getRawProject(name)
+    return {
+        ...source,
+        ...docs
+    }
 }
 
-export async function getEntityRaw(project, header, entity) {
-    const data = await getJson(`${API_DOCS_URL}${project}/${header}/${entity}`)
-    if (data == null) return null
+export async function getRawHeader(projectName, name) {
+    return (await getJson(`${API_DOCS_URL}${projectName}/${name}`))
+        ?? {}
+}
+export async function getHeader(projectName, name) {
+    var source = getRawSource()
+        .projects.find(x => x.name == projectName)
+        .headers.find(x => x.name == name);
+    var docs = await getRawHeader(projectName, name)
     return {
-        ...data,
-        project: project,
-        header: header,
-        name: entity,
-        entity: entity,
-        owners: [],
+        ...source,
+        ...docs,
+        project: projectName,
     }
 }
+
+export async function getRawEntity(projectName, headerName, name) {
+    return (await getJson(`${API_DOCS_URL}${projectName}/${headerName}/${name}`))
+        ?? {}
+}
+export async function getEntity(projectName, headerName, name) {
+    const source = getRawSource()
+        .projects.find(x => x.name == projectName)
+        .headers.find(x => x.name == headerName)
+        .entities.find(x => x.name == name);
+    const docs = await getRawEntity(projectName, headerName, name)
+
+    var members = source.members
+    for (const [groupName, groupValue] of Object.entries(docs.members)) {
+        var sourceGroup = members[groupName]
+        for (const member of groupValue) {
+            var memberIndex = sourceGroup.findIndex(x => x.name == member.name)
+            sourceGroup[memberIndex] = {
+                ...sourceGroup[memberIndex],
+                ...member
+            }
+        }
+    }
+
+    return {
+        ...source,
+        ...docs,
+        members: members,
+        project: projectName,
+        header: headerName,
+    }
+}
+
 export async function formatRawEntity(data) {
     const returnVal = {
         ...data,
