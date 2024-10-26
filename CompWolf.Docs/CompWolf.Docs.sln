@@ -10,6 +10,8 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "compwolf.docs.client", "com
 		{2084F26F-AB0F-4304-ACC1-F1E24A49F35D} = {2084F26F-AB0F-4304-ACC1-F1E24A49F35D}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompWolf.Docs.Server.Tests", "CompWolf.Docs.Server.Tests\CompWolf.Docs.Server.Tests.csproj", "{DD327975-E5B6-4B6A-842F-0DCDD8756246}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{B431654B-9EB7-4D5F-9DA2-03ADF15D696E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B431654B-9EB7-4D5F-9DA2-03ADF15D696E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B431654B-9EB7-4D5F-9DA2-03ADF15D696E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DD327975-E5B6-4B6A-842F-0DCDD8756246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD327975-E5B6-4B6A-842F-0DCDD8756246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD327975-E5B6-4B6A-842F-0DCDD8756246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD327975-E5B6-4B6A-842F-0DCDD8756246}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

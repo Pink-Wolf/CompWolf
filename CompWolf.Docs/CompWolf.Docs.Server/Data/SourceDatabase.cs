@@ -530,6 +530,13 @@ namespace CompWolf.Docs.Server.Data
             public string Name { get; set; } = "";
             public string Text { get; set; } = "";
 
+            public override string ToString()
+                => $"{Name}: {Text}";
+            public override bool Equals(object? obj)
+                => obj is Namespace other
+                && Name.Equals(other.Name)
+                && Text.Equals(other.Text);
+
             public static IEnumerable<Namespace> SplitText(string text)
             {
                 //After search, paranthesisLevel becomes endIndex
@@ -613,7 +620,14 @@ namespace CompWolf.Docs.Server.Data
         {
             int level = 0;
             int count = startIndex;
-            var iterator = text.Skip(startIndex).GetEnumerator();
+            var iterator = (startIndex <= 0)
+                ? text.GetEnumerator()
+                : text.Skip(startIndex).GetEnumerator();
+
+            if (iterator.MoveNext() is false
+                || iterator.Current.Equals(startBracket) is false)
+                throw new ArgumentException($"Could not find {startBracket} at the start of {text}");
+
 
             for (; iterator.MoveNext(); ++count)
             {
@@ -624,17 +638,13 @@ namespace CompWolf.Docs.Server.Data
                 if (endBracket.Equals(c))
                 {
                     --level;
-                    if (level == 0)
+                    if (level < 0)
                         return count + 1;
                 }
             }
+
             throw new FormatException($"Could not find {endBracket} to pair with {startBracket}");
         }
-        /// <param name="startIndex"> The index of the end bracket to find the end of. </param>
-        public static int GetEndOfBracketIndexReverse<Char, String>(Char startBracket, Char endBracket, String text, int startIndex)
-            where Char : IEquatable<Char>
-            where String : IEnumerable<Char>
-            => startIndex - GetEndOfBracketIndex(endBracket, startBracket, text.Take(startIndex + 1).Reverse());
 
         public static SourceEntity? CombineEntities(IEnumerable<SourceEntity> entities)
         {
