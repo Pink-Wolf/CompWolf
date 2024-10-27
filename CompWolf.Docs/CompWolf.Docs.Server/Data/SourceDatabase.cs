@@ -8,6 +8,7 @@ namespace CompWolf.Docs.Server.Data
 {
     public class SourceDatabase
     {
+        public static readonly string Newline = "\r";
         public static string CompWolfProgramPath => _compWolfProgramPath;
         private static readonly string _compWolfProgramPath = GetCompWolfProgramPath();
         private static string GetCompWolfProgramPath()
@@ -100,7 +101,7 @@ namespace CompWolf.Docs.Server.Data
                 yield return new SourceHeader()
                 {
                     Name = Path.GetFileNameWithoutExtension(headerFile),
-                    BriefDescription = string.Join(Environment.NewLine, descriptions),
+                    BriefDescription = string.Join(Newline, descriptions),
                     Entities = (await Task.WhenAll(files.Select(GetEntitiesFromFile)))
                         .SelectMany(x => x)
                         .ToArray()
@@ -144,7 +145,7 @@ namespace CompWolf.Docs.Server.Data
 
                 var templateMatch = Regex.Match(entityDeclaration, @"\s*template\s*<");
                 var templateEndIndex = templateMatch.Success
-                    ? GetEndOfBracketIndex('<', '>', entityDeclaration, templateMatch.Index)
+                    ? GetEndOfBracketIndexInCode('<', '>', entityDeclaration, templateMatch.Index)
                     : -1;
                 var noTemplateDeclaration = entityDeclaration[(templateEndIndex + 1)..];
 
@@ -254,7 +255,7 @@ namespace CompWolf.Docs.Server.Data
                     List<string> throwCommentLines = [];
                     {
                         var commentTarget = mainCommentLines;
-                        foreach (var line in entityComment.Split(Environment.NewLine))
+                        foreach (var line in entityComment.Split(Newline))
                         {
                             var newCommentText = line.TrimStart(' ', '*').TrimEnd();
                             var sectionMatch = Regex.Match(line, @"^@(\w+)\s");
@@ -287,11 +288,11 @@ namespace CompWolf.Docs.Server.Data
                         }
                     }
 
-                    mainComment = string.Join(Environment.NewLine, mainCommentLines);
-                    briefComment = string.Join(Environment.NewLine, briefCommentLines);
-                    returnComment = string.Join(Environment.NewLine, returnCommentLines);
-                    throwComment = string.Join(Environment.NewLine, throwCommentLines);
-                    parameterComments = parameterCommentLines.Select(x => (x.Key, string.Join(Environment.NewLine, x.Value)))
+                    mainComment = string.Join(Newline, mainCommentLines);
+                    briefComment = string.Join(Newline, briefCommentLines);
+                    returnComment = string.Join(Newline, returnCommentLines);
+                    throwComment = string.Join(Newline, throwCommentLines);
+                    parameterComments = parameterCommentLines.Select(x => (x.Key, string.Join(Newline, x.Value)))
                         .ToDictionary();
                 }
 
@@ -352,12 +353,12 @@ namespace CompWolf.Docs.Server.Data
                         if (char.IsWhiteSpace(firstChar)) continue;
                         if (firstChar == '{')
                         {
-                            declarationIndex = GetEndOfBracketIndex('{', '}', text, firstChar);
+                            declarationIndex = GetEndOfBracketIndexInCode('{', '}', text, firstChar);
                             continue;
                         }
                         if (firstChar == '(')
                         {
-                            declarationIndex = GetEndOfBracketIndex('(', ')', text, firstChar);
+                            declarationIndex = GetEndOfBracketIndexInCode('(', ')', text, firstChar);
                             continue;
                         }
                         if (firstChar == '/')
@@ -365,7 +366,7 @@ namespace CompWolf.Docs.Server.Data
                             switch (text[declarationIndex + 1])
                             {
                                 case '/':
-                                    declarationIndex = text.IndexOf(Environment.NewLine, declarationIndex + 2);
+                                    declarationIndex = text.IndexOf(Newline, declarationIndex + 2);
                                     continue;
                                 case '*':
                                     declarationIndex = text.IndexOf("*/", declarationIndex + 2) + 2;
@@ -383,10 +384,10 @@ namespace CompWolf.Docs.Server.Data
                             var parenthesisMatch = Regex.Match(text[bodyIndex..], @"^\s\(");
                             if (parenthesisMatch.Success)
                             {
-                                bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex + parenthesisMatch.Length - 1);
+                                bodyIndex = GetEndOfBracketIndexInCode('(', ')', text, bodyIndex + parenthesisMatch.Length - 1);
                             }
 
-                            endIndex = text.IndexOf(Environment.NewLine, bodyIndex);
+                            endIndex = text.IndexOf(Newline, bodyIndex);
                         }
                         else
                         {
@@ -404,10 +405,10 @@ namespace CompWolf.Docs.Server.Data
                                         else
                                             break;
                                     case '<':
-                                        bodyIndex = GetEndOfBracketIndex('<', '>', text, bodyIndex);
+                                        bodyIndex = GetEndOfBracketIndexInCode('<', '>', text, bodyIndex);
                                         continue;
                                     case '(':
-                                        bodyIndex = GetEndOfBracketIndex('(', ')', text, bodyIndex);
+                                        bodyIndex = GetEndOfBracketIndexInCode('(', ')', text, bodyIndex);
                                         continue;
                                     default: continue;
                                 }
@@ -417,7 +418,7 @@ namespace CompWolf.Docs.Server.Data
                                 throw new FormatException($"Cannot find end of member ${text[declarationIndex..Math.Min(text.Length, declarationIndex + 32)]}...");
 
                             endIndex = bodyIndex;
-                            if (text[endIndex] == '{') endIndex = GetEndOfBracketIndex('{', '}', text, endIndex);
+                            if (text[endIndex] == '{') endIndex = GetEndOfBracketIndexInCode('{', '}', text, endIndex);
                             if (text[endIndex] == '=') endIndex = text.IndexOf(';', bodyIndex + 1) + 1;
                         }
                     }
@@ -438,10 +439,10 @@ namespace CompWolf.Docs.Server.Data
 
                         if (previousWordEndIndex > 0)
                         {
-                            int previousLineIndex = text.LastIndexOf(Environment.NewLine, previousWordEndIndex);
+                            int previousLineIndex = text.LastIndexOf(Newline, previousWordEndIndex);
                             previousLineIndex = previousLineIndex < 0
                                 ? 0
-                                : previousLineIndex + Environment.NewLine.Length;
+                                : previousLineIndex + Newline.Length;
                             var firstLine = text[previousLineIndex..(previousWordEndIndex + 1)].TrimStart();
 
                             if (firstLine.StartsWith("//"))
@@ -540,45 +541,51 @@ namespace CompWolf.Docs.Server.Data
             public static IEnumerable<Namespace> SplitText(string text)
             {
                 //After search, paranthesisLevel becomes endIndex
-                LinkedList<(string name, int startIndex, int paranthesisLevel, List<string> subnamespaces)> namespaceData = [];
+                LinkedList<(string name, int nameIndex, int startIndex, int paranthesisLevel, List<string> subnamespaces)> namespaceData = [];
                 int namespaceWithoutEndCount = 0;
 
-                for (int i = text.IndexOf('{'); i >= 0; i = text.IndexOfAny(['{', '}'], i + 1))
+                foreach (var i in ForeachRelevantCharInCode(text))
                 {
-                    if (text[i] == '{')
+                    switch (text[i])
                     {
-                        var namespaceMatch = Regex.Match(text[0..i], @"namespace\s+([\w\:]+)\s*$");
-                        if (namespaceMatch.Success)
-                        {
-                            var name = namespaceMatch.Groups[1].Value;
-                            if (namespaceWithoutEndCount > 0)
+                        case '{':
                             {
-                                name = $"{namespaceData.Last!.Value.name}::{name}";
-                                namespaceData.Last!.ValueRef.subnamespaces.Add(name);
-                            }
+                                var namespaceMatch = Regex.Match(text[0..i], @"namespace\s+([\w\:]+)\s*$");
+                                if (namespaceMatch.Success)
+                                {
+                                    var name = namespaceMatch.Groups[1].Value;
+                                    if (namespaceWithoutEndCount > 0)
+                                    {
+                                        name = $"{namespaceData.Last!.Value.name}::{name}";
+                                        namespaceData.Last!.ValueRef.subnamespaces.Add(name);
+                                    }
 
-                            namespaceData.AddLast((name, i, 0, []));
-                            ++namespaceWithoutEndCount;
-                        }
-                        else
-                        {
-                            if (namespaceWithoutEndCount > 0)
-                                ++namespaceData.Last!.ValueRef.paranthesisLevel;
-                        }
-                    }
-                    else
-                    {
-                        if (namespaceData.Last != null)
-                        {
-                            --namespaceData.Last.ValueRef.paranthesisLevel;
-                            var (name, startIndex, paranthesisLevel, subnamespaces) = namespaceData.Last.Value;
-                            if (paranthesisLevel < 0)
-                            {
-                                namespaceData.AddFirst((name, startIndex, i, subnamespaces));
-                                namespaceData.RemoveLast();
-                                --namespaceWithoutEndCount;
+                                    namespaceData.AddLast((name, namespaceMatch.Index, i, 0, []));
+                                    ++namespaceWithoutEndCount;
+                                }
+                                else
+                                {
+                                    if (namespaceWithoutEndCount > 0)
+                                        ++namespaceData.Last!.ValueRef.paranthesisLevel;
+                                }
                             }
-                        }
+                            break;
+                        case '}':
+                            {
+                                if (namespaceData.Last != null)
+                                {
+                                    --namespaceData.Last.ValueRef.paranthesisLevel;
+                                    var (name, nameIndex, startIndex, paranthesisLevel, subnamespaces) = namespaceData.Last.Value;
+                                    if (paranthesisLevel < 0)
+                                    {
+                                        namespaceData.AddFirst((name, nameIndex, startIndex, i, subnamespaces));
+                                        namespaceData.RemoveLast();
+                                        --namespaceWithoutEndCount;
+                                    }
+                                }
+                            }
+                            break;
+                        default: break;
                     }
                 }
                 if (namespaceWithoutEndCount > 0)
@@ -593,12 +600,13 @@ namespace CompWolf.Docs.Server.Data
                             .Select(subspaceName =>
                             {
                                 var subspace = namespaceData.First(x => x.name == subspaceName);
-                                return (subspace.startIndex, subspace.paranthesisLevel);
+                                return (subspace.nameIndex, subspace.paranthesisLevel);
                             }
                         );
                         var indexOffset = space.startIndex;
-                        foreach (var (startIndex, endIndex) in subspaces)
+                        foreach (var (nameIndex, endIndex) in subspaces)
                         {
+                            var startIndex = nameIndex - 2;
                             var start = startIndex - indexOffset;
                             var end = endIndex - indexOffset;
                             body = body[0..start] + body[end..];
@@ -614,7 +622,7 @@ namespace CompWolf.Docs.Server.Data
         }
 
         /// <param name="startIndex"> The index of the start bracket to find the end of. </param>
-        public static int GetEndOfBracketIndex<Char, String>(Char startBracket, Char endBracket, String text, int startIndex = 0)
+        public static int GetEndOfBracketIndex<Char, String>(Func<Char, bool> isStartBracket, Func<Char, bool> isEndBracket, String text, int startIndex = 0)
             where Char : IEquatable<Char>
             where String : IEnumerable<Char>
         {
@@ -625,17 +633,17 @@ namespace CompWolf.Docs.Server.Data
                 : text.Skip(startIndex).GetEnumerator();
 
             if (iterator.MoveNext() is false
-                || iterator.Current.Equals(startBracket) is false)
-                throw new ArgumentException($"Could not find {startBracket} at the start of {text}");
+                || isStartBracket(iterator.Current) is false)
+                throw new ArgumentException($"Could not find start-bracket at index {startIndex} of {text}");
 
 
             for (; iterator.MoveNext(); ++count)
             {
                 var c = iterator.Current;
 
-                if (startBracket.Equals(c))
+                if (isStartBracket(c))
                     ++level;
-                if (endBracket.Equals(c))
+                else if (isEndBracket(c))
                 {
                     --level;
                     if (level < 0)
@@ -643,7 +651,108 @@ namespace CompWolf.Docs.Server.Data
                 }
             }
 
-            throw new FormatException($"Could not find {endBracket} to pair with {startBracket}");
+            throw new FormatException($"Could not find end-bracket to match start-bracket at index {startIndex} of ${text}");
+        }
+        /// <param name="startIndex"> The index of the start bracket to find the end of. </param>
+        public static Char GetEndOfBracket<Char, String>(Func<Char, bool> isStartBracket, Func<Char, bool> isEndBracket, String text, int startIndex = 0)
+            where Char : IEquatable<Char>
+            where String : IEnumerable<Char>
+        {
+            int level = 0;
+            var iterator = (startIndex <= 0)
+                ? text.GetEnumerator()
+                : text.Skip(startIndex).GetEnumerator();
+
+            if (iterator.MoveNext() is false
+                || isStartBracket(iterator.Current) is false)
+                throw new ArgumentException($"Could not find start-bracket at index {startIndex} of {text}");
+
+
+            while (iterator.MoveNext())
+            {
+                var c = iterator.Current;
+
+                if (isStartBracket(c))
+                    ++level;
+                else if (isEndBracket(c))
+                {
+                    --level;
+                    if (level < 0)
+                        return c;
+                }
+            }
+
+            throw new FormatException($"Could not find end-bracket to match start-bracket at index {startIndex} of {text}");
+        }
+        /// <param name="startIndex"> The index of the start bracket to find the end of. </param>
+        public static int GetEndOfBracketIndex<Char, String>(Char startBracket, Char endBracket, String text, int startIndex = 0)
+            where Char : IEquatable<Char>
+            where String : IEnumerable<Char>
+            => GetEndOfBracketIndex<Char, String>(startBracket.Equals, endBracket.Equals, text, startIndex);
+
+        public static int GetEndOfBracketIndexInCode(char startBracket, char endBracket, string text, int startIndex = 0)
+            => GetEndOfBracket<int, IEnumerable<int>>(i => text[i] == startBracket, i => text[i] == endBracket, ForeachRelevantCharInCode(text, startIndex), 0);
+
+        public static IEnumerable<int> ForeachRelevantCharInCode(string text, int startIndex = 0)
+        {
+            for (var index = startIndex; index < text.Length;)
+            {
+                var oldIndex = index;
+                switch (text[index])
+                {
+                    case '"':
+                        if ((index > 0) && (text[index - 1] == 'R'))
+                        {
+                            ++index;
+                            var endString = text[index..text.IndexOf('(', index)];
+                            endString = $"){endString}\"";
+                            index = text.IndexOf(endString, index + endString.Length - 1);
+                            if (index < 0)
+                                throw new FormatException($"Could not find ${endString} after index {oldIndex} of {text}");
+                            index += endString.Length;
+                        }
+                        else
+                        {
+                            do
+                            {
+                                index = text.IndexOf('"', ++index);
+                                if (index < 0)
+                                    throw new FormatException($"Could not find \" after index {oldIndex} of {text}");
+                                index += 1;
+                            } while (text[index - 2] == '\\');
+                        }
+                        break;
+                    case '/':
+                        switch (text[++index])
+                        {
+                            case '/':
+                                {
+                                    index = text.IndexOf(Newline, ++index);
+                                    if (index < 0)
+                                        yield break;
+                                    index += Newline.Length;
+                                }
+                                break;
+                            case '*':
+                                {
+                                    index = text.IndexOf("*/", ++index);
+                                    if (index < 0)
+                                        throw new FormatException($"Could not find */ after index {oldIndex} of {text}");
+                                    index += 2;
+                                }
+                                break;
+                            default:
+                                yield return index;
+                                ++index;
+                                break;
+                        }
+                        break;
+                    default:
+                        yield return index;
+                        ++index;
+                        break;
+                }
+            }
         }
 
         public static SourceEntity? CombineEntities(IEnumerable<SourceEntity> entities)
