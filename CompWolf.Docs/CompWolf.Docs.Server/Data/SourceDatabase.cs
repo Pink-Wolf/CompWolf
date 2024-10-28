@@ -1,8 +1,7 @@
 ﻿using CompWolf.Docs.Server.Models;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace CompWolf.Docs.Server.Data
 {
@@ -340,12 +339,32 @@ namespace CompWolf.Docs.Server.Data
             public string Declaration { get; set; } = "";
             public string Body { get; set; } = "";
 
+            public override string ToString()
+                => $"\r{Comment}\r{Declaration}\r{Body}\r";
+            public override bool Equals(object? obj)
+                => obj is MemberEntity other
+                && Comment.Equals(other.Comment)
+                && Declaration.Equals(other.Declaration)
+                && Body.Equals(other.Body)
+                ;
+            public override int GetHashCode()
+                => HashCode.Combine(Comment, Declaration, Body);
+
             public static IEnumerable<MemberEntity> SplitText(string text)
             {
                 if (string.IsNullOrEmpty(text)) yield break;
 
                 for (int declarationIndex = (text[0] == '{') ? 1 : 0; declarationIndex < text.Length; ++declarationIndex)
                 {
+                    {
+                        var i = SkipNonRelevantCharInCode(text, declarationIndex);
+                        if (i >= 0)
+                        {
+                            declarationIndex = i - 1;
+                            continue;
+                        }
+                    }
+
                     int bodyIndex, endIndex;
                     {
                         var firstChar = text[declarationIndex];
@@ -354,40 +373,45 @@ namespace CompWolf.Docs.Server.Data
                         if (firstChar == '{')
                         {
                             declarationIndex = GetEndOfBracketIndexInCode('{', '}', text, firstChar);
+                            --declarationIndex;
                             continue;
                         }
                         if (firstChar == '(')
                         {
                             declarationIndex = GetEndOfBracketIndexInCode('(', ')', text, firstChar);
+                            --declarationIndex;
                             continue;
                         }
                         if (firstChar == '/')
                         {
-                            switch (text[declarationIndex + 1])
-                            {
-                                case '/':
-                                    declarationIndex = text.IndexOf(Newline, declarationIndex + 2);
-                                    continue;
-                                case '*':
-                                    declarationIndex = text.IndexOf("*/", declarationIndex + 2) + 2;
-                                    continue;
-                                default: break;
-                            }
+                            if (declarationIndex + 2 < text.Length)
+                                switch (text[declarationIndex + 1])
+                                {
+                                    case '/':
+                                        declarationIndex = text.IndexOf(Newline, declarationIndex + 2);
+                                        --declarationIndex;
+                                        continue;
+                                    case '*':
+                                        declarationIndex = text.IndexOf("*/", declarationIndex + 2) + 2;
+                                        --declarationIndex;
+                                        continue;
+                                    default: break;
+                                }
                         }
 
-                        bodyIndex = declarationIndex + 1;
-                        var macroMatch = Regex.Match(text[bodyIndex..], @"^\s*#define\s+");
+                        bodyIndex = declarationIndex;
+                        var macroMatch = Regex.Match(text[bodyIndex..], @"^\s*#define\s+\S+\s*");
                         if (macroMatch.Success)
                         {
                             bodyIndex += macroMatch.Length;
 
-                            var parenthesisMatch = Regex.Match(text[bodyIndex..], @"^\s\(");
-                            if (parenthesisMatch.Success)
+                            if (text[bodyIndex] == '(')
                             {
-                                bodyIndex = GetEndOfBracketIndexInCode('(', ')', text, bodyIndex + parenthesisMatch.Length - 1);
+                                bodyIndex = GetEndOfBracketIndexInCode('(', ')', text, bodyIndex) + 1;
                             }
 
                             endIndex = text.IndexOf(Newline, bodyIndex);
+                            if (endIndex < 0) endIndex = text.Length;
                         }
                         else
                         {
@@ -395,9 +419,7 @@ namespace CompWolf.Docs.Server.Data
                             {
                                 switch (text[bodyIndex])
                                 {
-                                    case ';':
-                                        ++bodyIndex; // no body, so ";" is part of declaration
-                                        break;
+                                    case ';': break;
                                     case '{': break;
                                     case '=':
                                         if (Regex.Match(text[..bodyIndex], @"\soperator\s*$").Success)
@@ -406,20 +428,35 @@ namespace CompWolf.Docs.Server.Data
                                             break;
                                     case '<':
                                         bodyIndex = GetEndOfBracketIndexInCode('<', '>', text, bodyIndex);
+                                        --bodyIndex;
                                         continue;
                                     case '(':
                                         bodyIndex = GetEndOfBracketIndexInCode('(', ')', text, bodyIndex);
+                                        --bodyIndex;
                                         continue;
                                     default: continue;
                                 }
                                 break;
                             }
-                            if (bodyIndex == text.Length)
-                                throw new FormatException($"Cannot find end of member ${text[declarationIndex..Math.Min(text.Length, declarationIndex + 32)]}...");
 
                             endIndex = bodyIndex;
-                            if (text[endIndex] == '{') endIndex = GetEndOfBracketIndexInCode('{', '}', text, endIndex);
-                            if (text[endIndex] == '=') endIndex = text.IndexOf(';', bodyIndex + 1) + 1;
+                            switch (text[endIndex])
+                            {
+                                case ';':
+                                    endIndex = ++bodyIndex; // no body, so ";" is part of declaration
+                                    break;
+                                case '{':
+                                    endIndex = GetEndOfBracketIndexInCode('{', '}', text, endIndex);
+                                    break;
+                                case '=':
+                                    endIndex = text.IndexOf(';', bodyIndex + 1) + 1;
+                                    break;
+                                default:
+                                    throw new FormatException($"Cannot find end of entity {((text.Length > declarationIndex + 32)
+                                        ? text[declarationIndex..(declarationIndex + 32)] + "..."
+                                        : text[declarationIndex..]
+                                    )}");
+                            }
                         }
                     }
 
@@ -452,7 +489,7 @@ namespace CompWolf.Docs.Server.Data
                             else if (text[(previousWordEndIndex - 1)..(previousWordEndIndex + 1)] == "*/")
                             {
                                 var commentIndex = text.LastIndexOf("/*", previousWordEndIndex - 1);
-                                member.Comment = text[(commentIndex + 1)..(previousWordEndIndex - 1)];
+                                member.Comment = text[(commentIndex + 2)..(previousWordEndIndex - 1)];
                             }
                         }
 
@@ -537,6 +574,8 @@ namespace CompWolf.Docs.Server.Data
                 => obj is Namespace other
                 && Name.Equals(other.Name)
                 && Text.Equals(other.Text);
+            public override int GetHashCode()
+                => HashCode.Combine(Name, Text);
 
             public static IEnumerable<Namespace> SplitText(string text)
             {
@@ -693,65 +732,75 @@ namespace CompWolf.Docs.Server.Data
         public static int GetEndOfBracketIndexInCode(char startBracket, char endBracket, string text, int startIndex = 0)
             => GetEndOfBracket<int, IEnumerable<int>>(i => text[i] == startBracket, i => text[i] == endBracket, ForeachRelevantCharInCode(text, startIndex), 0);
 
+        /// <summary> Returns the index after skipping non-relevant code at the given index of the given text.
+        /// Returns -1 if the index points to relevant code. </summary>
+        public static int SkipNonRelevantCharInCode(string text, int index)
+        {
+            var oldIndex = index;
+            switch (text[index])
+            {
+                case '"':
+                    if ((index > 0) && (text[index - 1] == 'R'))
+                    {
+                        ++index;
+                        var endString = text[index..text.IndexOf('(', index)];
+                        endString = $"){endString}\"";
+                        index = text.IndexOf(endString, index + endString.Length - 1);
+                        if (index < 0)
+                            throw new FormatException($"Could not find ${endString} after index {oldIndex} of {text}");
+                        index += endString.Length;
+                    }
+                    else
+                    {
+                        do
+                        {
+                            index = text.IndexOf('"', ++index);
+                            if (index < 0)
+                                throw new FormatException($"Could not find \" after index {oldIndex} of {text}");
+                            index += 1;
+                        } while (text[index - 2] == '\\');
+                    }
+                    return index;
+                case '/':
+                    switch (text[++index])
+                    {
+                        case '/':
+                            {
+                                index = text.IndexOf(Newline, ++index);
+                                if (index < 0)
+                                    return text.Length;
+                                index += Newline.Length;
+                                return index;
+                            }
+                        case '*':
+                            {
+                                index = text.IndexOf("*/", ++index);
+                                if (index < 0)
+                                    throw new FormatException($"Could not find */ after index {oldIndex} of {text}");
+                                index += 2;
+                                return index;
+                            }
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return -1;
+        }
+
         public static IEnumerable<int> ForeachRelevantCharInCode(string text, int startIndex = 0)
         {
-            for (var index = startIndex; index < text.Length;)
+            for (var index = startIndex; index < text.Length; ++index)
             {
-                var oldIndex = index;
-                switch (text[index])
+                var newIndex = SkipNonRelevantCharInCode(text, index);
+                if (newIndex >= 0)
                 {
-                    case '"':
-                        if ((index > 0) && (text[index - 1] == 'R'))
-                        {
-                            ++index;
-                            var endString = text[index..text.IndexOf('(', index)];
-                            endString = $"){endString}\"";
-                            index = text.IndexOf(endString, index + endString.Length - 1);
-                            if (index < 0)
-                                throw new FormatException($"Could not find ${endString} after index {oldIndex} of {text}");
-                            index += endString.Length;
-                        }
-                        else
-                        {
-                            do
-                            {
-                                index = text.IndexOf('"', ++index);
-                                if (index < 0)
-                                    throw new FormatException($"Could not find \" after index {oldIndex} of {text}");
-                                index += 1;
-                            } while (text[index - 2] == '\\');
-                        }
-                        break;
-                    case '/':
-                        switch (text[++index])
-                        {
-                            case '/':
-                                {
-                                    index = text.IndexOf(Newline, ++index);
-                                    if (index < 0)
-                                        yield break;
-                                    index += Newline.Length;
-                                }
-                                break;
-                            case '*':
-                                {
-                                    index = text.IndexOf("*/", ++index);
-                                    if (index < 0)
-                                        throw new FormatException($"Could not find */ after index {oldIndex} of {text}");
-                                    index += 2;
-                                }
-                                break;
-                            default:
-                                yield return index;
-                                ++index;
-                                break;
-                        }
-                        break;
-                    default:
-                        yield return index;
-                        ++index;
-                        break;
+                    index = --newIndex;
+                    continue;
                 }
+                yield return index;
             }
         }
 
