@@ -183,5 +183,110 @@ namespace CompWolf.Docs.Server.Tests
 
             CollectionAssert.AreEquivalent(expected, actual);
         }
+
+        [TestCase("",
+            "", "", "", "",
+            TestName = "{m}(Empty)")]
+        [TestCase("           ",
+            "", "", "", "",
+            TestName = "{m}(Whitespace)")]
+
+        [TestCase("public:",
+            "", "", "", "",
+            TestName = "{m}(Empty visibility group)")]
+        [TestCase("public://groupName\r",
+            "", "", "", "",
+            "groupName", "", "", "",
+            TestName = "{m}(Empty group)")]
+        [TestCase("public://groupName",
+            "", "", "", "",
+            "groupName", "", "", "",
+            TestName = "{m}(Empty group without c++-style end of name)")]
+
+        [TestCase("test",
+            "", "test", "", "",
+            TestName = "{m}(Default Group)")]
+        [TestCase("testPublic protected:testProtected private:testPrivate",
+            "", "testPublic", "testProtected", "testPrivate",
+            TestName = "{m}(Default Group: Multiple visibilities)")]
+        [TestCase("testPublic1 public:testPublic2 protected:testProtected public:testPublic3",
+            "", "testPublic1 testPublic2 testPublic3", "testProtected", "",
+            TestName = "{m}(Default Group: Multiple of same visibilities)")]
+        [TestCase("testPublic protected:private:testPrivate",
+            "", "testPublic", "", "testPrivate",
+            TestName = "{m}(Default Group: Empty visibility)")]
+        [TestCase("testPublic        protected:         testProtected",
+            "", "testPublic", "testProtected", "",
+            TestName = "{m}(Default Group: Whitespace)")]
+
+        [TestCase("public://group1\rpublic1",
+            "", "", "", "",
+            "group1", "public1", "", "",
+            TestName = "{m}(C++-style Named Group: public)")]
+        [TestCase("protected://group1\rprotected1",
+            "", "", "", "",
+            "group1", "", "protected1", "",
+            TestName = "{m}(C++-style Named Group: protected)")]
+        [TestCase("  public  :  //  group1  \r  public1",
+            "", "", "", "",
+            "group1", "public1", "", "",
+            TestName = "{m}(C++-style Named Group: whitespace)")]
+        [TestCase("public://group1\rpublic1 protected:protected1",
+            "", "", "", "",
+            "group1", "public1", "protected1", "",
+            TestName = "{m}(C++-style Named Group: Multiple visibilities)")]
+        [TestCase("public:/*group1*/public1",
+            "", "", "", "",
+            "group1", "public1", "", "",
+            TestName = "{m}(C-style Named Group: public)")]
+        [TestCase("  public  :  /*  group1  */  public1",
+            "", "", "", "",
+            "group1", "public1", "", "",
+            TestName = "{m}(C-style Named Group: whitespace)")]
+
+        [TestCase("testPublic /* protected: */testProtected",
+            "", "testPublic /* protected: */testProtected", "", "",
+            TestName = "{m}(Ignore visibility within C-style comment)")]
+        [TestCase("testPublic // protected: \rtestProtected",
+            "", "testPublic // protected: \rtestProtected", "", "",
+            TestName = "{m}(Ignore visibility within C++-style comment)")]
+        [TestCase("testPublic \" protected: \"testProtected",
+            "", "testPublic \" protected: \"testProtected", "", "",
+            TestName = "{m}(Ignore visibility within comment)")]
+
+        [TestCase("testPublic /* public://groupName */groupBody",
+            "", "testPublic /* public://groupName */groupBody", "", "",
+            TestName = "{m}(Ignore group within C-style comment)")]
+        [TestCase("testPublic // public://groupName \rgroupBody",
+            "", "testPublic // public://groupName \rgroupBody", "", "",
+            TestName = "{m}(Ignore group within C++-style comment)")]
+        [TestCase("testPublic \" public://groupName \"groupBody",
+            "", "testPublic \" public://groupName \"groupBody", "", "",
+            TestName = "{m}(Ignore group within comment)")]
+        public void MemberGroup_SplitText(string text, params string[] expectedRaw)
+        {
+            var actual = SourceDatabase.MemberGroup.SplitText(text, true)
+                .Select(x => new SourceDatabase.MemberGroup()
+                {
+                    GroupName = x.GroupName,
+                    TextPerVisibility = x.TextPerVisibility.Select(x => (x.Key, x.Value.Trim())).ToDictionary()
+                })
+                .ToHashSet();
+            var expected = new HashSet<SourceDatabase.MemberGroup>();
+            for (int i = 0; i < expectedRaw.Length; i += 4)
+            {
+                expected.Add(new()
+                {
+                    GroupName = expectedRaw[i],
+                    TextPerVisibility = new (string, string)[] {
+                        ("public", expectedRaw[i + 1]),
+                        ("protected", expectedRaw[i + 2]),
+                        ("private", expectedRaw[i + 3])
+                    }.ToDictionary(),
+                });
+            }
+
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
     }
 }

@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
+using System.Xml.Linq;
 
 namespace CompWolf.Docs.Server.Data
 {
@@ -509,57 +511,105 @@ namespace CompWolf.Docs.Server.Data
             public string GroupName { get; set; } = "";
             public Dictionary<string, string> TextPerVisibility { get; set; } = [];
 
+            public override string ToString()
+                => $"{GroupName}: {string.Join("  ", TextPerVisibility.Select((key, value) => $"{key}: {value}"))}";
+            public override bool Equals(object? obj)
+                => obj is MemberGroup other
+                && GroupName.Equals(other.GroupName)
+                && TextPerVisibility.Values.Join(other.TextPerVisibility.Values, x => x, x => x,
+                    (lhs, rhs) => lhs.Equals(rhs))
+                    .Contains(false) is false;
+            public override int GetHashCode()
+                => ToString().GetHashCode();
+
             public static IEnumerable<MemberGroup> SplitText(string text, bool publicByDefault)
             {
-                var visibilityPattern = @"(public|protected|private):";
-                Dictionary<string, string> groups = [];
+                if (text.Length == 0) text = " ";
+                if (text[0] == '{') text = text[1..];
+                text = ' ' + text + ' ';
+
+                Dictionary<string, Dictionary<string, string>> groups = [];
+                void AddToGroup(string groupName, string visibility, string text)
                 {
-                    var textSplit = Regex.Split(text, @"({)|(})|" + visibilityPattern + @"\s*\/\/\s*(.+)");
-
-                    var currentGroup = "";
-                    groups.Add(currentGroup, (publicByDefault ? "public:" : "private:") + textSplit[2]);
-
-                    for (int i = 3; i < textSplit.Length; ++i)
+                    if (groups.TryGetValue(groupName, out var groupContent) is false)
                     {
-                        switch (textSplit[i])
-                        {
-                            case "{":
-                                var newI = GetEndOfBracketIndex("{", "}", textSplit, i);
-                                groups[currentGroup] = string.Join(null, [groups[currentGroup], .. textSplit[i..(newI + 1)]]);
-                                i = newI;
-                                continue;
-                            case "}": break;
-                            default:
-                                var visibility = textSplit[i];
-                                currentGroup = textSplit[++i].Trim();
-                                var body = textSplit[++i];
-                                groups[currentGroup] = visibility + ':' + body;
-                                continue;
-                        }
-                        break;
+                        groups[groupName] = groupContent = [];
+                        groupContent["public"] = "";
+                        groupContent["protected"] = "";
+                        groupContent["private"] = "";
                     }
+                    groupContent[visibility] += text;
+                }
+
+                {
+                    var textStart = 0;
+                    var currentGroup = "";
+                    var currentVisibility = publicByDefault ? "public" : "private";
+                    string? currentMaybeVisibility = null;
+                    for (var textIndex = textStart; textIndex < text.Length; ++textIndex)
+                    {
+                        var newIndex = SkipNonRelevantCharInCode(text, textIndex);
+                        if (newIndex >= 0)
+                        {
+                            textIndex = --newIndex;
+                            continue;
+                        }
+
+                        if (char.IsWhiteSpace(text[textIndex])) continue;
+                        if (char.IsWhiteSpace(text[textIndex - 1]) is false) continue;
+
+                        var currentText = text[textIndex..];
+
+                        var newVisibilityStart = -1;
+                        if (currentMaybeVisibility != null && currentText[0] == ':')
+                        {
+                            newVisibilityStart = textIndex + 1;
+                        }
+                        else
+                        {
+                            currentMaybeVisibility
+                                = currentText.StartsWith("public") ? "public"
+                                : currentText.StartsWith("protected") ? "protected"
+                                : currentText.StartsWith("private") ? "private"
+                                : null;
+
+                            if (currentMaybeVisibility != null && currentText.Length > currentMaybeVisibility.Length)
+                            {
+                                var c = currentText[currentMaybeVisibility.Length];
+                                if (c == ':')
+                                {
+                                    newVisibilityStart = textIndex + currentMaybeVisibility.Length + 1;
+                                }
+                                else if (char.IsWhiteSpace(c) is false)
+                                    currentMaybeVisibility = null;
+                            }
+                        }
+
+                        if (newVisibilityStart > -1)
+                        {
+                            AddToGroup(currentGroup, currentVisibility, text);
+
+                            currentVisibility = currentMaybeVisibility!;
+                            currentMaybeVisibility = null;
+
+                            var newGroupMatch = Regex.Match(text[newVisibilityStart..], @"^\s*\/\*(.*?)\*\/");
+                            if (newGroupMatch.Success is false)
+                                newGroupMatch = Regex.Match(text[newVisibilityStart..], @"^\s*\/\/(.*?)(?:$|" + Newline + ')');
+                            if (newGroupMatch.Success)
+                            {
+                                currentGroup = newGroupMatch.Groups[1].Value.Trim();
+                                textIndex += newGroupMatch.Length;
+                            }
+                        }
+                    }
+                    AddToGroup(currentGroup, currentVisibility, text);
                 }
 
                 return groups
-                    .Select(text =>
+                    .Select(group => new MemberGroup()
                     {
-                        var result = new MemberGroup()
-                        {
-                            GroupName = text.Key,
-                            TextPerVisibility = new(),
-                        };
-                        result.TextPerVisibility.Add("public", "");
-                        result.TextPerVisibility.Add("protected", "");
-                        result.TextPerVisibility.Add("private", "");
-
-                        var sections = Regex.Split(text.Value, visibilityPattern);
-                        for (int i = 1; i < sections.Length; i += 2)
-                        {
-                            var sectionVisibility = sections[i];
-                            var sectionBody = sections[i + 1];
-                            result.TextPerVisibility[sectionVisibility] += sectionBody;
-                        }
-                        return result;
+                        GroupName = group.Key,
+                        TextPerVisibility = group.Value,
                     });
             }
         }
