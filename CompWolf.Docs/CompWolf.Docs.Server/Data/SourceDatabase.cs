@@ -1,9 +1,6 @@
 ﻿using CompWolf.Docs.Server.Models;
-using System;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
-using System.Xml.Linq;
 
 namespace CompWolf.Docs.Server.Data
 {
@@ -124,7 +121,7 @@ namespace CompWolf.Docs.Server.Data
                 }
             }
 
-            var fileData = await File.ReadAllTextAsync(filePath);
+            var fileData = string.Join(Newline, await File.ReadAllLinesAsync(filePath));
             var data = Namespace.SplitText(fileData)
                 .SelectMany(GetEntitiesFromNamespace)
                 .ToArray();
@@ -133,20 +130,20 @@ namespace CompWolf.Docs.Server.Data
 
             return data;
         }
-        static IEnumerable<SourceEntity> GetEntitiesFromNamespace(Namespace space)
+        public static IEnumerable<SourceEntity> GetEntitiesFromNamespace(Namespace space)
         {
             var namespaceName = space.Name;
             var text = space.Text;
 
             foreach (var entityText in MemberEntity.SplitText(text))
             {
-                var entityComment = entityText.Comment;
-                var entityDeclaration = entityText.Declaration;
-                var entityBody = entityText.Body;
+                var entityComment = entityText.Comment.Trim();
+                var entityDeclaration = entityText.Declaration.Trim();
+                var entityBody = entityText.Body.Trim();
 
-                var templateMatch = Regex.Match(entityDeclaration, @"\s*template\s*<");
+                var templateMatch = Regex.Match(entityDeclaration, @"^\s*template\s*<");
                 var templateEndIndex = templateMatch.Success
-                    ? GetEndOfBracketIndexInCode('<', '>', entityDeclaration, templateMatch.Index)
+                    ? GetEndOfBracketIndexInCode('<', '>', entityDeclaration, templateMatch.Index + templateMatch.Length - 1)
                     : -1;
                 var noTemplateDeclaration = entityDeclaration[(templateEndIndex + 1)..];
 
@@ -170,6 +167,7 @@ namespace CompWolf.Docs.Server.Data
 
                 var cleanedDeclarationWords = parameterLessDeclaration
                     .Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.EndsWith(';') ? x[..(x.Length - 1)] : x)
                     .ToList();
 
                 Dictionary<string, SourceEntity[]> nestedEntities = [];
@@ -194,44 +192,85 @@ namespace CompWolf.Docs.Server.Data
                     EntityTypes.Alias => cleanedDeclarationWords.Last(),
                     EntityTypes.Concept => cleanedDeclarationWords.Last(),
                     EntityTypes.Variable => cleanedDeclarationWords.Last(),
+                    EntityTypes.Enum => cleanedDeclarationWords.Last(),
                     _ => throw new ArgumentOutOfRangeException(nameof(space),
                         "Tried deserializing entity of unknown type")
                 };
+                entityName = entityName.Trim();
+
+                List<SourceEnumMember> enumElements = [];
+                if (entityType == EntityTypes.Enum)
+                {
+                    enumElements = entityBody[1..].Split(',')
+                        .Select(x =>
+                        {
+                            x = x.Trim();
+                            var comment = "";
+                            if (x.StartsWith(@"/*"))
+                            {
+                                var i = x.IndexOf(@"*/");
+                                comment = x[2..i];
+                                x = x[(i + 2)..];
+
+                                char[] trimCharacters = (comment[0] == '*')
+                                    ? [' ', '*']
+                                    : [' '];
+                                comment = string.Join(Newline, comment.Split(Newline).Select(x => x.Trim(trimCharacters)));
+                            }
+                            else if (x.StartsWith(@"//"))
+                            {
+                                var i = x.IndexOf(Newline);
+                                comment = x[2..i];
+                                x = x[(i + Newline.Length)..];
+                            }
+                            var name = x[..Regex.Match(x, @"^\s*(\S+)").Groups[1].Length];
+                            return new SourceEnumMember()
+                            {
+                                Description = comment.Trim(),
+                                Name = name,
+                            };
+                        })
+                        .ToList();
+                }
 
                 if (entityType == EntityTypes.Class)
                 {
                     nestedEntities = MemberGroup.SplitText(entityBody, isStruct)
-                        .Select(x => (x.GroupName, x.TextPerVisibility
-                                .Where(x => x.Key != "private")
+                        .Select(x => (x.GroupName.Trim(), x.TextPerVisibility
+                                .Where(x => x.Item1 != "private")
                                 .SelectMany(x => GetEntitiesFromNamespace(new()
                                 {
                                     Name = namespaceName,
-                                    Text = x.Value,
+                                    Text = x.Item2,
                                 })
-                                    .Select(Value => (x.Key, Value)))
-                                .GroupBy(x => x.Value.Name)
+                                    .Select(Value =>
+                                    {
+                                        if (x.Item1 == "protected")
+                                            foreach (var declaration in Value.Declarations)
+                                                declaration.Protected = true;
+                                        return Value;
+                                    }))
+                                .GroupBy(x => x.Name)
                                 .Select(entityEnumerator =>
                                 {
                                     var entityGroup = entityEnumerator.ToList();
-                                    var entity = entityGroup.First().Value;
+                                    var entity = entityGroup[0];
 
-                                    if (entityGroup.Count == 1) return entity;
-
-                                    for (int i = 1; string.IsNullOrEmpty(entity.BriefDescription) && i < entityGroup.Count; ++i)
+                                    if (entityGroup.Count > 1)
                                     {
-                                        entity.BriefDescription = entityGroup[i].Value.BriefDescription;
+                                        for (int i = 1; string.IsNullOrEmpty(entity.BriefDescription) && i < entityGroup.Count; ++i)
+                                        {
+                                            entity.BriefDescription = entityGroup[i].BriefDescription;
+                                        }
+
+                                        entity.Declarations = entityGroup.SelectMany(x => x.Declarations).ToArray();
                                     }
-
-                                    entity.Declarations = entityGroup.SelectMany(x => x.Value.Declarations).ToArray();
-
-                                    if (entityGroup.First().Key == "protected")
-                                        foreach (var declaration in entity.Declarations)
-                                            declaration.Protected = true;
 
                                     return entity;
                                 })
                                 .ToArray()
                             ))
+                            .Where(x => x.Item2.Length > 0)
                             .ToDictionary();
 
                     if (nestedEntities.TryGetValue("constructors", out var constructors))
@@ -254,20 +293,26 @@ namespace CompWolf.Docs.Server.Data
                     Dictionary<string, List<string>> parameterCommentLines = [];
                     List<string> returnCommentLines = [];
                     List<string> throwCommentLines = [];
+                    if (entityComment.Length > 0)
                     {
                         var commentTarget = mainCommentLines;
-                        foreach (var line in entityComment.Split(Newline))
+                        bool javaDocComment = entityComment[0] == '*';
+                        foreach (var rawLine in entityComment.Split(Newline))
                         {
-                            var newCommentText = line.TrimStart(' ', '*').TrimEnd();
-                            var sectionMatch = Regex.Match(line, @"^@(\w+)\s");
+                            var newCommentText = javaDocComment
+                                ? rawLine.TrimStart(' ', '*')
+                                : rawLine.TrimStart(' ');
+                            newCommentText = newCommentText.TrimEnd();
+
+                            var sectionMatch = Regex.Match(newCommentText, @"^@(\w+)\s");
                             if (sectionMatch.Success)
                             {
-                                newCommentText = newCommentText[sectionMatch.Length..];
+                                newCommentText = newCommentText[sectionMatch.Length..].TrimStart();
 
                                 switch (sectionMatch.Groups[1].Value)
                                 {
                                     case "param":
-                                        var splitCommentText = newCommentText.Split(' ', 1);
+                                        var splitCommentText = newCommentText.Split(' ', 2);
                                         newCommentText = splitCommentText[1].TrimStart();
                                         commentTarget = parameterCommentLines[splitCommentText[0]] = [];
                                         break;
@@ -285,15 +330,15 @@ namespace CompWolf.Docs.Server.Data
                                 }
                             }
 
-                            commentTarget.Add(line.Trim());
+                            commentTarget.Add(newCommentText.Trim());
                         }
                     }
 
-                    mainComment = string.Join(Newline, mainCommentLines);
-                    briefComment = string.Join(Newline, briefCommentLines);
-                    returnComment = string.Join(Newline, returnCommentLines);
-                    throwComment = string.Join(Newline, throwCommentLines);
-                    parameterComments = parameterCommentLines.Select(x => (x.Key, string.Join(Newline, x.Value)))
+                    mainComment = string.Join(Newline, mainCommentLines).Trim();
+                    briefComment = string.Join(Newline, briefCommentLines).Trim();
+                    returnComment = string.Join(Newline, returnCommentLines).Trim();
+                    throwComment = string.Join(Newline, throwCommentLines).Trim();
+                    parameterComments = parameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
                         .ToDictionary();
                 }
 
@@ -318,7 +363,7 @@ namespace CompWolf.Docs.Server.Data
                     {
                         Name = entityName,
                         Type = entityType,
-                        BriefDescription =  briefComment,
+                        BriefDescription = briefComment,
                         Declarations = [new()
                         {
                             Description = mainComment,
@@ -330,6 +375,7 @@ namespace CompWolf.Docs.Server.Data
                         ReturnDescription = returnComment,
                         ParameterDescriptions = parameterComments,
                         ThrowDescription = throwComment,
+                        EnumMembers = [.. enumElements],
                     };
                 }
             }
@@ -372,11 +418,16 @@ namespace CompWolf.Docs.Server.Data
                         var firstChar = text[declarationIndex];
 
                         if (char.IsWhiteSpace(firstChar)) continue;
+                        if (firstChar == ';') continue;
                         if (firstChar == '{')
                         {
                             declarationIndex = GetEndOfBracketIndexInCode('{', '}', text, firstChar);
                             --declarationIndex;
                             continue;
+                        }
+                        if (firstChar == '}')
+                        {
+                            break;
                         }
                         if (firstChar == '(')
                         {
@@ -445,13 +496,19 @@ namespace CompWolf.Docs.Server.Data
                             switch (text[endIndex])
                             {
                                 case ';':
-                                    endIndex = ++bodyIndex; // no body, so ";" is part of declaration
                                     break;
                                 case '{':
                                     endIndex = GetEndOfBracketIndexInCode('{', '}', text, endIndex);
                                     break;
                                 case '=':
-                                    endIndex = text.IndexOf(';', bodyIndex + 1) + 1;
+                                    endIndex = text.IndexOf(';', bodyIndex + 1);
+                                    // Concept may be for example "= requires(T t) {}"
+                                    var potentialEntityType = text.IndexOf('{', bodyIndex + 1, endIndex - (bodyIndex + 1));
+                                    if (potentialEntityType > 0)
+                                    {
+                                        endIndex = potentialEntityType;
+                                        goto case '{';
+                                    }
                                     break;
                                 default:
                                     throw new FormatException($"Cannot find end of entity {((text.Length > declarationIndex + 32)
@@ -465,9 +522,9 @@ namespace CompWolf.Docs.Server.Data
                     {
                         MemberEntity member = new()
                         {
-                            Comment = text[0..declarationIndex],
+                            Comment = "",
                             Declaration = text[declarationIndex..bodyIndex],
-                            Body = text[bodyIndex..endIndex],
+                            Body = endIndex > bodyIndex ? text[bodyIndex..endIndex] : "",
                         };
 
                         int previousWordEndIndex;
@@ -509,14 +566,14 @@ namespace CompWolf.Docs.Server.Data
         public class MemberGroup
         {
             public string GroupName { get; set; } = "";
-            public Dictionary<string, string> TextPerVisibility { get; set; } = [];
+            public List<(string, string)> TextPerVisibility { get; set; } = [];
 
             public override string ToString()
                 => $"{GroupName}: {string.Join("  ", TextPerVisibility.Select((key, value) => $"{key}: {value}"))}";
             public override bool Equals(object? obj)
                 => obj is MemberGroup other
                 && GroupName.Equals(other.GroupName)
-                && TextPerVisibility.Values.Join(other.TextPerVisibility.Values, x => x, x => x,
+                && TextPerVisibility.Join(other.TextPerVisibility, x => x, x => x,
                     (lhs, rhs) => lhs.Equals(rhs))
                     .Contains(false) is false;
             public override int GetHashCode()
@@ -528,35 +585,44 @@ namespace CompWolf.Docs.Server.Data
                 if (text[0] == '{') text = text[1..];
                 text = ' ' + text + ' ';
 
-                Dictionary<string, Dictionary<string, string>> groups = [];
+                Dictionary<string, List<(string, string)>> groups = [];
                 void AddToGroup(string groupName, string visibility, string text)
                 {
                     if (groups.TryGetValue(groupName, out var groupContent) is false)
                     {
                         groups[groupName] = groupContent = [];
-                        groupContent["public"] = "";
-                        groupContent["protected"] = "";
-                        groupContent["private"] = "";
                     }
-                    groupContent[visibility] += text;
+                    groupContent.Add((visibility, text));
                 }
 
                 {
-                    var textStart = 0;
+                    var handledCharCount = 0;
                     var currentGroup = "";
                     var currentVisibility = publicByDefault ? "public" : "private";
+
                     string? currentMaybeVisibility = null;
-                    for (var textIndex = textStart; textIndex < text.Length; ++textIndex)
+                    var currentMaybeEndIndex = 0;
+
+                    for (var textIndex = handledCharCount; textIndex < text.Length; ++textIndex)
                     {
                         var newIndex = SkipNonRelevantCharInCode(text, textIndex);
-                        if (newIndex >= 0)
+                        if (newIndex > textIndex)
                         {
                             textIndex = --newIndex;
                             continue;
                         }
 
                         if (char.IsWhiteSpace(text[textIndex])) continue;
-                        if (char.IsWhiteSpace(text[textIndex - 1]) is false) continue;
+                        if (text[textIndex] == '{')
+                        {
+                            textIndex = GetEndOfBracketIndexInCode('{', '}', text, textIndex);
+                        }
+                        if (char.IsWhiteSpace(text[textIndex - 1]) is false) switch (text[textIndex - 1])
+                            {
+                                case ';': break;
+                                case '}': break;
+                                default: continue;
+                            }
 
                         var currentText = text[textIndex..];
 
@@ -573,21 +639,27 @@ namespace CompWolf.Docs.Server.Data
                                 : currentText.StartsWith("private") ? "private"
                                 : null;
 
-                            if (currentMaybeVisibility != null && currentText.Length > currentMaybeVisibility.Length)
+                            if (currentMaybeVisibility != null)
                             {
-                                var c = currentText[currentMaybeVisibility.Length];
-                                if (c == ':')
+                                currentMaybeEndIndex = textIndex;
+
+                                if (currentText.Length > currentMaybeVisibility.Length)
                                 {
-                                    newVisibilityStart = textIndex + currentMaybeVisibility.Length + 1;
+                                    var c = currentText[currentMaybeVisibility.Length];
+                                    if (c == ':')
+                                    {
+                                        newVisibilityStart = textIndex + currentMaybeVisibility.Length + 1;
+                                    }
+                                    else if (char.IsWhiteSpace(c) is false)
+                                        currentMaybeVisibility = null;
                                 }
-                                else if (char.IsWhiteSpace(c) is false)
-                                    currentMaybeVisibility = null;
                             }
                         }
 
                         if (newVisibilityStart > -1)
                         {
-                            AddToGroup(currentGroup, currentVisibility, text);
+                            AddToGroup(currentGroup, currentVisibility, text[handledCharCount..currentMaybeEndIndex]);
+                            textIndex = newVisibilityStart;
 
                             currentVisibility = currentMaybeVisibility!;
                             currentMaybeVisibility = null;
@@ -600,9 +672,10 @@ namespace CompWolf.Docs.Server.Data
                                 currentGroup = newGroupMatch.Groups[1].Value.Trim();
                                 textIndex += newGroupMatch.Length;
                             }
+                            handledCharCount = textIndex;
                         }
                     }
-                    AddToGroup(currentGroup, currentVisibility, text);
+                    AddToGroup(currentGroup, currentVisibility, text[handledCharCount..]);
                 }
 
                 return groups
@@ -865,7 +938,8 @@ namespace CompWolf.Docs.Server.Data
             {
                 case EntityTypes.Function: break;
                 default:
-                    throw new NotImplementedException($"Cannot combine entities of type {result.Type}");
+                    throw new NotImplementedException($"Cannot combine entities of type {result.Type}. The entities were:\n"
+                        + string.Join('\n', entities));
             }
 
             while (entityEnumerable.MoveNext())

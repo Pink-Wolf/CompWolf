@@ -1,0 +1,161 @@
+[
+  {
+    "name": "complex_class",
+    "declarations": [
+      {
+        "description": "complex_class description",
+        "declaration": "template<template<typename> class TemplateParameter>\rclass complex_class;",
+        "protected": false
+      }
+    ],
+    "type": "Class",
+    "members": {
+      "": [
+        {
+          "name": "member_data",
+          "declarations": [
+            {
+              "description": "member_data description",
+              "declaration": "int member_data;",
+              "protected": false
+            }
+          ],
+          "type": "Variable"
+        },
+        {
+          "name": "enum_member",
+          "declarations": [
+            {
+              "description": "enum_member description",
+              "declaration": "enum class enum_member;",
+              "protected": false
+            }
+          ],
+          "type": "Enum",
+          "enumMembers": [
+            {
+              "description": "enum1 description",
+              "name": "enum1"
+            },
+            {
+              "description": "enum2 description",
+              "name": "enum2"
+            },
+            {
+              "description": "enum3 description",
+              "name": "enum3"
+            }
+          ]
+        },
+        {
+          "name": "alias_member",
+          "declarations": [
+            {
+              "description": "alias_member description",
+              "declaration": "using alias_member;",
+              "protected": false
+            }
+          ],
+          "type": "Alias"
+        },
+        {
+          "name": "member_macro",
+          "declarations": [
+            {
+              "description": "member_macro description",
+              "declaration": "#define member_macro",
+              "protected": false
+            }
+          ],
+          "type": "Macro"
+        },
+        {
+          "name": "nested_class",
+          "declarations": [
+            {
+              "description": "nested_class description",
+              "declaration": "class nested_class;",
+              "protected": false
+            }
+          ],
+          "type": "Class",
+          "members": {
+            "": [
+              {
+                "name": "nested_class_method",
+                "declarations": [
+                  {
+                    "description": "nested_class_method protected description",
+                    "declaration": "void nested_class_method(int param1);",
+                    "protected": true
+                  },
+                  {
+                    "description": "nested_class_method public description",
+                    "declaration": "void nested_class_method(bool);",
+                    "protected": false
+                  }
+                ],
+                "type": "Function"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "ConceptName",
+    "declarations": [
+      {
+        "description": "ConceptName description",
+        "declaration": "template <typename T> concept ConceptName;",
+        "protected": false
+      }
+    ],
+    "type": "Concept"
+  },
+  {
+    "name": "simple_class",
+    "declarations": [
+      {
+        "description": "simple_class description",
+        "declaration": "class simple_class;",
+        "protected": false
+      }
+    ],
+    "type": "Class"
+  },
+  {
+    "name": "simple_struct",
+    "declarations": [
+      {
+        "description": "simple_struct description",
+        "declaration": "struct simple_struct;",
+        "protected": false
+      }
+    ],
+    "type": "Class"
+  },
+  {
+    "name": "forward_declared_class",
+    "declarations": [
+      {
+        "description": "forward_declared_class description",
+        "declaration": "class forward_declared_class;",
+        "protected": false
+      }
+    ],
+    "type": "Class"
+  },
+  {
+    "name": "global_function",
+    "declarations": [
+      {
+        "description": "global_function description",
+        "declaration": "void global_function();",
+        "protected": false
+      }
+    ],
+    "type": "Function"
+  }
+]

@@ -1,10 +1,16 @@
 using CompWolf.Docs.Server.Data;
-using System.Xml.Linq;
+using CompWolf.Docs.Server.Models;
+using System.Text.Json;
 
 namespace CompWolf.Docs.Server.Tests
 {
     public class SourceDatabaseTests
     {
+        private readonly static JsonSerializerOptions serializerOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        };
+
         [TestCase(3, "{  }", 0, TestName = "{m}(Basic)")]
         [TestCase(3, "{  }  ", 0, TestName = "{m}(Whitespace)")]
         [TestCase(3 - 2, "{  }", -2, TestName = "{m}(Negative index)")]
@@ -58,6 +64,10 @@ namespace CompWolf.Docs.Server.Tests
             "name", "body",
             TestName = "{m}(Basic with even more whitespace)")]
 
+        [TestCase("ignoreThis namespace name{body} ignoreThat",
+            "name", "body",
+            TestName = "{m}(Ignore non-namespace stuff)")]
+
         [TestCase("namespace name::nestedName{body}",
             "name::nestedName", "body",
             TestName = "{m}(Nested namespace definition)")]
@@ -102,31 +112,35 @@ namespace CompWolf.Docs.Server.Tests
         [TestCase("", TestName = "{m}(Empty)")]
         [TestCase("         ", TestName = "{m}(Whitespace)")]
         [TestCase("{/*comment*/type name;}",
-            "comment", "type name;", "",
+            "comment", "type name", "",
             TestName = "{m}(Variable: Full text is encompassed in brackets)")]
         [TestCase("{/* \r type name; \r */type name;}",
-            "type name;", "type name;", "",
+            "type name;", "type name", "",
             TestName = "{m}(Variable: Ignore variable in comment)")]
 
         [TestCase("/*comment*/type name;",
-            "comment", "type name;", "",
+            "comment", "type name", "",
             TestName = "{m}(Variable)")]
         [TestCase("/*  comment  */  type  name  ;  ",
-            "comment", "type  name  ;", "",
+            "comment", "type  name", "",
             TestName = "{m}(Variable: Whitespace)")]
         [TestCase("type name;",
-            "", "type name;", "",
+            "", "type name", "",
             TestName = "{m}(Variable: No comment)")]
 
-        [TestCase("/*comment*/class test{body}",
+        [TestCase("/*comment*/class test{body};",
             "comment", "class test", "{body",
             TestName = "{m}(Class)")]
-        [TestCase("  /*  comment  */  class  test  {  body  }  ",
+        [TestCase("  /*  comment  */  class  test  {  body  }  ;  ",
             "comment", "class  test", "{  body",
             TestName = "{m}(Class: Whitespace)")]
-        [TestCase("class test{body}",
+        [TestCase("class test{body};",
             "", "class test", "{body",
             TestName = "{m}(Class: No comment)")]
+        [TestCase("/*comment*/class test1{body1};/*comment*/class test2{body2};",
+            "comment", "class test1", "{body1",
+            "comment", "class test2", "{body2",
+            TestName = "{m}(Class: Multiple)")]
 
         [TestCase("/*comment*/#define test body\r",
             "comment", "#define test", "body",
@@ -137,6 +151,9 @@ namespace CompWolf.Docs.Server.Tests
         [TestCase("#define test body\r",
             "", "#define test", "body",
             TestName = "{m}(Macro: No comment)")]
+        [TestCase("/*comment*/#define test ;int test();\r",
+            "comment", "#define test", ";int test();",
+            TestName = "{m}(Macro: Function in macro)")]
 
         [TestCase("/*comment*/#define test() body\r",
             "comment", "#define test()", "body",
@@ -152,13 +169,13 @@ namespace CompWolf.Docs.Server.Tests
             TestName = "{m}(Parameter-macro: end instead of newline)")]
 
         [TestCase("/*comment*/using name=body;",
-            "comment", "using name", "=body;",
+            "comment", "using name", "=body",
             TestName = "{m}(Alias)")]
         [TestCase("  /*  comment  */  using  name  =  body  ;  ",
-            "comment", "using  name", "=  body  ;",
+            "comment", "using  name", "=  body",
             TestName = "{m}(Alias: Whitespace)")]
         [TestCase("using name=body;",
-            "", "using name", "=body;",
+            "", "using name", "=body",
             TestName = "{m}(Alias: No comment)")]
         public void MemberEntity_SplitText(string text, params string[] expectedRaw)
         {
@@ -185,83 +202,83 @@ namespace CompWolf.Docs.Server.Tests
         }
 
         [TestCase("",
-            "", "", "", "",
+            "", "0",
             TestName = "{m}(Empty)")]
         [TestCase("           ",
-            "", "", "", "",
+            "", "0",
             TestName = "{m}(Whitespace)")]
 
         [TestCase("public:",
-            "", "", "", "",
+            "", "0",
             TestName = "{m}(Empty visibility group)")]
         [TestCase("public://groupName\r",
-            "", "", "", "",
-            "groupName", "", "", "",
+            "", "0",
+            "groupName", "0",
             TestName = "{m}(Empty group)")]
         [TestCase("public://groupName",
-            "", "", "", "",
-            "groupName", "", "", "",
+            "", "0",
+            "groupName", "0",
             TestName = "{m}(Empty group without c++-style end of name)")]
 
         [TestCase("test",
-            "", "test", "", "",
+            "", "1", "public", "test",
             TestName = "{m}(Default Group)")]
         [TestCase("testPublic protected:testProtected private:testPrivate",
-            "", "testPublic", "testProtected", "testPrivate",
+            "", "3", "public", "testPublic", "protected", "testProtected", "private", "testPrivate",
             TestName = "{m}(Default Group: Multiple visibilities)")]
         [TestCase("testPublic1 public:testPublic2 protected:testProtected public:testPublic3",
-            "", "testPublic1 testPublic2 testPublic3", "testProtected", "",
+            "", "2", "public", "testPublic1 testPublic2 testPublic3", "protected", "testProtected",
             TestName = "{m}(Default Group: Multiple of same visibilities)")]
         [TestCase("testPublic protected:private:testPrivate",
-            "", "testPublic", "", "testPrivate",
+            "", "2", "public", "testPublic", "private", "testPrivate",
             TestName = "{m}(Default Group: Empty visibility)")]
         [TestCase("testPublic        protected:         testProtected",
-            "", "testPublic", "testProtected", "",
+            "", "2", "public", "testPublic", "protected", "testProtected",
             TestName = "{m}(Default Group: Whitespace)")]
 
         [TestCase("public://group1\rpublic1",
-            "", "", "", "",
-            "group1", "public1", "", "",
+            "", "0",
+            "group1", "1", "public", "public1",
             TestName = "{m}(C++-style Named Group: public)")]
         [TestCase("protected://group1\rprotected1",
-            "", "", "", "",
-            "group1", "", "protected1", "",
+            "", "0",
+            "group1", "1", "protected", "protected1",
             TestName = "{m}(C++-style Named Group: protected)")]
         [TestCase("  public  :  //  group1  \r  public1",
-            "", "", "", "",
-            "group1", "public1", "", "",
+            "", "0",
+            "group1", "1", "public", "public1",
             TestName = "{m}(C++-style Named Group: whitespace)")]
         [TestCase("public://group1\rpublic1 protected:protected1",
-            "", "", "", "",
-            "group1", "public1", "protected1", "",
+            "", "0",
+            "group1", "2", "public", "public1", "protected", "protected1",
             TestName = "{m}(C++-style Named Group: Multiple visibilities)")]
         [TestCase("public:/*group1*/public1",
-            "", "", "", "",
-            "group1", "public1", "", "",
+            "", "0",
+            "group1", "1", "public", "public1",
             TestName = "{m}(C-style Named Group: public)")]
         [TestCase("  public  :  /*  group1  */  public1",
-            "", "", "", "",
-            "group1", "public1", "", "",
+            "", "0",
+            "group1", "1", "public", "public1",
             TestName = "{m}(C-style Named Group: whitespace)")]
 
         [TestCase("testPublic /* protected: */testProtected",
-            "", "testPublic /* protected: */testProtected", "", "",
+            "", "1", "public", "testPublic /* protected: */testProtected",
             TestName = "{m}(Ignore visibility within C-style comment)")]
         [TestCase("testPublic // protected: \rtestProtected",
-            "", "testPublic // protected: \rtestProtected", "", "",
+            "", "1", "public", "testPublic // protected: \rtestProtected",
             TestName = "{m}(Ignore visibility within C++-style comment)")]
         [TestCase("testPublic \" protected: \"testProtected",
-            "", "testPublic \" protected: \"testProtected", "", "",
+            "", "1", "public", "testPublic \" protected: \"testProtected",
             TestName = "{m}(Ignore visibility within comment)")]
 
         [TestCase("testPublic /* public://groupName */groupBody",
-            "", "testPublic /* public://groupName */groupBody", "", "",
+            "", "1", "public", "testPublic /* public://groupName */groupBody",
             TestName = "{m}(Ignore group within C-style comment)")]
         [TestCase("testPublic // public://groupName \rgroupBody",
-            "", "testPublic // public://groupName \rgroupBody", "", "",
+            "", "1", "public", "testPublic // public://groupName \rgroupBody",
             TestName = "{m}(Ignore group within C++-style comment)")]
         [TestCase("testPublic \" public://groupName \"groupBody",
-            "", "testPublic \" public://groupName \"groupBody", "", "",
+            "", "1", "public", "testPublic \" public://groupName \"groupBody",
             TestName = "{m}(Ignore group within comment)")]
         public void MemberGroup_SplitText(string text, params string[] expectedRaw)
         {
@@ -269,22 +286,101 @@ namespace CompWolf.Docs.Server.Tests
                 .Select(x => new SourceDatabase.MemberGroup()
                 {
                     GroupName = x.GroupName,
-                    TextPerVisibility = x.TextPerVisibility.Select(x => (x.Key, x.Value.Trim())).ToDictionary()
+                    TextPerVisibility = x.TextPerVisibility.Select(x => (x.Item1, x.Item2.Trim())).ToList()
                 })
                 .ToHashSet();
             var expected = new HashSet<SourceDatabase.MemberGroup>();
-            for (int i = 0; i < expectedRaw.Length; i += 4)
+            for (int i = 0; i < expectedRaw.Length;)
             {
-                expected.Add(new()
+                SourceDatabase.MemberGroup newGroup = new()
                 {
                     GroupName = expectedRaw[i],
-                    TextPerVisibility = new (string, string)[] {
-                        ("public", expectedRaw[i + 1]),
-                        ("protected", expectedRaw[i + 2]),
-                        ("private", expectedRaw[i + 3])
-                    }.ToDictionary(),
-                });
+                    TextPerVisibility = [],
+                };
+                ++i;
+                int endIndex = int.Parse(expectedRaw[i]) * 2 + i + 1;
+                for (++i; i < endIndex; i += 2)
+                {
+                    newGroup.TextPerVisibility.Add((expectedRaw[i], expectedRaw[i + 1]));
+                }
+                expected.Add(newGroup);
             }
+
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
+
+        [TestCase("GetEntitiesFromNamespace_ComplexTest.cpp", "GetEntitiesFromNamespace_ComplexTest.json",
+            TestName = $"{nameof(GetEntitiesFromNamespace)}(Complex Test)")]
+        public void GetEntitiesFromNamespace_FromFile(string actualFilepath, string expectedFilepath)
+            => GetEntitiesFromNamespace(File.ReadAllText(actualFilepath).ReplaceLineEndings("\r"),
+                File.ReadAllText(expectedFilepath));
+
+        [TestCase("GetEntitiesFromNamespace_ComplexTest_NoWhitespace.cpp",
+            "GetEntitiesFromNamespace_ComplexTest_NoWhitespace.json",
+            TestName = $"{nameof(GetEntitiesFromNamespace)}(Complex Test: No whitespace)")]
+        public void GetEntitiesFromNamespace_FromFile_NoWhitespace(string actualFilepath, string expectedFilepath)
+            => GetEntitiesFromNamespace(
+                string.Join("", File.ReadAllText(actualFilepath)
+                    .ReplaceLineEndings().Split(Environment.NewLine)
+                    .Select(x => x.Trim()))
+                    .Replace(@"|NEWLINE|", SourceDatabase.Newline),
+                File.ReadAllText(expectedFilepath)
+            );
+
+        [TestCase("", "[]",
+            TestName = "{m}(Empty)")]
+        [TestCase("           ", "[]",
+            TestName = "{m}(Whitespace)")]
+        [TestCase("/**line1\r*line2*/void test();",
+            @"[{
+                ""name"": ""test"",
+                ""type"":""function"",
+                ""declarations"":[{
+                    ""description"": ""line1\rline2"",
+                    ""declaration"": ""void test();"",
+                    ""protected"": false
+                }]
+            }]",
+            TestName = "{m}(Ignore * at start of /**-comment's lines)")]
+        [TestCase("/*line1\r*line2*/void test();",
+            @"[{
+                ""name"": ""test"",
+                ""type"": ""function"",
+                ""declarations"": [{
+                    ""description"": ""line1\r*line2"",
+                    ""declaration"": ""void test();"",
+                    ""protected"": false
+                }]
+            }]",
+            TestName = "{m}(Do not ignore * at start of non-/**-comment's lines)")]
+
+        public void GetEntitiesFromNamespace(string namespaceBody, string expectedRaw)
+        {
+            var actual = SourceDatabase.GetEntitiesFromNamespace(new()
+            {
+                Name = "namespaceName",
+                Text = namespaceBody,
+            }).ToHashSet();
+
+            static IEnumerable<SourceEntity> FormatExpected(IEnumerable<SourceEntity> entities)
+            {
+                foreach (var entity in entities)
+                {
+                    entity.Namespace ??= "namespaceName";
+                    entity.BriefDescription ??= "";
+                    entity.ReturnDescription ??= "";
+                    entity.ParameterDescriptions ??= [];
+                    entity.ThrowDescription ??= "";
+                    entity.Members ??= [];
+                    foreach (var members in entity.Members.Values)
+                        FormatExpected(members);
+                    entity.EnumMembers ??= [];
+                }
+                return entities;
+            };
+
+            var expected = new HashSet<SourceEntity>(JsonSerializer.Deserialize<SourceEntity[]>(expectedRaw, serializerOptions)!);
+            FormatExpected(expected);
 
             CollectionAssert.AreEquivalent(expected, actual);
         }
