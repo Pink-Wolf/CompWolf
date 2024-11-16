@@ -1,6 +1,6 @@
 import EntityViewer from "@/lib/api/viewer/Entity"
 import { getOverview, getEntity } from "@/lib/api/getEntity"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
 export default async function EntityPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
@@ -26,9 +26,9 @@ export async function generateStaticParams() {
         project.headers.map(header =>
             header.entities.map(entity => {
                 return {
-                    project: betterEncodeURIComponent(project.name),
-                    header: betterEncodeURIComponent(header.name),
-                    entity: betterEncodeURIComponent(entity.name),
+                    project: generateStaticParamsEncoder(project.name),
+                    header: generateStaticParamsEncoder(header.name),
+                    entity: generateStaticParamsEncoder(entity.name),
                 }
             })
         )

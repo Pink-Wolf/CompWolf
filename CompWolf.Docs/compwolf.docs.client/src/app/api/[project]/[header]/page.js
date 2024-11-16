@@ -1,6 +1,6 @@
 import { getHeader, getOverview } from "@/lib/api/getEntity"
 import HeaderViewer from "@/lib/api/viewer/Header"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
 export default async function HeaderPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
@@ -24,8 +24,8 @@ export async function generateStaticParams() {
     return overview.projects.map(project =>
         project.headers.map(header => {
             return {
-                project: betterEncodeURIComponent(project.name),
-                header: betterEncodeURIComponent(header.name),
+                project: generateStaticParamsEncoder(project.name),
+                header: generateStaticParamsEncoder(header.name),
             }
         })
     ).flat(Infinity)

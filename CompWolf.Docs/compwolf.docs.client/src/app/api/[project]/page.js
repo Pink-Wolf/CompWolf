@@ -1,6 +1,6 @@
 import { getProject, getOverview } from "@/lib/api/getEntity"
 import ProjectViewer from "@/lib/api/viewer/Project"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
 export default async function ProjectPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
@@ -22,7 +22,7 @@ export async function generateStaticParams() {
 
     return overview.projects.map(project => {
         return {
-            project: betterEncodeURIComponent(project.name)
+            project: generateStaticParamsEncoder(project.name)
         }
     })
 }

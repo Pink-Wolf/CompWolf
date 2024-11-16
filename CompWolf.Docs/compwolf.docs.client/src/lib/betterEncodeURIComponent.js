@@ -5,3 +5,9 @@ export default function betterEncodeURIComponent(str) {
         (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
     )
 }
+
+export function generateStaticParamsEncoder(str) {
+    return (process.env.GENERATE_STATIC_PARAMS_AUTO_ENCODES === "1")
+        ? str
+        : betterEncodeURIComponent(str)
+}

@@ -1,6 +1,6 @@
 import { getOverview, getEntity } from "@/lib/api/getEntity"
 import EntityViewer from "@/lib/api/viewer/Entity"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
 export default async function MemberPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
@@ -29,7 +29,7 @@ function getMembers(entity, members) {
     return Object.values(members).flat().map(member => {
         let data = {
             ...entity,
-            members: [...entity.members, betterEncodeURIComponent(member.name)]
+            members: [...entity.members, generateStaticParamsEncoder(member.name)]
         }
         return [
             data,
@@ -51,9 +51,9 @@ export async function generateStaticParams() {
         project.headers.map(header =>
             header.entities.map(entity =>
                 getMembers({
-                    project: betterEncodeURIComponent(project.name),
-                    header: betterEncodeURIComponent(header.name),
-                    entity: betterEncodeURIComponent(entity.name),
+                    project: generateStaticParamsEncoder(project.name),
+                    header: generateStaticParamsEncoder(header.name),
+                    entity: generateStaticParamsEncoder(entity.name),
                     members: []
                 }, entity.members)
             )
