@@ -1,9 +1,10 @@
 [
   {
     "name": "complex_class",
+    "description": [ "complex_class description" ],
     "declarations": [
       {
-        "description": "complex_class description",
+        "description": "",
         "declaration": "template<template<typename> class TemplateParameter>\rclass complex_class;",
         "protected": false
       }
@@ -13,9 +14,10 @@
       "": [
         {
           "name": "member_data",
+          "description": [ "member_data description" ],
           "declarations": [
             {
-              "description": "member_data description",
+              "description": "",
               "declaration": "int member_data;",
               "protected": false
             }
@@ -24,9 +26,10 @@
         },
         {
           "name": "enum_member",
+          "description": [ "enum_member description" ],
           "declarations": [
             {
-              "description": "enum_member description",
+              "description": "",
               "declaration": "enum class enum_member;",
               "protected": false
             }
@@ -49,9 +52,10 @@
         },
         {
           "name": "alias_member",
+          "description": [ "alias_member description" ],
           "declarations": [
             {
-              "description": "alias_member description",
+              "description": "",
               "declaration": "using alias_member;",
               "protected": false
             }
@@ -60,9 +64,10 @@
         },
         {
           "name": "member_macro",
+          "description": [ "member_macro description" ],
           "declarations": [
             {
-              "description": "member_macro description",
+              "description": "",
               "declaration": "#define member_macro",
               "protected": false
             }
@@ -71,9 +76,10 @@
         },
         {
           "name": "nested_class",
+          "description": [ "nested_class description" ],
           "declarations": [
             {
-              "description": "nested_class description",
+              "description": "",
               "declaration": "class nested_class;",
               "protected": false
             }
@@ -83,6 +89,7 @@
             "": [
               {
                 "name": "nested_class_method",
+                "description": [ "description 1", "description 2", "description 3" ],
                 "declarations": [
                   {
                     "description": "nested_class_method protected description",
@@ -105,9 +112,10 @@
   },
   {
     "name": "ConceptName",
+    "description": [ "ConceptName description" ],
     "declarations": [
       {
-        "description": "ConceptName description",
+        "description": "",
         "declaration": "template <typename T> concept ConceptName;",
         "protected": false
       }
@@ -116,9 +124,10 @@
   },
   {
     "name": "simple_class",
+    "description": [ "simple_class description" ],
     "declarations": [
       {
-        "description": "simple_class description",
+        "description": "",
         "declaration": "class simple_class;",
         "protected": false
       }
@@ -127,9 +136,10 @@
   },
   {
     "name": "simple_struct",
+    "description": [ "simple_struct description" ],
     "declarations": [
       {
-        "description": "simple_struct description",
+        "description": "",
         "declaration": "struct simple_struct;",
         "protected": false
       }
@@ -138,9 +148,10 @@
   },
   {
     "name": "forward_declared_class",
+    "description": [ "forward_declared_class description" ],
     "declarations": [
       {
-        "description": "forward_declared_class description",
+        "description": "",
         "declaration": "class forward_declared_class;",
         "protected": false
       }
@@ -149,9 +160,10 @@
   },
   {
     "name": "global_function",
+    "description": [ "global_function description" ],
     "declarations": [
       {
-        "description": "global_function description",
+        "description": "",
         "declaration": "void global_function();",
         "protected": false
       }

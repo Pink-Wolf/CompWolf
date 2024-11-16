@@ -1,10 +1,16 @@
 import { Fragment } from "react"
-import { SimpleReference } from "./CodeComponents"
+import { Reference, SimpleReference } from "./CodeComponents"
 
 function BaseFormatter({ children, regexBegin, regexEnd, Formatter, RestFormatter }) {
 	return children
 		.split(new RegExp(regexBegin, `g`))
-		.map(s => s.split(new RegExp(regexEnd, `g`), 2))
+		.map((s, i) => {
+			if (i == 0) return [s]
+			const index = s.search(new RegExp(regexEnd, `g`))
+			return (index == -1)
+				? [s]
+				: [s.substring(0, index), s.substring(index)]
+		})
 		.map((s, i) => {
 			if (s[1] === undefined) return <RestFormatter key={i}>{s[0]}</RestFormatter>
 			return (
@@ -77,7 +83,12 @@ function ListFormatter({ children, NextFormatting, level = 0 }) {
 	)
 }
 function ReferenceFormatter({ children, NextFormatting }) {
-	return <BaseFormatter regexBegin="\[\[" regexEnd="\]\]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
+	return <BaseFormatter regexBegin="compwolf\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
+		{children}
+	</BaseFormatter>
+}
+function StdReferenceFormatter({ children, NextFormatting }) {
+	return <BaseFormatter regexBegin="std\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <Reference path={`https://duckduckgo.com/?sites=cppreference.com&q=` + children}>std::{children}</Reference>}>
 		{children}
 	</BaseFormatter>
 }
@@ -98,5 +109,5 @@ function CombinedFormatters({ children, Formatters }) {
 
 export default function FormattedText({ children }) {
 	if (children === undefined) return false
-	return <CombinedFormatters Formatters={[ListFormatter, ReferenceFormatter]}>{children}</CombinedFormatters>
+	return <CombinedFormatters Formatters={[ListFormatter, ReferenceFormatter, StdReferenceFormatter]}>{children}</CombinedFormatters>
 }

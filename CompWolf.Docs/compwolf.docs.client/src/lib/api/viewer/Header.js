@@ -1,20 +1,17 @@
-import { Declaration, Reference } from "@/lib/CodeComponents"
+import { Declaration, Reference, SimpleReference } from "@/lib/CodeComponents"
 import FormattedText from "@/lib/FormattedText"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export default function HeaderViewer({ data }) {
-	const is_empty = (x) => { return x == undefined || x.length == 0 }
-
 	return (
 		<section>
 			<small>
-				<p id="Project">In project <Reference path={`/api/${data.project}`}>{data.project}</Reference></p>
+				<p id="Project">In project <SimpleReference target={data.project} /></p>
 			</small>
 			<h1 id="Declaration">
-				<Declaration>{`<${data.header}>`}</Declaration>
+				<Declaration>{`<${data.name}>`}</Declaration>
 			</h1>
 			<section id="Description">
-				{data.detailedDescription.map((x, i) => {
+				{data.descriptions.map((x, i) => {
 					return (
 						<section key={i}>
 							<FormattedText>{x}</FormattedText>
@@ -27,7 +24,7 @@ export default function HeaderViewer({ data }) {
 				{data.entities.map((x, i) => {
 					return (
 						<li key={i}>
-							<Reference path={`/api/${data.project}/${data.header}/${betterEncodeURIComponent(x.name)}`}>{x.name}</Reference>: <FormattedText>{x.briefDescription}</FormattedText>
+							<SimpleReference target={x} />: <FormattedText>{x.descriptions[0]}</FormattedText>
 						</li>
 					)
 				})}

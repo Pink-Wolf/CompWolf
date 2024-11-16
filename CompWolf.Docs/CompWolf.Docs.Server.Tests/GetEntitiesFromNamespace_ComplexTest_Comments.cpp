@@ -36,13 +36,16 @@ public:
 	/** nested_class description */
 	class nested_class
 	{
-		/** nested_class_method private description */
+		/** description 1
+		 * @overload nested_class_method private description
+		 */
 		void nested_class_method()
 		{
 
 		}
 	protected:
-		/** nested_class_method protected description
+		/** description 2
+		 * @overload nested_class_method protected description
 		 * @param param1 param1 description
 		 */
 		void nested_class_method(int param1)
@@ -50,7 +53,8 @@ public:
 
 		}
 	public:
-		/** nested_class_method public description */
+		/** description 3
+		 * @overload nested_class_method public description */
 		void nested_class_method(bool)
 		{
 

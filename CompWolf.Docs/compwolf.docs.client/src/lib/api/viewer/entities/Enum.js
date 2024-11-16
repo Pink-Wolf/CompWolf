@@ -1,13 +1,13 @@
 import { Fragment } from "react"
 import { Declaration } from "@/lib/CodeComponents"
 import FormattedText from "@/lib/FormattedText"
-import DeclarationEntityViewer from "./DeclarationEntity"
+import BaseEntityViewer from "./BaseEntity"
 
 export default function EnumViewer({ data }) {
 	const is_empty = (x) => { return x == undefined || x.length == 0 }
 
 	return (
-		<DeclarationEntityViewer data={data}>
+		<BaseEntityViewer data={data}>
 			<section id="Values">
 				<h2>Values</h2>
 				<table className="memberTable">
@@ -18,14 +18,14 @@ export default function EnumViewer({ data }) {
 						</tr>
 					</thead>
 					<tbody>
-						{data.values?.map((x, i) => {
+						{data.enumMembers?.map((x, i) => {
 							return (
 								<tr key={i}>
 									<td>
 										{x.name}
 									</td>
 									<td>
-										<FormattedText>{x.briefDescription}</FormattedText>
+										<FormattedText>{x.description}</FormattedText>
 									</td>
 								</tr>
 							)
@@ -33,6 +33,6 @@ export default function EnumViewer({ data }) {
 					</tbody>
 				</table>
 			</section>
-		</DeclarationEntityViewer>
+		</BaseEntityViewer>
 	)
 }

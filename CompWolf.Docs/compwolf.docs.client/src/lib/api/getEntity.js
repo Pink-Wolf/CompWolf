@@ -28,136 +28,65 @@ async function postJson(path, data) {
     return await response.json()
 }
 
-export async function getExample(name) {
-    const example = await getJson(`${EXAMPLE_URL}${name}`)
-    return example
-}
-
 export async function getRawSource() {
     return await getJson(API_SOURCE_URL);
 }
+export async function getOverview() {
+    let data = await getRawSource()
+    for (let projectI = 0; projectI < data.projects.length; ++projectI) {
+        const project = data.projects[projectI]
+        project.project = project
 
-export async function getRawProject(name) {
-    return (await getJson(`${API_DOCS_URL}${name}`))
-        ?? {}
-}
-export async function getProject(name) {
-    var source = getRawSource()
-        .projects.find(x => x.name == name);
-    var docs = await getRawProject(name)
-    return {
-        ...source,
-        ...docs
-    }
-}
+        for (let headerI = 0; headerI < project.headers.length; ++headerI) {
+            const header = project.headers[headerI]
+            header.project = project
+            header.header = header
+            if (header.descriptions.length === 0)
+                header.descriptions = [""]
 
-export async function getRawHeader(projectName, name) {
-    return (await getJson(`${API_DOCS_URL}${projectName}/${name}`))
-        ?? {}
-}
-export async function getHeader(projectName, name) {
-    var source = getRawSource()
-        .projects.find(x => x.name == projectName)
-        .headers.find(x => x.name == name);
-    var docs = await getRawHeader(projectName, name)
-    return {
-        ...source,
-        ...docs,
-        project: projectName,
-    }
-}
+            for (let entityI = 0; entityI < header.entities.length; ++entityI) {
+                const entity = header.entities[entityI]
 
-export async function getRawEntity(projectName, headerName, name) {
-    return (await getJson(`${API_DOCS_URL}${projectName}/${headerName}/${name}`))
-        ?? {}
-}
-export async function getEntity(projectName, headerName, name) {
-    const source = getRawSource()
-        .projects.find(x => x.name == projectName)
-        .headers.find(x => x.name == headerName)
-        .entities.find(x => x.name == name);
-    const docs = await getRawEntity(projectName, headerName, name)
+                function formatEntity(entity, owners) {
+                    entity.project = project
+                    entity.header = header
+                    entity.owners = owners
+                    if (entity.descriptions.length === 0)
+                        entity.descriptions = [""]
 
-    var members = source.members
-    for (const [groupName, groupValue] of Object.entries(docs.members)) {
-        var sourceGroup = members[groupName]
-        for (const member of groupValue) {
-            var memberIndex = sourceGroup.findIndex(x => x.name == member.name)
-            sourceGroup[memberIndex] = {
-                ...sourceGroup[memberIndex],
-                ...member
+                    const memberGroups = Object.values(entity.members).flat()
+                    for (let nestedI = 0; nestedI < memberGroups.length; ++nestedI) {
+                        const nested = memberGroups[nestedI]
+                        formatEntity(nested, [...owners, entity])
+                    }
+                }
+
+                formatEntity(entity, [])
             }
         }
     }
-
-    return {
-        ...source,
-        ...docs,
-        members: members,
-        project: projectName,
-        header: headerName,
-    }
+    return data
 }
 
-export async function formatRawEntity(data) {
-    const returnVal = {
-        ...data,
-        example: (data.example === undefined || data.example.code == "") ? undefined : await getExample(data.example)
-    }
-    switch (returnVal.type) {
-        case `concept`:
-        case `class`: {
-            if (returnVal.hasOwnProperty("constructor")) {
-                if (returnVal.copyable && returnVal.movable) {
-                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is copyable and movable.`
-                }
-                else if (returnVal.copyable && !returnVal.movable) {
-                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is copyable, but not movable.`
-                    returnVal.constructor.detailedDescription.push(`[[${returnVal.name}]] is not movable.`)
-                }
-                else if (!returnVal.copyable && returnVal.movable) {
-                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is not copyable, but is movable.`
-                    returnVal.constructor.detailedDescription.push(`[[${returnVal.name}]] is not copyable.`)
-                }
-                else if (!returnVal.copyable && !returnVal.movable) {
-                    returnVal.constructor.briefDescription = `[[${returnVal.name}]] is not copyable nor movable.`
-                    returnVal.constructor.detailedDescription.push(`[[${returnVal.name}]] is not copyable nor movable.`)
-                }
-            }
+export async function getProject(projectName) {
+    return (await getOverview())
+        .projects
+        .find(x => x.name === projectName)
+}
+export async function getHeader(projectName, headerName) {
+    return (await getProject(projectName))
+        .headers
+        .find(x => x.name === headerName)
+}
+export async function getEntity(projectName, headerName, entityName) {
+    const data = (await getHeader(projectName, headerName))
+        .entities
+        .find(x => x.name === entityName)
 
-            returnVal.memberGroups = await Promise.all(
-                returnVal.memberGroups.map(async memberGroup => {
-                    return {
-                        name: memberGroup.name,
-                        items: await Promise.all(
-                            memberGroup.items.map(
-                                async member => {
-                                    return await formatRawEntity({
-                                        ...member,
-                                        project: data.project,
-                                        header: data.header,
-                                        owners: [...data.owners, data.name],
-                                    })
-                                }
-                            )
-                        )
-                    }
-                })
-            )
-        } break
-        default: break
-    }
-    return returnVal
-}
-export async function getEntity(project, header, entity) {
-    return await formatRawEntity(await getEntityRaw(project, header, entity))
-}
-export async function postEntity(project, header, entity, data) {
-    return await postJson(`${API_DOCS_URL}${project}/${header}/${entity}`, data)
-}
+    if (typeof (data.members) !== typeof (undefined) && typeof (data.members[""]) !== typeof (undefined))
+        data.members = { "": [], ...data.members }
 
-export async function getOverview() {
-    return await getJson(`${DATABASE_URL}api/source`)
+    return data
 }
 
 export async function getPathTo(name) {
@@ -167,9 +96,10 @@ export async function getPathTo(name) {
     let isMember = memberSplitterIndex >= 0
     let memberName = !isMember ? "" : name.substring(memberSplitterIndex + 2, name.length).split("::").map(x => betterEncodeURIComponent(x)).join("/")
     if (isMember) {
+        const fullName = name
         name = name.substring(0, memberSplitterIndex)
 
-        if (name == `std`) return undefined
+        if (name == `std`) return `https://duckduckgo.com/?sites=cppreference.com&q=` + fullName.substring(memberSplitterIndex + 2)
     }
 
     var path = undefined

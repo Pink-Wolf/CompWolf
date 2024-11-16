@@ -8,10 +8,10 @@ export default function ProjectListViewer({ data }) {
 		<section>
 			<h2>Projects:</h2>
 			<ul>
-				{data.projects.map((x, i) => {
+				{data.map((x, i) => {
 					return (
 						<li key={i}>
-							<Reference path={`/api/${x.name}`}>{x.name}</Reference>: <FormattedText>{x.briefDescription}</FormattedText>
+							<Reference path={`/api/${x.name}`}>{x.name}</Reference>
 						</li>
 					)
 				})}

@@ -2,26 +2,13 @@ import { Fragment } from "react"
 import { Declaration, Reference, SimpleReference } from "@/lib/CodeComponents"
 import FormattedText from "@/lib/FormattedText"
 import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
-import DeclarationEntityViewer from "./DeclarationEntity"
+import BaseEntityViewer from "./BaseEntity"
 
 export default function ClassViewer({ data }) {
 	const is_empty = (x) => { return x == undefined || x.length == 0 }
 
-	const dataPath = `/api/
-		${data.project}/
-		${data.header}/
-		${(data.owners ?? []).map(x => `${betterEncodeURIComponent(x)}/`).join()}
-		${betterEncodeURIComponent(data.name)}`
-	function MemberReference({ name }) {
-		return (
-			<Reference path={`${dataPath}/${betterEncodeURIComponent(name)}`}>
-				{name}
-			</Reference>
-		)
-	}
-
 	return (
-		<DeclarationEntityViewer data={data} top={
+		<BaseEntityViewer data={data} top={
 			<Fragment>
 				<small hidden={is_empty(data.baseClasses)}>
 					Inherits from: {
@@ -62,7 +49,7 @@ export default function ClassViewer({ data }) {
 				</table>
 			</section>
 			
-			<section hidden={is_empty(data.memberGroups) && is_empty(data.constructor?.overloads)} id="MemberFunctions">
+			<section hidden={is_empty(data.members)} id="MemberFunctions">
 				<h2>Members</h2>
 				<table className="memberTable">
 					<thead>
@@ -72,35 +59,22 @@ export default function ClassViewer({ data }) {
 						</tr>
 					</thead>
 					<tbody>
-						<tr hidden={is_empty(data.constructor?.overloads)}>
-							<td>
-								<Reference path={`${dataPath}/${betterEncodeURIComponent(data.name)}`}>
-									(constructors)
-								</Reference>
-							</td>
-							<td>
-								<FormattedText>{data.constructor?.briefDescription}</FormattedText>
-							</td>
-						</tr>
-						{data.memberGroups?.map((x, i) => {
+						{Object.entries(data.members ?? {}).map((x, i) => {
 							return (
 								<Fragment key={i}>
-									<tr hidden={is_empty(x.name) && is_empty(x.description)}>
+									<tr hidden={is_empty(x[0])}>
 										<td colSpan="2">
-											<h3>{x.name}</h3>
-											<div>
-												<FormattedText>{x.description}</FormattedText>
-											</div>
+											<h3>{x[0]}</h3>
 										</td>
 									</tr>
-									{x.items.map((x, i) => {
+									{x[1].map((x, i) => {
 										return (
 											<tr key={i}>
 												<td>
-													<MemberReference name={x.name} />
+													<SimpleReference target={x} />
 												</td>
 												<td>
-													<FormattedText>{x.briefDescription}</FormattedText>
+													<FormattedText>{x.descriptions[0]}</FormattedText>
 												</td>
 											</tr>
 										)
@@ -111,6 +85,6 @@ export default function ClassViewer({ data }) {
 					</tbody>
 				</table>
 			</section>
-		</DeclarationEntityViewer>
+		</BaseEntityViewer>
 	)
 }

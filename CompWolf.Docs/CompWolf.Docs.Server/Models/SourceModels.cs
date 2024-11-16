@@ -55,12 +55,15 @@ namespace CompWolf.Docs.Server.Models
         // Default:
         public string Name { get; set; } = default!;
         public EntityTypes Type { get; set; } = default!;
-        public string BriefDescription { get; set; } = default!;
+        public string[] Descriptions { get; set; } = default!;
         public SourceDeclaration[] Declarations { get; set; } = default!;
         public string Namespace { get; set; } = default!;
+        public string[] Warnings { get; set; } = default!;
+        public string[] Related { get; set; } = default!;
+        public Dictionary<string, string> TemplateParameterDescriptions { get; set; } = default!;
         // Class:
-        public SourceEntity? Constructors { get; set; } = default!;
         public Dictionary<string, SourceEntity[]> Members { get; set; } = default!;
+        public string[] BaseClasses { get; set; } = default!;
         // Function:
         public string ReturnDescription { get; set; } = default!;
         public Dictionary<string, string> ParameterDescriptions { get; set; } = default!;
@@ -82,11 +85,20 @@ namespace CompWolf.Docs.Server.Models
 
             return Name == other.Name
                 && Type == other.Type
-                && BriefDescription == other.BriefDescription
+                && Namespace == other.Namespace
+                && ((Descriptions is null) ? other.Descriptions is null : other.Descriptions is not null
+                    && Descriptions.SequenceEqual(other.Descriptions))
                 && ((Declarations is null) ? other.Declarations is null : other.Declarations is not null
                     && Declarations.SequenceEqual(other.Declarations))
-                && Namespace == other.Namespace
-                && Constructors == other.Constructors
+                && ((Warnings is null) ? other.Warnings is null : other.Warnings is not null
+                    && Warnings.SequenceEqual(other.Warnings))
+                && ((Related is null) ? other.Related is null : other.Related is not null
+                    && Related.SequenceEqual(other.Related))
+                && (TemplateParameterDescriptions is null ? other.TemplateParameterDescriptions is null : other.TemplateParameterDescriptions is not null
+                    && TemplateParameterDescriptions.Count == other.TemplateParameterDescriptions.Count
+                    && TemplateParameterDescriptions.Union(other.TemplateParameterDescriptions).Count() == TemplateParameterDescriptions.Count)
+                && ((BaseClasses is null) ? other.BaseClasses is null : other.BaseClasses is not null
+                    && BaseClasses.SequenceEqual(other.BaseClasses))
                 && (Members is null ? other.Members is null : other.Members is not null
                     && Members.Count == memberCheck.Length && (memberCheck.Contains(false) is false))
                 && ReturnDescription == other.ReturnDescription
@@ -104,13 +116,24 @@ namespace CompWolf.Docs.Server.Models
             HashCode hash = new();
             hash.Add(Name);
             hash.Add(Type);
-            hash.Add(BriefDescription);
             hash.Add(Namespace);
             hash.Add(ReturnDescription);
             hash.Add(ThrowDescription);
-            hash.Add(Constructors);
+            if (Descriptions is not null) foreach (var item in Descriptions)
+                hash.Add(item);
             if (Declarations is not null) foreach (var item in Declarations.OrderBy(x => x.Declaration))
                 hash.Add(item);
+            if (Warnings is not null) foreach (var item in Warnings)
+                    hash.Add(item);
+            if (Related is not null) foreach (var item in Related)
+                    hash.Add(item);
+            if (BaseClasses is not null) foreach (var item in BaseClasses)
+                    hash.Add(item);
+            if (TemplateParameterDescriptions is not null) foreach (var item in TemplateParameterDescriptions.OrderBy(x => x.Key))
+            {
+                hash.Add(item.Key);
+                hash.Add(item.Value);
+            }
             if (ParameterDescriptions is not null) foreach (var item in ParameterDescriptions.OrderBy(x => x.Key))
             {
                 hash.Add(item.Key);
@@ -133,7 +156,7 @@ namespace CompWolf.Docs.Server.Models
     public class SourceHeader
     {
         public string Name { get; set; } = default!;
-        public string BriefDescription { get; set; } = default!;
+        public string[] Descriptions { get; set; } = default!;
         public SourceEntity[] Entities { get; set; } = default!;
     }
     public class SourceProject

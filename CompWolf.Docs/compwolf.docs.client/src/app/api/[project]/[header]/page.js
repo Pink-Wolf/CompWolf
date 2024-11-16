@@ -4,17 +4,10 @@ import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export default async function HeaderPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
-    let project = decodeURIComponent(params.project)
-    let header = decodeURIComponent(params.header)
+    const project = decodeURIComponent(params.project)
+    const header = decodeURIComponent(params.header)
 
-    const overview = await getOverview()
-    const data = {
-        ...(await getHeader(project, header)),
-        entities: overview
-            .projects.find((x) => { return x.name === project })
-            .headers.find((x) => { return x.name === header })
-            .entities
-    }
+    const data = await getHeader(project, header)
 
     return <HeaderViewer data={data} />
 }

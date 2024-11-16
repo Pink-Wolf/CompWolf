@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <version_number>
+#include <version_numbers>
 
 TEST(CompwolfVersion2, major) {
 	EXPECT_EQ(CompWolf::compwolf_version.major, 1);

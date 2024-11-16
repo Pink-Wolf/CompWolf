@@ -11,6 +11,12 @@ namespace CompWolf.Docs.Server.Tests
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
+        [SetUp]
+        public void Setup()
+        {
+            SourceDatabase.Newline = "\r";
+        }
+
         [TestCase(3, "{  }", 0, TestName = "{m}(Basic)")]
         [TestCase(3, "{  }  ", 0, TestName = "{m}(Whitespace)")]
         [TestCase(3 - 2, "{  }", -2, TestName = "{m}(Negative index)")]
@@ -335,8 +341,9 @@ namespace CompWolf.Docs.Server.Tests
             @"[{
                 ""name"": ""test"",
                 ""type"":""function"",
+                ""description"": [""line1\rline2""],
                 ""declarations"":[{
-                    ""description"": ""line1\rline2"",
+                    ""description"": """",
                     ""declaration"": ""void test();"",
                     ""protected"": false
                 }]
@@ -346,8 +353,9 @@ namespace CompWolf.Docs.Server.Tests
             @"[{
                 ""name"": ""test"",
                 ""type"": ""function"",
+                ""description"": [""line1\r*line2""],
                 ""declarations"": [{
-                    ""description"": ""line1\r*line2"",
+                    ""description"": """",
                     ""declaration"": ""void test();"",
                     ""protected"": false
                 }]
@@ -367,11 +375,15 @@ namespace CompWolf.Docs.Server.Tests
                 foreach (var entity in entities)
                 {
                     entity.Namespace ??= "namespaceName";
-                    entity.BriefDescription ??= "";
+                    entity.Descriptions ??= [];
                     entity.ReturnDescription ??= "";
                     entity.ParameterDescriptions ??= [];
                     entity.ThrowDescription ??= "";
                     entity.Members ??= [];
+                    entity.Warnings ??= [];
+                    entity.Related ??= [];
+                    entity.BaseClasses ??= [];
+                    entity.TemplateParameterDescriptions ??= [];
                     foreach (var members in entity.Members.Values)
                         FormatExpected(members);
                     entity.EnumMembers ??= [];

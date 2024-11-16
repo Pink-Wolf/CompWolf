@@ -42,12 +42,7 @@ async function HeaderMenu() {
                 name: `api`,
                 items: apiItems,
                 Display: ({ }) => <Link href="/api/">API</Link>,
-            },
-            ...(process.env.INCLUDE_API_EDITOR != "1") ? [] : [{
-                name: `editor/api`,
-                items: apiItems,
-                Display: ({ }) => <Link href="/editor/api/">API Editor</Link>,
-            }]
+            }
         ],
         pathPrefix: `/`,
     }

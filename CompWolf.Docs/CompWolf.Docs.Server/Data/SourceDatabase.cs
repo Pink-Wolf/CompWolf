@@ -6,7 +6,7 @@ namespace CompWolf.Docs.Server.Data
 {
     public class SourceDatabase
     {
-        public static readonly string Newline = "\r";
+        public static string Newline { get; set; } = Environment.NewLine;
         public static string CompWolfProgramPath => _compWolfProgramPath;
         private static readonly string _compWolfProgramPath = GetCompWolfProgramPath();
         private static string GetCompWolfProgramPath()
@@ -99,7 +99,7 @@ namespace CompWolf.Docs.Server.Data
                 yield return new SourceHeader()
                 {
                     Name = Path.GetFileNameWithoutExtension(headerFile),
-                    BriefDescription = string.Join(Newline, descriptions),
+                    Descriptions = [.. descriptions],
                     Entities = (await Task.WhenAll(files.Select(GetEntitiesFromFile)))
                         .SelectMany(x => x)
                         .ToArray()
@@ -156,16 +156,30 @@ namespace CompWolf.Docs.Server.Data
                         parameterLessDeclaration = parameterLessDeclaration[..parameterIndex];
                 }
                 var attributeLessDeclaration = parameterLessDeclaration;
-                bool hasAttributes;
                 {
                     var parameterIndex = parameterLessDeclaration.IndexOf('[');
-                    hasAttributes = parameterIndex >= 0;
-                    if (hasAttributes)
+                    if (parameterIndex >= 0)
+                    {
+                        var operatorMatch = Regex.Match(parameterLessDeclaration[..parameterIndex], @"operator\s*$");
+                        if (operatorMatch.Success) parameterIndex = parameterLessDeclaration.IndexOf('[', parameterIndex + 1);
+                    }
+                    if (parameterIndex >= 0)
                         attributeLessDeclaration = parameterLessDeclaration[..parameterIndex]
                             + parameterLessDeclaration[parameterLessDeclaration.IndexOf(']', parameterIndex)..];
                 }
 
-                var cleanedDeclarationWords = parameterLessDeclaration
+                var declarationAfterColon = "";
+                {
+                    var colonIndex = attributeLessDeclaration.IndexOf(':');
+                    if (colonIndex >= 0)
+                    {
+                        var index = entityDeclaration.Length - attributeLessDeclaration.Length + colonIndex;
+                        declarationAfterColon = entityDeclaration[(index + 1)..];
+                        entityDeclaration = entityDeclaration[..index];
+                    }
+                }
+
+                var cleanedDeclarationWords = attributeLessDeclaration
                     .Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.EndsWith(';') ? x[..(x.Length - 1)] : x)
                     .ToList();
@@ -233,8 +247,23 @@ namespace CompWolf.Docs.Server.Data
                         .ToList();
                 }
 
+                string[] baseClasses = [];
                 if (entityType == EntityTypes.Class)
                 {
+                    baseClasses = declarationAfterColon
+                        .Split(",")
+                        .Select(text =>
+                        {
+                            var publicMatch = Regex.Match(text, @"^\s*public\s*");
+                            if (publicMatch.Success is false) return null;
+                            text = text[(publicMatch.Length)..];
+                            if (text.StartsWith("virtual")) text = text["virtual".Length..];
+                            return text.Trim();
+                        })
+                        .Where(x => x != null)
+                        .Select(x => x!)
+                        .ToArray();
+
                     nestedEntities = MemberGroup.SplitText(entityBody, isStruct)
                         .Select(x => (x.GroupName.Trim(), x.TextPerVisibility
                                 .Where(x => x.Item1 != "private")
@@ -258,12 +287,8 @@ namespace CompWolf.Docs.Server.Data
 
                                     if (entityGroup.Count > 1)
                                     {
-                                        for (int i = 1; string.IsNullOrEmpty(entity.BriefDescription) && i < entityGroup.Count; ++i)
-                                        {
-                                            entity.BriefDescription = entityGroup[i].BriefDescription;
-                                        }
-
                                         entity.Declarations = entityGroup.SelectMany(x => x.Declarations).ToArray();
+                                        entity.Descriptions = entityGroup.SelectMany(x => x.Descriptions).ToArray();
                                     }
 
                                     return entity;
@@ -281,18 +306,26 @@ namespace CompWolf.Docs.Server.Data
                         {
                             constructor.Name = entityName;
                             constructor.Type = EntityTypes.Function;
+
+                            if (nestedEntities.TryGetValue("", out _) is false)
+                                nestedEntities[""] = [];
+                            nestedEntities[""] = [constructor, .. (nestedEntities[""])];
                         }
                     }
                 }
 
-                string mainComment, briefComment, returnComment, throwComment;
-                Dictionary<string, string> parameterComments;
+                string mainComment, returnComment, throwComment, overloadComment;
+                List<string> related, warnings;
+                Dictionary<string, string> parameterComments, templateParameterComments;
                 {
                     List<string> mainCommentLines = [];
-                    List<string> briefCommentLines = [];
                     Dictionary<string, List<string>> parameterCommentLines = [];
+                    Dictionary<string, List<string>> templateParameterCommentLines = [];
                     List<string> returnCommentLines = [];
                     List<string> throwCommentLines = [];
+                    List<string> overloadCommentLines = [];
+                    List<List<string>> warningsLines = [];
+                    related = [];
                     if (entityComment.Length > 0)
                     {
                         var commentTarget = mainCommentLines;
@@ -312,18 +345,34 @@ namespace CompWolf.Docs.Server.Data
                                 switch (sectionMatch.Groups[1].Value)
                                 {
                                     case "param":
-                                        var splitCommentText = newCommentText.Split(' ', 2);
-                                        newCommentText = splitCommentText[1].TrimStart();
-                                        commentTarget = parameterCommentLines[splitCommentText[0]] = [];
+                                        {
+                                            var splitCommentText = newCommentText.Split(' ', 2);
+                                            newCommentText = splitCommentText[1].TrimStart();
+                                            commentTarget = parameterCommentLines[splitCommentText[0]] = [];
+                                        }
+                                        break;
+                                    case "typeParam":
+                                        {
+                                            var splitCommentText = newCommentText.Split(' ', 2);
+                                            newCommentText = splitCommentText[1].TrimStart();
+                                            commentTarget = templateParameterCommentLines[splitCommentText[0]] = [];
+                                        }
                                         break;
                                     case "return":
                                         commentTarget = returnCommentLines;
                                         break;
-                                    case "brief":
-                                        commentTarget = briefCommentLines;
-                                        break;
                                     case "throws":
                                         commentTarget = throwCommentLines;
+                                        break;
+                                    case "overload":
+                                        commentTarget = overloadCommentLines;
+                                        break;
+                                    case "warnings":
+                                        warningsLines.Add([]);
+                                        commentTarget = warningsLines.Last();
+                                        break;
+                                    case "related":
+                                        related.Add(newCommentText.Trim());
                                         break;
                                     default:
                                         throw new FormatException($"Cannot deserialize Javadoc tag {sectionMatch.Groups[1]}");
@@ -335,11 +384,14 @@ namespace CompWolf.Docs.Server.Data
                     }
 
                     mainComment = string.Join(Newline, mainCommentLines).Trim();
-                    briefComment = string.Join(Newline, briefCommentLines).Trim();
                     returnComment = string.Join(Newline, returnCommentLines).Trim();
                     throwComment = string.Join(Newline, throwCommentLines).Trim();
+                    overloadComment = string.Join(Newline, overloadCommentLines).Trim();
                     parameterComments = parameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
                         .ToDictionary();
+                    templateParameterComments = templateParameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
+                        .ToDictionary();
+                    warnings = warningsLines.Select(x => string.Join(Newline, x.Select(x => x.Trim()))).ToList();
                 }
 
                 switch (entityType)
@@ -363,15 +415,18 @@ namespace CompWolf.Docs.Server.Data
                     {
                         Name = entityName,
                         Type = entityType,
-                        BriefDescription = briefComment,
+                        Descriptions = string.IsNullOrEmpty(mainComment) ? [] : mainComment.Split(Newline + Newline),
+                        Namespace = namespaceName,
                         Declarations = [new()
                         {
-                            Description = mainComment,
+                            Description = overloadComment,
                             Declaration = entityDeclaration,
                         }],
-                        Namespace = namespaceName,
-                        Constructors = constructor,
+                        Warnings = warnings.ToArray(),
+                        Related = related.ToArray(),
+                        TemplateParameterDescriptions = templateParameterComments,
                         Members = nestedEntities,
+                        BaseClasses = baseClasses,
                         ReturnDescription = returnComment,
                         ParameterDescriptions = parameterComments,
                         ThrowDescription = throwComment,
@@ -946,7 +1001,6 @@ namespace CompWolf.Docs.Server.Data
             {
                 var nextResult = entityEnumerable.Current;
 
-                result.BriefDescription += nextResult.BriefDescription;
                 result.ReturnDescription += nextResult.ReturnDescription;
                 result.ThrowDescription += nextResult.ThrowDescription;
                 result.Declarations = [.. result.Declarations, .. nextResult.Declarations];

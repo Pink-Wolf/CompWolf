@@ -4,15 +4,9 @@ import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
 export default async function ProjectPage({ params }) {
     if (params.project === "%5Bproject%5D") return <div />
-    let project = decodeURIComponent(params.project)
+    const project = decodeURIComponent(params.project)
 
-    const overview = await getOverview()
-    const data = {
-        ...(await getProject(project)),
-        headers: overview
-            .projects.find((x) => { return x.name === project })
-            .headers
-    }
+    const data = await getProject(project)
 
     return <ProjectViewer data={data} />
 }

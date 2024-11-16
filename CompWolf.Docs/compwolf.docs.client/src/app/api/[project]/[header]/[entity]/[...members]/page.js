@@ -16,32 +16,17 @@ export default async function MemberPage({ params }) {
         let targetName = members[entityI]
         let owner = entities[entities.length - 1]
 
-        if (targetName == owner.name) {
-            entities.push({ ...owner.constructor, name: owner.name, type: "function" })
-        } else owner.memberGroups?.find((memberGroup) => {
-            memberGroup.items.find((member) => {
-                if (member.name === targetName) entities.push(member)
-
-                return (entities.length > 1 + entityI)
-            })
-            return (entities.length > 1 + entityI)
-        })
+        const nextEntity = Object.values(owner.members).flat().find(x => x.name == targetName)
+        entities.push(nextEntity)
     }
 
-    let data = {
-        ...entities[entities.length - 1],
-        project: entities[0].project,
-        header: entities[0].header,
-        owners: entities.slice(0, entities.length - 1).map(x => x.name),
-        entity: entity,
-        namespace: entities[0].namespace,
-    }
+    let data = entities[entities.length - 1]
 
     return <EntityViewer data={data} />
 }
 
 function getMembers(entity, members) {
-    return (members ?? []).map(member => {
+    return Object.values(members).flat().map(member => {
         let data = {
             ...entity,
             members: [...entity.members, betterEncodeURIComponent(member.name)]

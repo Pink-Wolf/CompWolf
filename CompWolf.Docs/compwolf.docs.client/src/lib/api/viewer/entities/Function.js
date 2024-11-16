@@ -4,30 +4,44 @@ import BaseEntityViewer from "./BaseEntity"
 import { Fragment } from "react"
 
 export default function FunctionViewer({ data }) {
-	const is_empty = (x) => { return x == undefined || x.length == 0 }
-	
-	return (
-		<BaseEntityViewer data={data} top={
-			<Fragment>
-				<ol id="Declarations" type="1">
-					{data.overloads.map((x, i) => {
-						return (
-							<li key={i + 1}>
-								<Declaration>{x.declaration}</Declaration>
-								<FormattedText>{x.description}</FormattedText>
-							</li>
-						)
-					})}
-					{data.name !== data.owners[data.owners.length - 1]}
-				</ol>
-			</Fragment>
-		}>
+	const parameters = Object.entries(data.parameterDescriptions)
 
-			<section hidden={is_empty(data.exceptions)} id="Exceptions">
+	return (
+		<BaseEntityViewer data={data}>
+
+			<section hidden={parameters.length === 0 && !data.returnDescription}>
+				<h2>Parameters</h2>
+				<table className="memberTable">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr hidden={!data.returnDescription}>
+							<td> Returns </td>
+							<td>
+								<FormattedText>{data.ReturnDescription}</FormattedText>
+							</td>
+						</tr>
+						{parameters.map((x, i) => {
+							return (
+								<tr key={i}>
+									<td> {x[0]} </td>
+									<td>
+										<FormattedText>{x[1]}</FormattedText>
+									</td>
+								</tr>
+							)
+						})}
+					</tbody>
+				</table>
+			</section>
+
+			<section hidden={!data.throwDescription} id="Exceptions">
 				<h2>Exceptions</h2>
-				{data.exceptions?.map((x, i) => {
-					return <blockquote key={i}><FormattedText>{x}</FormattedText></blockquote>
-				})}
+				{ data.throwDescription }
 			</section>
 		</BaseEntityViewer>
 	)

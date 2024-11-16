@@ -1,6 +1,6 @@
 import Style from "@/styles/EntityViewer.css"
 
-import { CodeViewer, Reference, SimpleReference } from "@/lib/CodeComponents"
+import { CodeViewer, Declaration, SimpleReference } from "@/lib/CodeComponents"
 import FormattedText from "@/lib/FormattedText"
 import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
@@ -10,18 +10,34 @@ export default function BaseEntityViewer({ data, top, children }) {
 	return (
 		<section>
 			<h1 id="Path">
-				{[data.namespace, ...data.owners, data.name].join("::")}
+				{[data.namespace, ...data.owners.map(x => x.name), data.name].join("::")}
 			</h1>
 			<small>
-				<p id="Project">In project <Reference path={`/api/${data.project}`}>{data.project}</Reference></p>
-				<p id="Header">Defined in header <Reference path={`/api/${data.project}/${data.header}`}>&lt;{data.header}&gt;</Reference></p>
-				<p id="Owner" hidden={!data.owners.length}>Member of <Reference path={`/api/${data.project}/${data.header}/${data.owners.map(x => betterEncodeURIComponent(x)).join("/")}`}>{data.owners.join("::")}</Reference></p>
+				<p id="Project">In project <SimpleReference target={data.project} /></p>
+				<p id="Header">Defined in header <SimpleReference target={data.header} /></p>
+				<p id="Owner" hidden={!data.owners.length}>Member of {data.owners.map((x, i) => <SimpleReference key={i} target={x} />)}</p>
 			</small>
 
 			{top}
 
+			<div id="Declarations" type="1" hidden={data.declarations.length !== 1}>
+				<Declaration>{data.declarations[0].declaration}</Declaration>
+				<FormattedText>{data.declarations[0].description}</FormattedText>
+			</div>
+			<ol id="Declarations" type="1" hidden={data.declarations.length === 1}>
+				{data.declarations.map((x, i) => {
+					return (
+						<li key={i + 1}>
+							<Declaration>{x.declaration}</Declaration>
+							<FormattedText>{x.description}</FormattedText>
+						</li>
+					)
+				})}
+				{data.name !== data.owners[data.owners.length - 1]}
+			</ol>
+
 			<div id="Description">
-				{data.detailedDescription.map((x, i) => {
+				{data.descriptions.map((x, i) => {
 					return (
 						<section key={i}>
 							<FormattedText>{x}</FormattedText>
