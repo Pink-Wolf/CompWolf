@@ -632,9 +632,9 @@ namespace CompWolf.Docs.Server.Data
                                 Body = endIndex > bodyIndex ? text[bodyIndex..endIndex] : "",
                             };
 
-                            if (declarationStartIndex > 1)
+                            if (declarationStartIndex > Newline.Length)
                             {
-                                int previousLineIndex = text.LastIndexOf(Newline, declarationStartIndex);
+                                int previousLineIndex = text.LastIndexOf(Newline, declarationStartIndex - Newline.Length);
                                 previousLineIndex = previousLineIndex < 0
                                     ? 0
                                     : previousLineIndex + Newline.Length;
