@@ -21,11 +21,12 @@ function BaseFormatter({ children, regexBegin, regexEnd, Formatter, RestFormatte
 		})
 }
 function ListFormatter({ children, NextFormatting, level = 0 }) {
+	const listSymbols = "-*"
 	let organizedChildren = children
 		.split(/(\r?\n)/)
 		.reduce((output, line) => {
 			var level = 0
-			for (level = 0; level < line.length && line[level] === `-`; ++level)
+			for (level = 0; level < line.length && listSymbols.includes(line[level]); ++level)
 				;
 
 			var outputLevel = 0
