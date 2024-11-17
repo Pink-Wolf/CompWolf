@@ -28,8 +28,8 @@ export default function BaseEntityViewer({ data, top, children }) {
 				{data.declarations.map((x, i) => {
 					return (
 						<li key={i + 1}>
-							<Declaration>{x.declaration}</Declaration>
 							<FormattedText>{x.description}</FormattedText>
+							<Declaration>{x.declaration}</Declaration>
 						</li>
 					)
 				})}
@@ -53,7 +53,7 @@ export default function BaseEntityViewer({ data, top, children }) {
 				})}
 			</section>
 
-			<section hidden={data.templateParameterDescriptions.length === 0}>
+			<section hidden={Object.entries(data.templateParameterDescriptions).length === 0}>
 				<h2>Template Parameters</h2>
 				<table className="memberTable">
 					<thead>
