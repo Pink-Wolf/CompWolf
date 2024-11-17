@@ -53,6 +53,30 @@ export default function BaseEntityViewer({ data, top, children }) {
 				})}
 			</section>
 
+			<section hidden={data.templateParameterDescriptions.length === 0}>
+				<h2>Template Parameters</h2>
+				<table className="memberTable">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						{Object.entries(data.templateParameterDescriptions).map((x, i) => {
+							return (
+								<tr key={i}>
+									<td> {x[0]} </td>
+									<td>
+										<FormattedText>{x[1]}</FormattedText>
+									</td>
+								</tr>
+							)
+						})}
+					</tbody>
+				</table>
+			</section>
+
 			{children}
 
 			<section hidden={!data.example || !data.example.name} id="Example">

@@ -8,12 +8,12 @@ namespace compwolf
 {
     /** A set of an enum's elements.
      * Specifically an std::bitset whose bits represent different elements from an enum.
-     * @param EnumType The enum whose elements this set can contain.
+     * @typeparam EnumType The enum whose elements this set can contain.
      * An enum whose last element is "size", and whose elements do not have explicitly defined values, is a valid enum.
      * In general:
      * * The element's values must be explicitly convertible to std::size_t.
      * * If the compwolf::enum_bitset's second template parameter is not specified, the enum's last element must be "size".
-     * @param Size The highest value of the given enum.
+     * @typeparam Size The highest value of the given enum.
      * More specifically, the highest value from the enum that the compwolf::enum_bitset can contain.
      * Passing an enum value higher than this is undefined behaviour.
      */

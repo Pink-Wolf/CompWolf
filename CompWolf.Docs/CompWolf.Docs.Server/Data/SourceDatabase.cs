@@ -351,7 +351,7 @@ namespace CompWolf.Docs.Server.Data
                                             commentTarget = parameterCommentLines[splitCommentText[0]] = [];
                                         }
                                         break;
-                                    case "typeParam":
+                                    case "typeparam":
                                         {
                                             var splitCommentText = newCommentText.Split(' ', 2);
                                             newCommentText = splitCommentText[1].TrimStart();
