@@ -13,7 +13,7 @@ async function getJson(path) {
             'Content-Type': 'application/json',
         },
     })
-    if (!response.ok) throw new Error(`Could not get data from ${path}\n${response.status}: ${response.statusText}`)
+    if (!response.ok) throw new Error(`Could not get data from ${path} (${response.status}):\n${await response.text()}\n`)
     return await response.json()
 }
 async function postJson(path, data) {
@@ -24,7 +24,7 @@ async function postJson(path, data) {
         },
         body: JSON.stringify(data, null, 2),
     })
-    if (!response.ok) throw new Error(`Could not post data to ${path}\n${response.status}: ${response.statusText}`)
+    if (!response.ok) throw new Error(`Could not post data to ${path} (${response.status}):\n${await response.text() }\n`)
     return await response.json()
 }
 
