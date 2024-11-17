@@ -1,5 +1,5 @@
 import { Fragment } from "react"
-import { Reference, SimpleReference } from "./CodeComponents"
+import { SimpleReference } from "./CodeComponents"
 
 function BaseFormatter({ children, regexBegin, regexEnd, Formatter, RestFormatter }) {
 	return children
@@ -84,7 +84,12 @@ function ListFormatter({ children, NextFormatting, level = 0 }) {
 	)
 }
 function ReferenceFormatter({ children, NextFormatting }) {
-	return <BaseFormatter regexBegin="(?:compwolf|std)\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
+	return <BaseFormatter regexBegin="compwolf\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
+		{children}
+	</BaseFormatter>
+}
+function StdReferenceFormatter({ children, NextFormatting }) {
+	return <BaseFormatter regexBegin="std\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={`std::` + children} />}>
 		{children}
 	</BaseFormatter>
 }
@@ -105,5 +110,5 @@ function CombinedFormatters({ children, Formatters }) {
 
 export default function FormattedText({ children }) {
 	if (children === undefined) return false
-	return <CombinedFormatters Formatters={[ListFormatter, ReferenceFormatter]}>{children}</CombinedFormatters>
+	return <CombinedFormatters Formatters={[ListFormatter, ReferenceFormatter, StdReferenceFormatter]}>{children}</CombinedFormatters>
 }
