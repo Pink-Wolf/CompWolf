@@ -186,7 +186,7 @@ namespace CompWolf.Docs.Server.Data
                 var declarationAfterColon = "";
                 {
                     var colonIndex = attributeLessDeclaration.IndexOf(':');
-                    if (colonIndex >= 0)
+                    if (colonIndex >= 0 && attributeLessDeclaration[colonIndex + 1] != ':')
                     {
                         var index = entityDeclaration.Length - attributeLessDeclaration.Length + colonIndex;
                         declarationAfterColon = entityDeclaration[(index + 1)..];
@@ -423,31 +423,27 @@ namespace CompWolf.Docs.Server.Data
                     default: break;
                 }
 
-
-                if (entityName.Contains("::") is false)
+                yield return new()
                 {
-                    yield return new()
-                    {
-                        Name = entityName,
-                        Type = entityType,
-                        Descriptions = string.IsNullOrEmpty(mainComment) ? [] : mainComment.Split(Newline + Newline),
-                        Namespace = namespaceName,
-                        Declarations = [new()
+                    Name = entityName,
+                    Type = entityType,
+                    Descriptions = string.IsNullOrEmpty(mainComment) ? [] : mainComment.Split(Newline + Newline),
+                    Namespace = namespaceName,
+                    Declarations = [new()
                         {
                             Description = overloadComment,
                             Declaration = entityDeclaration,
                         }],
-                        Warnings = warnings.ToArray(),
-                        Related = related.ToArray(),
-                        TemplateParameterDescriptions = templateParameterComments,
-                        Members = nestedEntities,
-                        BaseClasses = baseClasses,
-                        ReturnDescription = returnComment,
-                        ParameterDescriptions = parameterComments,
-                        ThrowDescription = throwComment,
-                        EnumMembers = [.. enumElements],
-                    };
-                }
+                    Warnings = warnings.ToArray(),
+                    Related = related.ToArray(),
+                    TemplateParameterDescriptions = templateParameterComments,
+                    Members = nestedEntities,
+                    BaseClasses = baseClasses,
+                    ReturnDescription = returnComment,
+                    ParameterDescriptions = parameterComments,
+                    ThrowDescription = throwComment,
+                    EnumMembers = [.. enumElements],
+                };
             }
         }
 
