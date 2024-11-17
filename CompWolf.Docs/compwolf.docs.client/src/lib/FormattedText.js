@@ -83,12 +83,7 @@ function ListFormatter({ children, NextFormatting, level = 0 }) {
 	)
 }
 function ReferenceFormatter({ children, NextFormatting }) {
-	return <BaseFormatter regexBegin="compwolf\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
-		{children}
-	</BaseFormatter>
-}
-function StdReferenceFormatter({ children, NextFormatting }) {
-	return <BaseFormatter regexBegin="std\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <Reference path={`https://duckduckgo.com/?sites=cppreference.com&q=` + children}>std::{children}</Reference>}>
+	return <BaseFormatter regexBegin="(?:compwolf|std)\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
 		{children}
 	</BaseFormatter>
 }
@@ -109,5 +104,5 @@ function CombinedFormatters({ children, Formatters }) {
 
 export default function FormattedText({ children }) {
 	if (children === undefined) return false
-	return <CombinedFormatters Formatters={[ListFormatter, ReferenceFormatter, StdReferenceFormatter]}>{children}</CombinedFormatters>
+	return <CombinedFormatters Formatters={[ListFormatter, ReferenceFormatter]}>{children}</CombinedFormatters>
 }

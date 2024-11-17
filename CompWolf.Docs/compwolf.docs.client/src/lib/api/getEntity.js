@@ -89,17 +89,18 @@ export async function getEntity(projectName, headerName, entityName) {
     return data
 }
 
+const stdPath = `https://duckduckgo.com/?sites=cppreference.com&q=`
 export async function getPathTo(name) {
+    if (name.startsWith("std::"))
+        return stdPath + name.substring(5)
+
     const overview = await getOverview()
 
     let memberSplitterIndex = name.indexOf("::")
     let isMember = memberSplitterIndex >= 0
     let memberName = !isMember ? "" : name.substring(memberSplitterIndex + 2, name.length).split("::").map(x => betterEncodeURIComponent(x)).join("/")
     if (isMember) {
-        const fullName = name
         name = name.substring(0, memberSplitterIndex)
-
-        if (name == `std`) return `https://duckduckgo.com/?sites=cppreference.com&q=` + fullName.substring(memberSplitterIndex + 2)
     }
 
     var path = undefined
@@ -123,4 +124,33 @@ export async function getPathTo(name) {
     }
 
     return path
+}
+export function getPathToObject(target) {
+    const pathArray = [`api`]
+
+    if (target.project !== target) {
+        pathArray.push(target.project.name)
+
+        if (target.header !== target) {
+            pathArray.push(target.header.name)
+
+            for (var i = 0; i < target.owners.length; i++) {
+                pathArray.push(target.owners[i].name)
+            }
+        }
+    }
+
+    pathArray.push(target.name)
+
+    return '/' + pathArray.map(betterEncodeURIComponent).join('/')
+}
+export function getFullNameOfObject(target) {
+    if (target.project === target) return target.name
+    if (target.header === target) return target.name
+    return [...target.owners.map(x => x.name), target.name].join(`::`)
+}
+export function getShortNameOfObject(target) {
+    if (target.name == target.owners[target.owners.length - 1].name)
+        return `[constructor]`
+    return target.name
 }

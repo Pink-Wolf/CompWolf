@@ -71,7 +71,7 @@ export default function ClassViewer({ data }) {
 										return (
 											<tr key={i}>
 												<td>
-													<SimpleReference target={x} />
+													<SimpleReference target={x} useShortName={true} />
 												</td>
 												<td>
 													<FormattedText>{x.descriptions[0]}</FormattedText>

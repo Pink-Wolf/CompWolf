@@ -20,9 +20,9 @@ export default function FunctionViewer({ data }) {
 					</thead>
 					<tbody>
 						<tr hidden={!data.returnDescription}>
-							<td> Returns </td>
+							<td>[Returns]</td>
 							<td>
-								<FormattedText>{data.ReturnDescription}</FormattedText>
+								<FormattedText>{data.returnDescription}</FormattedText>
 							</td>
 						</tr>
 						{parameters.map((x, i) => {
