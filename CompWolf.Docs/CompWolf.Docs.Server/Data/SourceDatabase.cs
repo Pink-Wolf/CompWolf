@@ -332,10 +332,9 @@ namespace CompWolf.Docs.Server.Data
                         bool javaDocComment = entityComment[0] == '*';
                         foreach (var rawLine in entityComment.Split(Newline))
                         {
-                            var newCommentText = javaDocComment
-                                ? rawLine.TrimStart(' ', '*')
-                                : rawLine.TrimStart(' ');
-                            newCommentText = newCommentText.TrimEnd();
+                            var newCommentText = rawLine.Trim();
+                            if (javaDocComment && newCommentText[0] == '*')
+                                newCommentText = newCommentText[1..].TrimStart();
 
                             var sectionMatch = Regex.Match(newCommentText, @"^@(\w+)\s");
                             if (sectionMatch.Success)
@@ -371,15 +370,16 @@ namespace CompWolf.Docs.Server.Data
                                         warningsLines.Add([]);
                                         commentTarget = warningsLines.Last();
                                         break;
-                                    case "related":
+                                    case "see":
                                         related.Add(newCommentText.Trim());
-                                        break;
+                                        goto skipLine;
                                     default:
                                         throw new FormatException($"Cannot deserialize Javadoc tag {sectionMatch.Groups[1]}");
                                 }
                             }
 
                             commentTarget.Add(newCommentText.Trim());
+                        skipLine:;
                         }
                     }
 

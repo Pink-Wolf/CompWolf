@@ -1,1 +1,2 @@
+// Contains compwolf::version_number, a number denoting a work's version.
 #include "private/other/version_number.hpp"

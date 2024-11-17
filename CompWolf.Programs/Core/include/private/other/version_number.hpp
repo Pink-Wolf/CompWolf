@@ -3,7 +3,7 @@
 
 namespace CompWolf
 {
-	/* A number denoting the version of a program, split into a major-, minor-, and patch-integer. */
+	/** A number denoting the version of a program, split into a major-, minor-, and patch-integer. */
 	struct version_number
 	{
 		/* The major part of the version-number, usually increasing when major, possible breaking changes to behaviour are done. */
@@ -14,7 +14,9 @@ namespace CompWolf
 		int patch;
 	};
 
-	/* The version of CompWolf the used library is. */
+	/** The version of CompWolf the used library is.
+	 * @see version_number
+	 */
 	extern const version_number compwolf_version;
 }
 
