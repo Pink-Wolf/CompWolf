@@ -138,8 +138,23 @@ namespace CompWolf.Docs.Server.Data
             foreach (var entityText in MemberEntity.SplitText(text))
             {
                 var entityComment = entityText.Comment.Trim();
-                var entityDeclaration = entityText.Declaration.Trim();
+                var entityDeclaration = entityText.Declaration;
                 var entityBody = entityText.Body.Trim();
+
+                {
+                    var indentionMatch = Regex.Match(entityDeclaration, @"^\s+");
+                    if (indentionMatch.Success)
+                    {
+                        var indentionText = indentionMatch.Value!;
+                        var declarationStart = indentionText.LastIndexOf(Newline) + Newline.Length;
+                        indentionText = indentionText[declarationStart..];
+                        entityDeclaration = string.Join(Newline,
+                            entityDeclaration[declarationStart..]
+                            .Split(Newline)
+                            .Select(x => x[indentionText.Length..])
+                        );
+                    }
+                }
 
                 var templateMatch = Regex.Match(entityDeclaration, @"^\s*template\s*<");
                 var templateEndIndex = templateMatch.Success
@@ -175,7 +190,7 @@ namespace CompWolf.Docs.Server.Data
                     {
                         var index = entityDeclaration.Length - attributeLessDeclaration.Length + colonIndex;
                         declarationAfterColon = entityDeclaration[(index + 1)..];
-                        entityDeclaration = entityDeclaration[..index];
+                        entityDeclaration = entityDeclaration[..index].TrimEnd();
                     }
                 }
 
@@ -575,35 +590,36 @@ namespace CompWolf.Docs.Server.Data
                     }
 
                     {
+                        var declarationStartIndex = declarationIndex;
+                        do
+                        {
+                            --declarationStartIndex;
+                        } while (declarationStartIndex > 0 && char.IsWhiteSpace(text[declarationStartIndex]));
+                        ++declarationStartIndex;
+
                         MemberEntity member = new()
                         {
                             Comment = "",
-                            Declaration = text[declarationIndex..bodyIndex],
+                            Declaration = text[declarationStartIndex..bodyIndex],
                             Body = endIndex > bodyIndex ? text[bodyIndex..endIndex] : "",
                         };
 
-                        int previousWordEndIndex;
-                        for (previousWordEndIndex = declarationIndex - 1;
-                            previousWordEndIndex > 0 && char.IsWhiteSpace(text[previousWordEndIndex]);
-                            --previousWordEndIndex)
-                        { }
-
-                        if (previousWordEndIndex > 0)
+                        if (declarationStartIndex > 1)
                         {
-                            int previousLineIndex = text.LastIndexOf(Newline, previousWordEndIndex);
+                            int previousLineIndex = text.LastIndexOf(Newline, declarationStartIndex);
                             previousLineIndex = previousLineIndex < 0
                                 ? 0
                                 : previousLineIndex + Newline.Length;
-                            var firstLine = text[previousLineIndex..(previousWordEndIndex + 1)].TrimStart();
+                            var firstLine = text[previousLineIndex..declarationStartIndex].TrimStart();
 
                             if (firstLine.StartsWith("//"))
                             {
                                 member.Comment = firstLine[2..];
                             }
-                            else if (text[(previousWordEndIndex - 1)..(previousWordEndIndex + 1)] == "*/")
+                            else if (text[(declarationStartIndex - 2)..declarationStartIndex] == "*/")
                             {
-                                var commentIndex = text.LastIndexOf("/*", previousWordEndIndex - 1);
-                                member.Comment = text[(commentIndex + 2)..(previousWordEndIndex - 1)];
+                                var commentIndex = text.LastIndexOf("/*", declarationStartIndex - 2);
+                                member.Comment = text[(commentIndex + 2)..(declarationStartIndex - 2)];
                             }
                         }
 
