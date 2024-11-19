@@ -148,6 +148,8 @@ namespace CompWolf.Docs.Server.Data
                 var entityDeclaration = entityText.Declaration;
                 var entityBody = entityText.Body.Trim();
 
+                if (entityComment.Contains(@"@hidden")) continue;
+
                 try
                 {
                     var indentionMatch = Regex.Match(entityDeclaration, @"^\s+");
