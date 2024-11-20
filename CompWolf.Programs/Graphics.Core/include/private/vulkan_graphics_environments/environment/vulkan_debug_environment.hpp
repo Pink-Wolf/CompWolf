@@ -25,7 +25,8 @@ namespace compwolf::vulkan
 				teardown_function(p);
 			}
 		};
-		std::unique_ptr<vulkan_handle::vulkan_debug_messenger, vulkan_debug_teardown> _vulkan_debugger;
+		using debugger_type = std::unique_ptr<vulkan_handle::vulkan_debug_messenger_t, vulkan_debug_teardown>;
+		debugger_type _vulkan_debugger = debugger_type(nullptr, vulkan_debug_teardown());
 
 	public: // constructors
 		/** @overload Constructs a freed [[vulkan_debug_environment]].
