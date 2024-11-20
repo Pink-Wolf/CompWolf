@@ -3,7 +3,7 @@
 
 #include "compwolf_vulkan.hpp"
 #include <type_traits>
-#include <format>
+#include <sstream>
 
 namespace compwolf
 {
@@ -34,10 +34,11 @@ namespace compwolf
 		default: type_string = "unknown_type"; break;
 		}
 
-		auto message = std::format("CompWolf debugger: {} {}:\n{}\n", type_string, severity_string, callback_data->pMessage);
+		std::stringstream messageStream("CompWolf debugger: ");
+		messageStream << type_string << ' ' << severity_string << ":\n" << callback_data->pMessage << '\n';
 
 		auto& reporter = *static_cast<OnMessageType*>(user_data);
-		reporter(message);
+		reporter(messageStream.view());
 
 		return VK_FALSE; // Debug callback must return VK_FALSE
 	};

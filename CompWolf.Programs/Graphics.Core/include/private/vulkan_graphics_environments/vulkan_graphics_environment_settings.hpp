@@ -15,7 +15,7 @@ namespace compwolf::vulkan
 		/** When not empty, the environment will set up internal debugging, and report debugging messages to this.
 		 * This should generally be left empty.
 		 */
-		std::function<void(std::string)> internal_debug_callback;
+		std::function<void(std::string_view)> internal_debug_callback;
 	};
 }
 
