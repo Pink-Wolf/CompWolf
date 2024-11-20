@@ -29,7 +29,7 @@ namespace compwolf::vulkan
 		 * See [[freeable]] for more information.
 		 * @see freeable
 		 */
-		constexpr vulkan_graphics_environment() noexcept = default;
+		vulkan_graphics_environment() noexcept = default;
 		/**
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @warning It is undefined behaviour to construct or destruct a [[vulkan_graphics_environment]] on a thread other than the one that started the program.

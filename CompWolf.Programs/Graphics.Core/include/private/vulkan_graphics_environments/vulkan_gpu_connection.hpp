@@ -27,7 +27,7 @@ namespace compwolf::vulkan
 		 * See [[freeable]] for more information.
 		 * @see freeable
 		 */
-		constexpr vulkan_gpu_connection() noexcept = default;
+		vulkan_gpu_connection() noexcept = default;
 		/** Should be called by [[vulkan_graphics_environment]].
 		 * Constructs a [[vulkan_gpu_connection]] representing the given [[vulkan_handle::physical_device]].
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.

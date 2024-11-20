@@ -38,7 +38,7 @@ namespace compwolf
 		 * See [[freeable]] for more information.
 		 * @see freeable
 		 */
-		constexpr graphics_environment() noexcept = default;
+		graphics_environment() noexcept = default;
 		/**
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @warning It is undefined behaviour to construct or destruct a [[graphics_environment]] on a thread other than the one that started the program.
