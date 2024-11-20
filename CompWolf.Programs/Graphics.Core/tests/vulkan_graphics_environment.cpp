@@ -2,7 +2,7 @@
 #include <vulkan_graphics_environments>
 #include <private/vulkan_graphics_environments/vulkan_graphics_environment.hpp>
 
-TEST(VulkanGraphicsEnvironment, construction_and_destruction) {
+TEST(VulkanGraphicsEnvironment, simple_construction) {
 	ASSERT_NO_THROW({
 		compwolf::vulkan::vulkan_graphics_environment_settings settings;
 		compwolf::vulkan::vulkan_graphics_environment e(settings);

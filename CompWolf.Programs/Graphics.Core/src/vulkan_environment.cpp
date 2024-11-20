@@ -55,7 +55,11 @@ namespace compwolf::vulkan
 		case VK_ERROR_LAYER_NOT_PRESENT: throw std::runtime_error("Could not set up vulkan, used by CompWolf; the machine does not have the right layers.");
 		case VK_ERROR_EXTENSION_NOT_PRESENT: throw std::runtime_error("Could not set up vulkan, used by CompWolf; the machine does not have the right extensions.");
 		case VK_ERROR_INCOMPATIBLE_DRIVER: throw std::runtime_error("Could not set up vulkan, used by CompWolf; the machine has incompatible drivers.");
-		default: throw std::runtime_error("Could not set up vulkan, used by CompWolf.");
+		default:
+			const char* message;
+			GET_VULKAN_ERROR_STRING(result, message,
+				"Could not set up Vulkan, used by CompWolf.Graphics: ")
+				throw std::runtime_error(message);
 		}
 
 		_vulkan_instance.reset(from_vulkan(instance));

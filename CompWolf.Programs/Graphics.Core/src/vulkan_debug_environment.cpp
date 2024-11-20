@@ -29,7 +29,11 @@ namespace compwolf::vulkan
 		switch (result)
 		{
 		case VK_SUCCESS: break;
-		default: throw std::runtime_error("Could not set up CompWolf debugger; could not create Vulkan debug messenger.");
+		default:
+			const char* message;
+			GET_VULKAN_ERROR_STRING(result, message,
+				"Could not set up CompWolf debugger: could not create Vulkan debug messenger: ")
+			throw std::runtime_error(message);
 		}
 
 		_vulkan_debugger.reset(from_vulkan(debugMessenger));

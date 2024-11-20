@@ -2,6 +2,7 @@
 #include "compwolf_vulkan.hpp"
 
 #include <stdexcept>
+#include <sstream>
 
 namespace compwolf::vulkan
 {
@@ -15,7 +16,9 @@ namespace compwolf::vulkan
 
 		if (result != GLFW_TRUE)
 		{
-			throw std::runtime_error("Could not set up glfw, used by CompWolf");
+			const char* message;
+			GET_GLFW_ERROR_STRING(glfwGetError(NULL), message, "Could not set up glfw, used by CompWolf: ")
+			throw std::runtime_error(message);
 		}
 	}
 

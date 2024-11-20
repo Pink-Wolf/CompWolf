@@ -29,7 +29,11 @@ namespace compwolf::vulkan
 				case VK_SUCCESS:
 				case VK_INCOMPLETE:
 					break;
-				default: throw std::runtime_error("Could not get extensions from gpu");
+				default:
+					const char* message;
+					GET_VULKAN_ERROR_STRING(result, message,
+						"Could not get a GPU's extensions: ")
+						throw std::runtime_error(message);
 				}
 			}
 		);
@@ -108,7 +112,11 @@ namespace compwolf::vulkan
 		case VK_SUCCESS: break;
 		case VK_ERROR_EXTENSION_NOT_PRESENT: throw std::runtime_error("Could not set up a connection to a gpu; the machine does not have the right extensions.");
 		case VK_ERROR_FEATURE_NOT_PRESENT: throw std::runtime_error("Could not set up a connection to a gpu; the machine does not have the right features.");
-		default: throw std::runtime_error("Could not set up a connection to a gpu.");
+		default:
+			const char* message;
+			GET_VULKAN_ERROR_STRING(result, message,
+				"Could not set up a connection to a GPU: ")
+				throw std::runtime_error(message);
 		}
 
 		_vulkan_device = from_vulkan(logicDevice);
