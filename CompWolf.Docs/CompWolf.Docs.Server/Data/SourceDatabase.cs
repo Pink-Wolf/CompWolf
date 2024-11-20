@@ -251,7 +251,20 @@ namespace CompWolf.Docs.Server.Data
 
                     if (entityType == EntityTypes.Enum)
                     {
-                        enumElements = entityBody[1..].Split(',')
+                        List<string> enumTextElements = [];
+                        {
+                            int charCount = 1;
+                            foreach (var i in ForeachRelevantCharInCode(entityBody, charCount))
+                            {
+                                if (entityBody[i] == ',')
+                                {
+                                    enumTextElements.Add(entityBody[charCount..i]);
+                                    charCount = i + 1;
+                                }
+                            }
+                        }
+
+                        enumElements = enumTextElements
                             .Select(x =>
                             {
                                 x = x.Trim();
@@ -421,7 +434,7 @@ namespace CompWolf.Docs.Server.Data
                                     case "overload":
                                         commentTarget = overloadCommentLines;
                                         break;
-                                    case "warnings":
+                                    case "warning":
                                         warningsLines.Add([]);
                                         commentTarget = warningsLines.Last();
                                         break;
@@ -1082,16 +1095,16 @@ namespace CompWolf.Docs.Server.Data
     public class SourceDatabaseException : AggregateException
     {
         public SourceDatabaseException(Exception innerException, string sourceName)
-            : base($"Source: {sourceName}", innerException)
+            : base($"Source: {sourceName}\n", innerException)
         { }
         public SourceDatabaseException(Exception innerException, string sourceText, int sourceIndex)
-            : base($"Source Text: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}", innerException)
+            : base($"Source Text: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}\n", innerException)
         { }
         public SourceDatabaseException(Exception innerException, string sourceName, string exceptionMessage)
-            : base($"{exceptionMessage}\nSource: {sourceName}", innerException)
+            : base($"{exceptionMessage}\nSource: {sourceName}\n", innerException)
         { }
         public SourceDatabaseException(Exception innerException, string sourceText, int sourceIndex, string exceptionMessage)
-            : base($"{exceptionMessage}\nSource Text: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}", innerException)
+            : base($"{exceptionMessage}\nSource Text: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}\n", innerException)
         { }
     }
 }
