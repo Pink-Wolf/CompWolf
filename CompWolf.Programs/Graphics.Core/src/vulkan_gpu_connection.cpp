@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <cstring>
 
 namespace compwolf::vulkan
 {
@@ -38,7 +39,7 @@ namespace compwolf::vulkan
 		bool has_swapchain_extension = std::any_of(
 			extensionProperties.cbegin(),
 			extensionProperties.cend(),
-			[](VkExtensionProperties a) { return 0 == strcmp(a.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME); }
+			[](VkExtensionProperties a) { return 0 == std::strcmp(a.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME); }
 		);
 
 		bool is_present_device = has_swapchain_extension && features.samplerAnisotropy;

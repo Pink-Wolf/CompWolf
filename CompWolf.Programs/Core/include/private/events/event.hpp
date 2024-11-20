@@ -30,7 +30,7 @@ namespace compwolf
 
 	public: // modifiers
 		/** Subscribes the given functor to the event.
-		 * @returns a key to identify the functor, if you later wishes to unsubscribe it from the event.
+		 * @return a key to identify the functor, if you later wishes to unsubscribe it from the event.
 		 */
 		key_type subscribe(value_type observer) noexcept
 		{
@@ -83,7 +83,7 @@ namespace compwolf
 
 	public: // modifiers
 		/** Subscribes the given functor to the event.
-		 * @returns a key to identify the functor, if you later wishes to unsubscribe it from the event.
+		 * @return a key to identify the functor, if you later wishes to unsubscribe it from the event.
 		 */
 		key_type subscribe(value_type observer) noexcept
 		{
