@@ -1,6 +1,7 @@
 #ifndef COMPWOLF_VULKAN_GRAPHICS_ENVIRONMENT_SETTINGS
 #define COMPWOLF_VULKAN_GRAPHICS_ENVIRONMENT_SETTINGS
 
+#include <graphics_environments>
 #include <string>
 #include <version_numbers>
 #include <functional>

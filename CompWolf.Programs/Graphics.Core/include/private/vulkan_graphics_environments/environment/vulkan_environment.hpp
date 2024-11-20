@@ -1,7 +1,6 @@
 #ifndef COMPWOLF_VULKAN_ENVIRONMENT
 #define COMPWOLF_VULKAN_ENVIRONMENT
 
-#include <graphics_environments>
 #include "../vulkan_graphics_environment_settings.hpp"
 #include "../vulkan_handle.hpp"
 #include <freeables>
