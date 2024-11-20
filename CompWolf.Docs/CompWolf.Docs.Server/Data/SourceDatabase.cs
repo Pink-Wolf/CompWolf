@@ -149,7 +149,7 @@ namespace CompWolf.Docs.Server.Data
                 var entityBody = entityText.Body.Trim();
 
                 if (entityComment.Contains(@"@hidden")) continue; // @hidden
-                if (Regex.IsMatch(entityDeclaration, @"{^\s*(?:class|struct) \S*;\s*$")) continue; // forward declaration of class
+                if (Regex.IsMatch(entityDeclaration, @"^\s*(?:class|struct) \S*\s*$")) continue; // forward declaration of class
 
                 try
                 {
