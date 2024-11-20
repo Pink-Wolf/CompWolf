@@ -1,4 +1,0 @@
-﻿{
-  "description": "The following code defines a struct \"vertex\", and then specializes [[shader_field_info]] so this struct can be passed to shaders in the future.\nThis specialization is defined using [[new_shader_field]], where each field's type and position is listed in a [[type_value_pair]].",
-  "code": "vertex_shader_field_info.cpp"
-}

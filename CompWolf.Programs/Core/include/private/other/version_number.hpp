@@ -1,7 +1,7 @@
 #ifndef COMPWOLF_VERSION_NUMBER_HEADER
 #define COMPWOLF_VERSION_NUMBER_HEADER
 
-namespace CompWolf
+namespace compwolf
 {
 	/** A number denoting the version of a program, split into a major-, minor-, and patch-integer. */
 	struct version_number

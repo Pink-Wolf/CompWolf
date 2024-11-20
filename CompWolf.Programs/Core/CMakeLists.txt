@@ -15,6 +15,7 @@ set(RESOURCES
 )
 set(TESTS
     "tests/enum_bitset.cpp"
+    "tests/event.cpp"
 )
 
 

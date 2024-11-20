@@ -1,7 +1,0 @@
-{
-  "briefDescription": "Contains logic for using the GPU to for example draw objects on a window.",
-  "detailedDescription": [
-    "Contains logic for creating windows and using the GPU.\nCan for example use the GPU to draw objects on the window.",
-    "Most logic requires a [[graphics_environment]] to be constructed."
-  ]
-}

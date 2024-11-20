@@ -1,10 +1,8 @@
-#include <version_numbers>
 #include <iostream>
+#include <vulkan_graphics_environments>
 
 int main()
 {
-	std::cout
-		<< CompWolf::compwolf_version.major << '.'
-		<< CompWolf::compwolf_version.minor << '.'
-		<< CompWolf::compwolf_version.patch << "\n"; 
+	compwolf::vulkan::vulkan_graphics_environment_settings s;
+	compwolf::vulkan::vulkan_graphics_environment e(s);
 }

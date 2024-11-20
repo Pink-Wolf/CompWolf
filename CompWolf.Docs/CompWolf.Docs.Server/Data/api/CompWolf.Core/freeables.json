@@ -1,6 +1,0 @@
-{
-  "briefDescription": "Contains [[freeable]], an interface stating an object can be in an invalid, \"freed\" state.",
-  "detailedDescription": [
-    "Contains [[freeable]], an interface stating an object can be in an invalid, \"freed\" state."
-  ]
-}

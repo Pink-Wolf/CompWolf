@@ -9,14 +9,18 @@ set(DEPENDENT_COMPWOLF_TARGETS
     "Core"
 )
 set(SOURCES
-    "src/graph_test.cpp"
+    "src/vulkan_gpu_connection.cpp"
+    "src/glfw_environment.cpp"
+    "src/vulkan_environment.cpp"
+    "src/vulkan_debug_environment.cpp"
+    "src/vulkan_graphics_environment.cpp"
 )
 set(RESOURCES
     "resources/CompWolf.Graphics.simple_vertex_shader.vert"
     "resources/CompWolf.Graphics.single_color_pixel_shader.frag"
 )
 set(TESTS
-    "tests/test.cpp"
+    "tests/vulkan_graphics_environment.cpp"
 )
 
 

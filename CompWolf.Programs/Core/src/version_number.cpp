@@ -1,6 +1,6 @@
 #include "version_numbers"
 
-namespace CompWolf
+namespace compwolf
 {
 	const version_number compwolf_version{ 1, 2, 3 };
 }
