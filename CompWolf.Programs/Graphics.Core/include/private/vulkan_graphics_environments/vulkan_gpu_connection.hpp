@@ -9,8 +9,8 @@
 
 namespace compwolf::vulkan
 {
-	/** A Vulkan-implementation of [[gpu_connection]].
-	 * @see gpu_connection
+	/** A Vulkan-implementation of [[GpuConnection]].
+	 * @see GpuConnection
 	 * @see vulkan_graphics_environment
 	 */
 	class vulkan_gpu_connection : public basic_freeable
