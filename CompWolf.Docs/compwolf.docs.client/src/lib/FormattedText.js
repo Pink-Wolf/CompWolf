@@ -6,10 +6,10 @@ function BaseFormatter({ children, regexBegin, regexEnd, Formatter, RestFormatte
 		.split(new RegExp(regexBegin, `g`))
 		.map((s, i) => {
 			if (i == 0) return [s]
-			const index = s.search(new RegExp(regexEnd, `g`))
-			return (index == -1)
+			const match = new RegExp(regexEnd, `g`).exec(s)
+			return (match === null)
 				? [s]
-				: [s.substring(0, index), s.substring(index)]
+				: [s.substring(0, match.index), s.substring(match.index + match[0].length)]
 		})
 		.map((s, i) => {
 			if (s[1] === undefined) return <RestFormatter key={i}>{s[0]}</RestFormatter>
