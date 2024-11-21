@@ -17,11 +17,15 @@ namespace compwolf::vulkan
 		: graphics_environment(settings)
 	{
 		auto newInstanceCount = ++_instanceCount;
-		if (newInstanceCount == 1)
+		if (newInstanceCount == 1) try
 		{
 			_glfw_environment = glfw_environment(settings);
 			_vulkan_environment = vulkan_environment(settings);
 			_vulkan_debug_environment = vulkan_debug_environment(settings, vulkan_instance());
+		}
+		catch (...)
+		{
+			on_free();
 		}
 	}
 
