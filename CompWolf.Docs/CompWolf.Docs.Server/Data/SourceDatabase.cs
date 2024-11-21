@@ -786,9 +786,12 @@ namespace CompWolf.Docs.Server.Data
                                 currentVisibility = currentMaybeVisibility!;
                                 currentMaybeVisibility = null;
 
-                                var newGroupMatch = Regex.Match(text[newVisibilityStart..], @"^\s*\/\*(.*?)\*\/");
+                                var groupCommentTextEnd = text.IndexOf(Newline, newVisibilityStart) + Newline.Length;
+                                if (groupCommentTextEnd < Newline.Length) groupCommentTextEnd = text.Length;
+
+                                var newGroupMatch = Regex.Match(text[newVisibilityStart..groupCommentTextEnd], @"^\s*\/\*(.*?)\*\/");
                                 if (newGroupMatch.Success is false)
-                                    newGroupMatch = Regex.Match(text[newVisibilityStart..], @"^\s*\/\/(.*?)(?:$|" + Newline + ')');
+                                    newGroupMatch = Regex.Match(text[newVisibilityStart..groupCommentTextEnd], @"^\s*\/\/(.*?)(?:$|" + Newline + ')');
                                 if (newGroupMatch.Success)
                                 {
                                     currentGroup = newGroupMatch.Groups[1].Value.Trim();
