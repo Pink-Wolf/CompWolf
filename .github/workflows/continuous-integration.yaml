@@ -27,6 +27,8 @@ jobs:
   graphics-core:
     name: Test CompWolf.Graphics.Core
     runs-on: ubuntu-latest
+    # Do not run, as ubuntu-latest does not have a GPU, which is necessary for CompWolf.Graphics.Core
+    if: false
     steps:
     - name: Checkout
       uses: actions/checkout@v4
