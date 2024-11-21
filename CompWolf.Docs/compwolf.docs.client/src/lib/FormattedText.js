@@ -83,6 +83,11 @@ function ListFormatter({ children, NextFormatting, level = 0 }) {
 		</Fragment>
 	)
 }
+function NameReferenceFormatter({ children, NextFormatting }) {
+	return <BaseFormatter regexBegin="\[\[" regexEnd="\]\]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
+		{children}
+	</BaseFormatter>
+}
 function ReferenceFormatter({ children, NextFormatting }) {
 	return <BaseFormatter regexBegin="compwolf\:\:" regexEnd="[^\w_]" RestFormatter={NextFormatting} Formatter={({ children }) => <SimpleReference name={children} />}>
 		{children}
@@ -110,5 +115,5 @@ function CombinedFormatters({ children, Formatters }) {
 
 export default function FormattedText({ children }) {
 	if (children === undefined) return false
-	return <CombinedFormatters Formatters={[ListFormatter, ReferenceFormatter, StdReferenceFormatter]}>{children}</CombinedFormatters>
+	return <CombinedFormatters Formatters={[ListFormatter, NameReferenceFormatter, ReferenceFormatter, StdReferenceFormatter]}>{children}</CombinedFormatters>
 }
