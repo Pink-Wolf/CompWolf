@@ -10,7 +10,7 @@ namespace compwolf::vulkan
 
 	glfw_environment::glfw_environment(const vulkan_graphics_environment_settings&)
 	{
-		_not_empty = true;
+		_is_valid = true;
 
 		auto result = glfwInit();
 
@@ -24,23 +24,23 @@ namespace compwolf::vulkan
 
 	glfw_environment::glfw_environment(glfw_environment&& other) noexcept
 	{
-		_not_empty = true;
-		other._not_empty = false;
+		_is_valid = true;
+		other._is_valid = false;
 	}
 	glfw_environment& glfw_environment::operator=(glfw_environment&& other) noexcept
 	{
-		_not_empty = true;
-		other._not_empty = false;
+		_is_valid = true;
+		other._is_valid = false;
 		return *this;
 	}
 
 	/******************************** CompWolf::freeable ********************************/
 
-	void glfw_environment::free() noexcept
+	glfw_environment::~glfw_environment() noexcept
 	{
-		if (empty()) return;
+		if (!_is_valid) return;
 
 		glfwTerminate();
-		_not_empty = false;
+		_is_valid = false;
 	}
 }

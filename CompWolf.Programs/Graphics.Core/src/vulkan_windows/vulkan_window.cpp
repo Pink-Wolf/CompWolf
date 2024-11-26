@@ -64,6 +64,6 @@ namespace compwolf::vulkan
 
 	void vulkan_window::update_image()
 	{
-
+		window::update_image();
 	}
 }

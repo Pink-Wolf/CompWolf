@@ -1,3 +1,4 @@
 // Contains [[event]], an implementation of the observer pattern.
 #include "private/events/event.hpp"
+#include "private/events/destruct_event.hpp"
 #include "private/events/listenable.hpp"

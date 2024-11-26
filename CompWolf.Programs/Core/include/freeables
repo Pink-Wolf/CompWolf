@@ -1,2 +1,0 @@
-// Contains [[freeable]], which denotes that a type of object can be freed.
-#include "private/other/freeable.hpp"

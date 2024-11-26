@@ -2,7 +2,6 @@
 #define COMPWOLF_GLFW_ENVIRONMENT
 
 #include "../vulkan_graphics_environment_settings.hpp"
-#include <freeables>
 
 namespace compwolf::vulkan
 {
@@ -10,15 +9,15 @@ namespace compwolf::vulkan
 	 * Handles the GLFW-part of [[vulkan_graphics_environment]].
 	 * @see vulkan_graphics_environment
 	 */
-	class glfw_environment : public basic_freeable
+	class glfw_environment
 	{
 	private: // fields
-		bool _not_empty = false;
+		bool _is_valid = false;
 
 	public: // constructors
-		/** Constructs a freed [[glfw_handle]].
-		 * @see freeable
-		 * @overload Constructs a freed [[glfw_handle]].
+		/** Constructs an invalid [[glfw_environment]].
+		 * Using this is undefined behaviour.
+		 * @overload
 		 */
 		glfw_environment() = default;
 		glfw_environment(glfw_environment&&) noexcept;
@@ -30,16 +29,7 @@ namespace compwolf::vulkan
 		 */
 		glfw_environment(const vulkan_graphics_environment_settings&);
 
-		~glfw_environment() noexcept { free(); }
-
-	public: // compwolf::freeable
-		/** @see freeable */
-		auto empty() const noexcept -> bool final
-		{
-			return !_not_empty;
-		}
-		/** @see freeable */
-		void free() noexcept final;
+		~glfw_environment() noexcept;
 	};
 }
 

@@ -7,8 +7,6 @@
 #include "environment/vulkan_environment.hpp"
 #include "environment/vulkan_debug_environment.hpp"
 
-#include <events>
-
 namespace compwolf::vulkan
 {
 	class vulkan_graphics_environment;
@@ -26,14 +24,14 @@ namespace compwolf::vulkan
 		static std::vector<vulkan_gpu_connection> _gpus;
 
 	public: // constructors
-		/** Constructs a freed [[vulkan_graphics_environment]].
-		 * @see freeable
-		 * @overload Constructs a freed [[vulkan_graphics_environment]].
+		/** Constructs an invalid [[vulkan_graphics_environment]].
+		 * Using this environment, except [[graphics_environment::operator bool]], is undefined behaviour.
+		 * @overload
 		 */
 		vulkan_graphics_environment() noexcept = default;
-		vulkan_graphics_environment(vulkan_graphics_environment&&) = default;
+		vulkan_graphics_environment(vulkan_graphics_environment&&) noexcept;
 		auto operator=(vulkan_graphics_environment&&) -> vulkan_graphics_environment& = default;
-		~vulkan_graphics_environment() noexcept { free(); }
+		~vulkan_graphics_environment() noexcept;
 
 		/**
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
@@ -58,10 +56,6 @@ namespace compwolf::vulkan
 
 		/** @see compwolf::graphics_environment */
 		void update() final;
-
-	protected:
-		/** @see freeable */
-		void on_free() noexcept final;
 	};
 }
 

@@ -2,7 +2,6 @@
 #define COMPWOLF_GRAPHICS_ENVIRONMENT
 
 #include "graphics_environment_settings.hpp"
-#include <freeables>
 #include <events>
 #include <thread>
 #include <vector>
@@ -22,22 +21,25 @@ namespace compwolf
 	 * @warning It is undefined behaviour to construct or destruct a [[graphics_environment]] on a thread other than the one that started the program.
 	 */
 	template<GpuConnection GpuType>
-	class graphics_environment : public basic_freeable
+	class graphics_environment
 	{
 	public:
 		/** The boundary class representing one or more GPUs on a machine. */
 		using gpu_type = GpuType;
 
 	private:
+		destruct_event<> _destructing;
 		graphics_environment_settings _settings;
 		std::thread::id _main_graphics_thread;
 
 	public: // constructors
-		/** @overload Constructs a freed [[graphics_environment]].
-		 * See [[freeable]] for more information.
-		 * @see freeable
+		/** Constructs an invalid [[graphics_environment]].
+		 * Using this environment, except [[graphics_environment::operator bool]], is undefined behaviour.
+		 * @overload
 		 */
 		graphics_environment() noexcept = default;
+		graphics_environment(graphics_environment&&) = default;
+		auto operator=(graphics_environment&&) -> graphics_environment& = default;
 		/**
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @warning It is undefined behaviour to construct or destruct a [[graphics_environment]] on a thread other than the one that started the program.
@@ -77,6 +79,15 @@ namespace compwolf
 		 */
 		virtual auto gpus() const noexcept -> const std::vector<typename gpu_type>& = 0;
 
+		/** Returns an event that is invoked right before the environment is destructed. */
+		auto destructing() const noexcept -> const event<>& { return _destructing; }
+
+		/** Returns whether this is valid, that is one not constructed by the default constructor. */
+		operator bool() const noexcept
+		{
+			return _main_graphics_thread == std::thread::id();
+		}
+
 	public: // modifiers
 		/** Handles any jobs from outside the program, which has been received since the last call to [[graphics_environment]]::update.
 		 * Jobs includes for example updating what keyboard keys are being pressed.
@@ -85,31 +96,6 @@ namespace compwolf
 		 * @throws any exception thrown by code handling the jobs.
 		 */
 		virtual void update() = 0;
-
-	public: // compwolf::freeable
-		/** @see freeable */
-		auto empty() const noexcept -> bool final
-		{
-			return _main_graphics_thread == std::thread::id();
-		}
-		/** @see freeable */
-		void free() noexcept final
-		{
-			if (empty()) return;
-
-			freeing();
-			on_free();
-			_main_graphics_thread = std::thread::id();
-			freed();
-		}
-	protected:
-		virtual void on_free() noexcept = 0;
-
-	public: // events
-		/** Invoked before the environment is freed. */
-		event<> freeing;
-		/** Invoked after the environment has been freed. */
-		event<> freed;
 	};
 }
 

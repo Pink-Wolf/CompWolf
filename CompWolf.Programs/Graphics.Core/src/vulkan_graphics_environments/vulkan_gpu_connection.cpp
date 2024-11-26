@@ -9,8 +9,10 @@ namespace compwolf::vulkan
 {
 	vulkan_gpu_connection::vulkan_gpu_connection(
 		vulkan_handle::instance vulkan_instance,
-		vulkan_handle::physical_device vulkan_physical_device)
-		: _vulkan_instance(vulkan_instance), _vulkan_physical_device(vulkan_physical_device)
+		vulkan_handle::physical_device vulkan_physical_device,
+		const event<>& environment_destruction_event)
+		: _destructing(&environment_destruction_event),
+		_vulkan_instance(vulkan_instance), _vulkan_physical_device(vulkan_physical_device)
 	{
 		auto instance = to_vulkan(vulkan_instance);
 		auto physicalDevice = to_vulkan(vulkan_physical_device);

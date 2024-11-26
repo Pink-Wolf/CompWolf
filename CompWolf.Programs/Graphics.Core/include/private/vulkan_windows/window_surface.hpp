@@ -3,7 +3,6 @@
 
 #include <windows>
 #include <vulkan_graphics_environments>
-#include <freeables>
 #include <unique_deleter_ptr>
 #include <memory>
 #include <owneds>
@@ -14,7 +13,7 @@ namespace compwolf::vulkan
 	 * This should generally not be accessed directly, and should only be constructed by [[vulkan_window]].
 	 * @see vulkan_window
 	 */
-	class window_surface : public basic_freeable
+	class window_surface
 	{
 	private: // fields
 		const vulkan_gpu_connection* _gpu;
@@ -27,6 +26,12 @@ namespace compwolf::vulkan
 		/** Returns the gpu that the window is on. */
 		auto gpu() const noexcept -> const vulkan_gpu_connection& { return *_gpu; }
 
+		/** Returns whether this is valid, that is one not constructed by the default constructor. */
+		operator bool() const noexcept
+		{
+			return !!_render_pass;
+		}
+
 	public: // vulkan-related
 		/** Returns the surface's [[vulkan_handle::surface]], representing a VkSurfaceKHR. */
 		auto vulkan_surface() const noexcept -> vulkan_handle::surface { return _vulkan_surface.get(); }
@@ -36,30 +41,17 @@ namespace compwolf::vulkan
 		auto vulkan_render_pass() const noexcept -> vulkan_handle::render_pass { return _render_pass.get(); }
 
 	public: // constructor
-		/** Constructs a freed [[window_surface]].
-		 * @see freeable
-		 * @overload Constructs a freed [[window_surface]].
+		/** Constructs an invalid [[window_surface]].
+		 * Using this environment, except [[window_surface::operator bool]], is undefined behaviour.
+		 * @overload
 		 */
 		window_surface() = default;
 		window_surface(window_surface&&) = default;
 		auto operator=(window_surface&&) -> window_surface& = default;
-		~window_surface() noexcept { free(); }
 
-	public:
+		/** Should be called by [[vulkan_window]]. */
 		window_surface(const vulkan_graphics_environment*, const vulkan_gpu_connection*,
 			window_settings&, vulkan_handle::glfw_window);
-
-	public: // compwolf::freeable
-		auto empty() const noexcept -> bool final
-		{
-			return !_render_pass;
-		}
-		void free() noexcept final
-		{
-			_render_pass.reset();
-			_format.reset();
-			_vulkan_surface.reset();
-		}
 	};
 }
 

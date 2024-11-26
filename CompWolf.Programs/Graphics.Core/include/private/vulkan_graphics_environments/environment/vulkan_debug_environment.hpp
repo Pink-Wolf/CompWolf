@@ -3,7 +3,6 @@
 
 #include "../vulkan_graphics_environment_settings.hpp"
 #include "../vulkan_handle.hpp"
-#include <freeables>
 #include <unique_deleter_ptr>
 #include <memory>
 #include <functional>
@@ -14,14 +13,14 @@ namespace compwolf::vulkan
 	 * Handles internal debugging of Vulkan-part of [[vulkan_graphics_environment]].
 	 * @see vulkan_graphics_environment
 	 */
-	class vulkan_debug_environment : public basic_freeable
+	class vulkan_debug_environment
 	{
 		unique_deleter_ptr<vulkan_handle::vulkan_debug_messenger_t> _vulkan_debugger;
 
 	public: // constructors
-		/** Constructs a freed [[vulkan_debug_environment]].
-		 * @see freeable
-		 * @overload Constructs a freed [[vulkan_debug_environment]].
+		/** Constructs an invalid [[vulkan_debug_environment]].
+		 * Using this is undefined behaviour.
+		 * @overload
 		 */
 		vulkan_debug_environment() noexcept = default;
 		vulkan_debug_environment(vulkan_debug_environment&&) noexcept = default;
@@ -32,20 +31,6 @@ namespace compwolf::vulkan
 		 * @warning Constructing multiple [[vulkan_debug_environment]]s has undefined behaviour.
 		 */
 		vulkan_debug_environment(const vulkan_graphics_environment_settings&, vulkan_handle::instance);
-
-		~vulkan_debug_environment() noexcept { free(); }
-
-	public: // compwolf::freeable
-		/** @see freeable */
-		auto empty() const noexcept -> bool final
-		{
-			return !_vulkan_debugger;
-		}
-		/** @see freeable */
-		void free() noexcept final
-		{
-			_vulkan_debugger.reset();
-		}
 	};
 }
 

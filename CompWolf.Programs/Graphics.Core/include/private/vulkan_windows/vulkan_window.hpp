@@ -33,15 +33,20 @@ namespace compwolf::vulkan
 		/** Returns the swapchain of the window, as in the actual images that are being drawn before being displaying on the window. */
 		auto swapchain() const noexcept -> const window_swapchain& { return _swapchain; }
 
+		/** Returns whether this is valid, that is one not constructed by the default constructor. */
+		operator bool() const noexcept
+		{
+			return !!_glfw_window;
+		}
+
 	public: // constructors
-		/** Constructs a freed [[vulkan_window]].
-		 * @see freeable
-		 * @overload Constructs a freed [[vulkan_window]].
+		/** Constructs an invalid [[vulkan_window]].
+		 * Using this environment, except [[vulkan_window::operator bool]], is undefined behaviour.
+		 * @overload
 		 */
 		vulkan_window() = default;
 		vulkan_window(vulkan_window&&) = default;
 		auto operator=(vulkan_window&&) -> vulkan_window& = default;
-		~vulkan_window() noexcept { free(); }
 
 	private:
 		vulkan_window(const vulkan_graphics_environment*, const vulkan_gpu_connection*, window_settings settings);
@@ -49,7 +54,7 @@ namespace compwolf::vulkan
 		/* Constructs a window on the given gpu, with the given settings.
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @throws std::invalid_argument if the given settings have invalid settings.
-		 * @overload Constructs a window on the given gpu, with the given settings.
+		 * @overload
 		 */
 		vulkan_window(const vulkan_gpu_connection& gpu, window_settings settings)
 			: vulkan_window(nullptr, &gpu, settings)
@@ -58,7 +63,7 @@ namespace compwolf::vulkan
 		/* Constructs a window with the given settings.
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @throws std::invalid_argument if the given settings have invalid settings.
-		 * @overload Constructs a window with the given settings.
+		 * @overload
 		 */
 		vulkan_window(const vulkan_graphics_environment& environment, window_settings settings)
 			: vulkan_window(&environment, nullptr, settings)
@@ -68,12 +73,13 @@ namespace compwolf::vulkan
 		/** Makes the window update what is shown on it. */
 		void update_image() final;
 
-	public: // compwolf::freeable
-		void on_free() noexcept final
+		/** Closes the window. */
+		void close() noexcept final
 		{
-			_swapchain.free();
-			_surface.free();
-			_glfw_window.reset();
+			window::close();
+			_swapchain = window_swapchain();
+			_surface = window_surface();
+			_glfw_window = nullptr;
 		}
 	};
 }

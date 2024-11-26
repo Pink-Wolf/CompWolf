@@ -3,7 +3,6 @@
 
 #include "../vulkan_graphics_environment_settings.hpp"
 #include "../vulkan_handle.hpp"
-#include <freeables>
 #include <unique_deleter_ptr>
 #include <memory>
 
@@ -13,14 +12,14 @@ namespace compwolf::vulkan
 	 * Handles the Vulkan-part of [[vulkan_graphics_environment]].
 	 * @see vulkan_graphics_environment
 	 */
-	class vulkan_environment : public basic_freeable
+	class vulkan_environment
 	{
 		unique_deleter_ptr<vulkan_handle::instance_t> _vulkan_instance;
 
 	public: // constructors
-		/** Constructs a freed [[vulkan_environment]].
-		 * @see freeable
-		 * @overload Constructs a freed [[vulkan_environment]].
+		/** Constructs an invalid [[vulkan_environment]].
+		 * Using this is undefined behaviour.
+		 * @overload
 		 */
 		vulkan_environment() = default;
 		vulkan_environment(vulkan_environment&&) noexcept = default;
@@ -32,25 +31,11 @@ namespace compwolf::vulkan
 		 */
 		vulkan_environment(const vulkan_graphics_environment_settings&);
 
-		~vulkan_environment() noexcept { free(); }
-
 	public: // vulkan-specific
 		/** Returns the environment's [[vulkan_handle::instance]]. */
 		auto vulkan_instance() const noexcept -> vulkan_handle::instance
 		{
 			return _vulkan_instance.get();
-		}
-
-	public: // compwolf::freeable
-		/** @see freeable */
-		auto empty() const noexcept -> bool final
-		{
-			return !_vulkan_instance;
-		}
-		/** @see freeable */
-		void free() noexcept final
-		{
-			_vulkan_instance.reset();
 		}
 	};
 }

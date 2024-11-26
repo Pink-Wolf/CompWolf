@@ -47,14 +47,33 @@ namespace compwolf::vulkan
 				for (auto& physical_device : physicalDevices)
 				{
 					auto vulkan_physical_device = from_vulkan(physical_device);
-					vulkan_gpu_connection new_gpu(vulkan_instance(), vulkan_physical_device);
+					vulkan_gpu_connection new_gpu(vulkan_instance(), vulkan_physical_device, destructing());
 					_gpus.push_back(std::move(new_gpu));
 				}
 			}
 		}
 		catch (...)
 		{
-			on_free();
+			_gpus.clear();
+			_vulkan_debug_environment = vulkan_debug_environment();
+			_vulkan_environment = vulkan_environment();
+			_glfw_environment = glfw_environment();
+			throw;
+		}
+	}
+	vulkan_graphics_environment::vulkan_graphics_environment(vulkan_graphics_environment&& other) noexcept
+	{
+		if (other) ++_instanceCount;
+	}
+	vulkan_graphics_environment::~vulkan_graphics_environment() noexcept
+	{
+		auto newInstanceCount = --_instanceCount;
+		if (newInstanceCount == 0)
+		{
+			_gpus.clear();
+			_vulkan_debug_environment = vulkan_debug_environment();
+			_vulkan_environment = vulkan_environment();
+			_glfw_environment = glfw_environment();
 		}
 	}
 
@@ -63,17 +82,5 @@ namespace compwolf::vulkan
 		if (!is_this_main_thread()) throw std::logic_error("graphics_environment.update() was called on a thread that is not the main graphics thread.");
 
 		glfwPollEvents();
-	}
-
-	void vulkan_graphics_environment::on_free() noexcept
-	{
-		auto newInstanceCount = --_instanceCount;
-		if (newInstanceCount == 0)
-		{
-			_gpus.clear();
-			_vulkan_debug_environment.free();
-			_vulkan_environment.free();
-			_glfw_environment.free();
-		}
 	}
 }

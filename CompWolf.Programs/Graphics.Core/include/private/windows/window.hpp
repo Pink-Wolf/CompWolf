@@ -2,7 +2,6 @@
 #define COMPWOLF_GRAPHICS_WINDOW
 
 #include "window_settings.hpp"
-#include <freeables>
 #include <dimensions>
 #include <events>
 
@@ -19,7 +18,7 @@ namespace compwolf
 	 * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this window works with.
 	 */
 	template <typename GraphicsEnvironmentType>
-	class window : public basic_freeable
+	class window
 	{
 	public:
 		/** The type of [[graphics_environment]] that this window works with */
@@ -27,7 +26,12 @@ namespace compwolf
 
 	private:
 		const GraphicsEnvironmentType::gpu_type* _gpu;
+
+		bool _running;
+		event<> _closing;
+
 		listenable<int2> _pixel_size;
+		event<void> _image_updating;
 
 	public: // accessors
 		/** Returns the gpu that the window is on. */
@@ -42,25 +46,33 @@ namespace compwolf
 		 */
 		auto pixel_size_listenable() const noexcept -> listenable<int2> { return _pixel_size; }
 
-		/** Returns whether the window is not freed. */
-		auto running() const noexcept -> bool { return !empty(); }
+		/** Returns whether the window is up and running and not closed. */
+		auto running() const noexcept -> bool { return _running; }
+		/** Returns whether the window is up and running and not closed. */
+		operator bool() const noexcept
+		{
+			return running();
+		}
 
-	private: // events
-		event<void> _image_updating;
-		event<void> _image_updated;
-	public:
+		/** Returns an event that is invoked right before the window is closed. */
+		auto closing() const noexcept -> const event<>& { return _closing; }
+
+		/** Returns an event that is invoked right before the window's image is being updated. */
 		auto image_updating() const noexcept -> const event<void>& { return _image_updating; }
-		auto image_updated() const noexcept -> const event<void>& { return _image_updated; }
-	protected:
-		auto image_updating() noexcept -> event<void>& { return _image_updating; }
-		auto image_updated() noexcept -> event<void>& { return _image_updated; }
 
 	public: // modifiers
 		/** Makes the window update what is shown on it. */
-		virtual void update_image() = 0;
+		virtual void update_image()
+		{
+			_image_updating.invoke();
+		}
 
-		/** Frees the window. */
-		void close() noexcept { free(); }
+		/** Closes the window. */
+		virtual void close() noexcept
+		{
+			_closing.invoke();
+			_running = false;
+		}
 
 	protected:
 		/** Sets what gpu the window reports it is on;
@@ -72,9 +84,9 @@ namespace compwolf
 		}
 
 	public: // constructors
-		/** Constructs a freed [[window]].
-		 * @see freeable
-		 * @overload Constructs a freed [[window]].
+		/** Constructs an invalid [[window]].
+		 * Using this window, except [[window::operator bool]], is undefined behaviour.
+		 * @overload
 		 */
 		window() = default;
 		window(window&&) = default;
@@ -102,38 +114,11 @@ namespace compwolf
 		window(const GraphicsEnvironmentType& environment, window_settings& settings) noexcept
 			: window(nullptr, settings) {}
 
-		/** Constructs a window on the given gpu, with the given settings. */
+		/** Constructs a window on the given gpu, with the given settings.
+		 * Also sets invalid values of settings to some default value
+		 */
 		window(const GraphicsEnvironmentType::gpu_type& gpu, window_settings& settings) noexcept
 			: window(&gpu, settings) {}
-
-	public: // compwolf::freeable
-		/** Invoked right before the window's data is freed.
-		 * @see free()
-		 */
-		event<> freeing;
-		/** Invoked right after the window's data is freed.
-		 * @see free()
-		 */
-		event<> freed;
-
-	protected:
-		virtual void on_free() noexcept = 0;
-
-	public:
-		auto empty() const noexcept -> bool final
-		{
-			return !_gpu;
-		}
-		/** @see freeable */
-		void free() noexcept final
-		{
-			if (empty()) return;
-
-			freeing();
-			on_free();
-			_gpu = nullptr;
-			freed();
-		}
 	};
 }
 

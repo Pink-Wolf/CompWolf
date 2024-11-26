@@ -2,12 +2,11 @@
 #define COMPWOLF_GRAPHICS_SWAPCHAIN_FRAME
 
 #include <vulkan_graphics_environments>
-#include <freeables>
 
 namespace compwolf::vulkan
 {
 	/* Contains data about an actual image that is being drawn before being displayed on a window. */
-	class swapchain_frame : basic_freeable
+	class swapchain_frame
 	{
 		unique_deleter_ptr<vulkan_handle::image_view_t> _image;
 		unique_deleter_ptr<vulkan_handle::frame_buffer_t> _frame_buffer;
@@ -24,24 +23,13 @@ namespace compwolf::vulkan
 		auto frame_buffer_ptr() noexcept -> unique_deleter_ptr<vulkan_handle::frame_buffer_t>& { return _frame_buffer; }
 
 	public: // constructors
-		/** Constructs a freed [[swapchain_frame]].
-		 * @see freeable
-		 * @overload Constructs a freed [[swapchain_frame]].
+		/** Constructs an invalid [[swapchain_frame]].
+		 * Using this is undefined behaviour.
+		 * @overload
 		 */
 		swapchain_frame() = default;
 		swapchain_frame(swapchain_frame&&) = default;
 		auto operator=(swapchain_frame&&) -> swapchain_frame& = default;
-
-	public: // compwolf::freeable
-		auto empty() const noexcept -> bool final
-		{
-			return !(_image || _frame_buffer);
-		}
-		void free() noexcept final
-		{
-			_image.reset();
-			_frame_buffer.reset();
-		}
 	};
 }
 

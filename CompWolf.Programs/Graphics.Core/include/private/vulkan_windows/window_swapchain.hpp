@@ -5,7 +5,6 @@
 #include <vulkan_graphics_environments>
 #include "swapchain_frame.hpp"
 #include "window_surface.hpp"
-#include <freeables>
 #include <unique_deleter_ptr>
 #include <owneds>
 #include <vector>
@@ -17,7 +16,7 @@ namespace compwolf::vulkan
 	 * This should generally not be accessed directly, and should only be constructed by [[vulkan_window]].
 	 * @see vulkan_window
 	 */
-	class window_swapchain : basic_freeable
+	class window_swapchain
 	{
 	private: // fields
 		const vulkan_gpu_connection* _gpu;
@@ -42,6 +41,12 @@ namespace compwolf::vulkan
 		/** Returns information about the image on the swapchain that is currently being drawn. */
 		auto current_frame() const noexcept -> const swapchain_frame& { return frames()[current_frame_index()]; }
 
+		/** Returns whether this is valid, that is one not constructed by the default constructor. */
+		operator bool() const noexcept
+		{
+			return !!_vulkan_swapchain;
+		}
+
 	private: // modifiers
 		/** Makes the window display the current frame, and makes a new frame the current one. */
 		void to_next_frame();
@@ -51,27 +56,17 @@ namespace compwolf::vulkan
 		auto vulkan_swapchain() const noexcept -> vulkan_handle::swapchain { return _vulkan_swapchain.get(); }
 
 	public: // constructors
-		/** Constructs a freed [[window_swapchain]].
-		 * @see freeable
-		 * @overload Constructs a freed [[window_swapchain]].
+		/** Constructs an invalid [[window_swapchain]].
+		 * Using this environment, except [[window_swapchain::operator bool]], is undefined behaviour.
+		 * @overload
 		 */
 		window_swapchain() = default;
 		window_swapchain(window_swapchain&&) = default;
 		auto operator=(window_swapchain&&) -> window_swapchain& = default;
-		
+
+		/** Should be called by [[vulkan_window]]. */
 		window_swapchain(window_settings&,
 			vulkan_handle::glfw_window, const window_surface&);
-		
-	public: // compwolf::freeable
-		auto empty() const noexcept -> bool final
-		{
-			return !_vulkan_swapchain;
-		}
-		void free() noexcept final
-		{
-			_frames.clear();
-			_vulkan_swapchain.reset();
-		}
 	};
 }
 
