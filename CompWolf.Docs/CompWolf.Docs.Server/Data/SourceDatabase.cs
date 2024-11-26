@@ -404,7 +404,7 @@ namespace CompWolf.Docs.Server.Data
                         bool javaDocComment = entityComment[0] == '*';
                         foreach (var rawLine in entityComment.Split(Newline))
                         {
-                            var newCommentText = rawLine.Trim();
+                            var newCommentText = rawLine.Trim() + " ";
                             if (javaDocComment && newCommentText[0] == '*')
                                 newCommentText = newCommentText[1..].TrimStart();
 
