@@ -9,7 +9,7 @@
 
 namespace compwolf::vulkan
 {
-	/* Vulkan implementation of [[window]].
+	/** Vulkan implementation of [[window]].
 	 * @see window
 	 */
 	class vulkan_window : public window<vulkan_graphics_environment>
@@ -51,7 +51,7 @@ namespace compwolf::vulkan
 	private:
 		vulkan_window(const vulkan_graphics_environment*, const vulkan_gpu_connection*, window_settings settings);
 	public:
-		/* Constructs a window on the given gpu, with the given settings.
+		/** Constructs a window on the given gpu, with the given settings.
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @throws std::invalid_argument if the given settings have invalid settings.
 		 * @overload
@@ -60,7 +60,7 @@ namespace compwolf::vulkan
 			: vulkan_window(nullptr, &gpu, settings)
 		{}
 
-		/* Constructs a window with the given settings.
+		/** Constructs a window with the given settings.
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @throws std::invalid_argument if the given settings have invalid settings.
 		 * @overload
