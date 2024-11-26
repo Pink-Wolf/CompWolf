@@ -20,23 +20,23 @@ namespace compwolf::vulkan
 		window_swapchain _swapchain;
 
 	public: // vulkan-related
-		/* Returns the surface's [[vulkan_handle::glfw_window]], representing a GLFWwindow-pointer. */
+		/** Returns the surface's [[vulkan_handle::glfw_window]], representing a GLFWwindow-pointer. */
 		auto glfw_window() const noexcept -> const vulkan_handle::glfw_window { return _glfw_window.get(); }
 
-		/* Returns the surface of the window, as in the actual area that can display a dynamic image. */
+		/** Returns the surface of the window, as in the actual area that can display a dynamic image. */
 		auto surface() noexcept -> window_surface& { return _surface; }
-		/* Returns the surface of the window, as in the actual area that can display a dynamic image. */
+		/** Returns the surface of the window, as in the actual area that can display a dynamic image. */
 		auto surface() const noexcept -> const window_surface& { return _surface; }
 
-		/* Returns the swapchain of the window, as in the actual images that are being drawn before being displaying on the window. */
+		/** Returns the swapchain of the window, as in the actual images that are being drawn before being displaying on the window. */
 		auto swapchain() noexcept -> window_swapchain& { return _swapchain; }
-		/* Returns the swapchain of the window, as in the actual images that are being drawn before being displaying on the window. */
+		/** Returns the swapchain of the window, as in the actual images that are being drawn before being displaying on the window. */
 		auto swapchain() const noexcept -> const window_swapchain& { return _swapchain; }
 
 	public: // constructors
-		/** @overload Constructs a freed [[vulkan_window]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[vulkan_window]].
 		 * @see freeable
+		 * @overload Constructs a freed [[vulkan_window]].
 		 */
 		vulkan_window() = default;
 		vulkan_window(vulkan_window&&) = default;
@@ -49,6 +49,7 @@ namespace compwolf::vulkan
 		/* Constructs a window on the given gpu, with the given settings.
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @throws std::invalid_argument if the given settings have invalid settings.
+		 * @overload Constructs a window on the given gpu, with the given settings.
 		 */
 		vulkan_window(const vulkan_gpu_connection& gpu, window_settings settings)
 			: vulkan_window(nullptr, &gpu, settings)
@@ -57,13 +58,14 @@ namespace compwolf::vulkan
 		/* Constructs a window with the given settings.
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @throws std::invalid_argument if the given settings have invalid settings.
+		 * @overload Constructs a window with the given settings.
 		 */
 		vulkan_window(const vulkan_graphics_environment& environment, window_settings settings)
 			: vulkan_window(&environment, nullptr, settings)
 		{}
 
 	public: // compwolf::window
-		/* Makes the window update what is shown on it. */
+		/** Makes the window update what is shown on it. */
 		void update_image() final;
 
 	public: // compwolf::freeable

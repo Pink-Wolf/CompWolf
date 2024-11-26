@@ -31,7 +31,10 @@ namespace compwolf::vulkan
 		auto vulkan_fence() const noexcept -> vulkan_handle::fence { return _vulkan_fence.get(); }
 
 	public: // constructors
-		/** Constructs a freed gpu_fence, as in one that cannot be used. */
+		/** Constructs a freed [[gpu_fence]].
+		 * @see freeable
+		 * @overload Constructs a freed [[gpu_fence]].
+		 */
 		gpu_fence() = default;
 		gpu_fence(gpu_fence&&) = default;
 		auto operator=(gpu_fence&&) -> gpu_fence& = default;

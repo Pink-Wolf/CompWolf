@@ -26,9 +26,9 @@ namespace compwolf::vulkan
 		static std::vector<vulkan_gpu_connection> _gpus;
 
 	public: // constructors
-		/** @overload Constructs a freed [[vulkan_graphics_environment]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[vulkan_graphics_environment]].
 		 * @see freeable
+		 * @overload Constructs a freed [[vulkan_graphics_environment]].
 		 */
 		vulkan_graphics_environment() noexcept = default;
 		vulkan_graphics_environment(vulkan_graphics_environment&&) = default;

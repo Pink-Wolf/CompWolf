@@ -19,9 +19,9 @@ namespace compwolf::vulkan
 		unique_deleter_ptr<vulkan_handle::vulkan_debug_messenger_t> _vulkan_debugger;
 
 	public: // constructors
-		/** @overload Constructs a freed [[vulkan_debug_environment]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[vulkan_debug_environment]].
 		 * @see freeable
+		 * @overload Constructs a freed [[vulkan_debug_environment]].
 		 */
 		vulkan_debug_environment() noexcept = default;
 		vulkan_debug_environment(vulkan_debug_environment&&) noexcept = default;

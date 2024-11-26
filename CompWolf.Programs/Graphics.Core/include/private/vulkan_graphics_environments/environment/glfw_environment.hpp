@@ -16,9 +16,9 @@ namespace compwolf::vulkan
 		bool _not_empty = false;
 
 	public: // constructors
-		/** @overload Constructs a freed [[glfw_handle]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[glfw_handle]].
 		 * @see freeable
+		 * @overload Constructs a freed [[glfw_handle]].
 		 */
 		glfw_environment() = default;
 		glfw_environment(glfw_environment&&) noexcept;

@@ -18,9 +18,9 @@ namespace compwolf::vulkan
 		unique_deleter_ptr<vulkan_handle::instance_t> _vulkan_instance;
 
 	public: // constructors
-		/** @overload Constructs a freed [[vulkan_environment]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[vulkan_environment]].
 		 * @see freeable
+		 * @overload Constructs a freed [[vulkan_environment]].
 		 */
 		vulkan_environment() = default;
 		vulkan_environment(vulkan_environment&&) noexcept = default;

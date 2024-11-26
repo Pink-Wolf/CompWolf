@@ -51,9 +51,9 @@ namespace compwolf::vulkan
 		auto vulkan_swapchain() const noexcept -> vulkan_handle::swapchain { return _vulkan_swapchain.get(); }
 
 	public: // constructors
-		/** @overload Constructs a freed [[window_swapchain]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[window_swapchain]].
 		 * @see freeable
+		 * @overload Constructs a freed [[window_swapchain]].
 		 */
 		window_swapchain() = default;
 		window_swapchain(window_swapchain&&) = default;

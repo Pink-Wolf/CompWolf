@@ -24,9 +24,9 @@ namespace compwolf::vulkan
 		auto frame_buffer_ptr() noexcept -> unique_deleter_ptr<vulkan_handle::frame_buffer_t>& { return _frame_buffer; }
 
 	public: // constructors
-		/** @overload Constructs a freed [[swapchain_frame]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[swapchain_frame]].
 		 * @see freeable
+		 * @overload Constructs a freed [[swapchain_frame]].
 		 */
 		swapchain_frame() = default;
 		swapchain_frame(swapchain_frame&&) = default;

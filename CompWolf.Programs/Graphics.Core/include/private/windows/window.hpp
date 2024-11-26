@@ -49,11 +49,11 @@ namespace compwolf
 		event<void> _image_updating;
 		event<void> _image_updated;
 	public:
-		auto image_updating() const noexcept -> event<void> { return _image_updating; }
-		auto image_updated() const noexcept -> event<void> { return _image_updated; }
+		auto image_updating() const noexcept -> const event<void>& { return _image_updating; }
+		auto image_updated() const noexcept -> const event<void>& { return _image_updated; }
 	protected:
-		auto image_updating() noexcept -> event<void> { return _image_updating; }
-		auto image_updated() noexcept -> event<void> { return _image_updated; }
+		auto image_updating() noexcept -> event<void>& { return _image_updating; }
+		auto image_updated() noexcept -> event<void>& { return _image_updated; }
 
 	public: // modifiers
 		/** Makes the window update what is shown on it. */
@@ -72,9 +72,9 @@ namespace compwolf
 		}
 
 	public: // constructors
-		/** @overload Constructs a freed [[window]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[window]].
 		 * @see freeable
+		 * @overload Constructs a freed [[window]].
 		 */
 		window() = default;
 		window(window&&) = default;
@@ -95,6 +95,9 @@ namespace compwolf
 	public:
 		/** Constructs a window on no specific gpu, with the given settings.
 		 * Also sets invalid values of settings to some default value
+		 * [[window::set_gpu]] must be called afterwards to set the gpu!
+		 * @overload sets the window to not have a gpu.
+		 * [[window::set_gpu]] must be called afterwards to set the gpu!
 		 */
 		window(const GraphicsEnvironmentType& environment, window_settings& settings) noexcept
 			: window(nullptr, settings) {}

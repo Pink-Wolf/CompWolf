@@ -397,6 +397,7 @@ namespace CompWolf.Docs.Server.Data
                     List<string> overloadCommentLines = [];
                     List<List<string>> warningsLines = [];
                     related = [];
+                    bool isOverload = false;
                     if (entityComment.Length > 0)
                     {
                         var commentTarget = mainCommentLines;
@@ -435,6 +436,10 @@ namespace CompWolf.Docs.Server.Data
                                         commentTarget = throwCommentLines;
                                         break;
                                     case "overload":
+                                        isOverload = true;
+                                        commentTarget = overloadCommentLines;
+                                        break;
+                                    case "mainoverload":
                                         commentTarget = overloadCommentLines;
                                         break;
                                     case "warning":
@@ -454,7 +459,7 @@ namespace CompWolf.Docs.Server.Data
                         }
                     }
 
-                    mainComment = string.Join(Newline, mainCommentLines).Trim();
+                    mainComment = isOverload ? "" : string.Join(Newline, mainCommentLines).Trim();
                     returnComment = string.Join(Newline, returnCommentLines).Trim();
                     throwComment = string.Join(Newline, throwCommentLines).Trim();
                     overloadComment = string.Join(Newline, overloadCommentLines).Trim();

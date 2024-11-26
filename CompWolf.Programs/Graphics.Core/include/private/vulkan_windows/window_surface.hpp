@@ -28,17 +28,17 @@ namespace compwolf::vulkan
 		auto gpu() const noexcept -> const vulkan_gpu_connection& { return *_gpu; }
 
 	public: // vulkan-related
-		/* Returns the surface's [[vulkan_handle::surface]], representing a VkSurfaceKHR. */
+		/** Returns the surface's [[vulkan_handle::surface]], representing a VkSurfaceKHR. */
 		auto vulkan_surface() const noexcept -> vulkan_handle::surface { return _vulkan_surface.get(); }
-		/* Returns the surface's [[vulkan_handle::surface_format_handle]]-pointer. */
+		/** Returns the surface's [[vulkan_handle::surface_format_handle]]-pointer. */
 		auto vulkan_format() const noexcept -> const vulkan_handle::surface_format_info { return _format.get(); }
-		/* Returns the surface's [[vulkan_handle::render_pass]], representing a VkRenderPass. */
+		/** Returns the surface's [[vulkan_handle::render_pass]], representing a VkRenderPass. */
 		auto vulkan_render_pass() const noexcept -> vulkan_handle::render_pass { return _render_pass.get(); }
 
 	public: // constructor
-		/** @overload Constructs a freed [[window_surface]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[window_surface]].
 		 * @see freeable
+		 * @overload Constructs a freed [[window_surface]].
 		 */
 		window_surface() = default;
 		window_surface(window_surface&&) = default;

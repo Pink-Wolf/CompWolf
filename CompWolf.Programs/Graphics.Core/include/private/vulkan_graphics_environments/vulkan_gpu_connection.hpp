@@ -24,9 +24,9 @@ namespace compwolf::vulkan
 		unique_deleter_ptr<vulkan_handle::device_t> _vulkan_device{};
 
 	public: // constructors
-		/** @overload Constructs a freed [[graphics_environment]].
-		 * See [[freeable]] for more information.
+		/** Constructs a freed [[vulkan_gpu_connection]].
 		 * @see freeable
+		 * @overload Constructs a freed [[vulkan_gpu_connection]].
 		 */
 		vulkan_gpu_connection() noexcept = default;
 		vulkan_gpu_connection(vulkan_gpu_connection&&) = default;

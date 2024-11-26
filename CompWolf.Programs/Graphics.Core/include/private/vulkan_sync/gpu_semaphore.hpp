@@ -25,7 +25,10 @@ namespace compwolf::vulkan
 		auto vulkan_semaphore() const noexcept -> vulkan_handle::semaphore { return _vulkan_semaphore.get(); }
 
 	public: // constructors
-		/* Constructs a freed gpu_semaphore, as in one that cannot be used. */
+		/** Constructs a freed [[gpu_semaphore]].
+		 * @see freeable
+		 * @overload Constructs a freed [[gpu_semaphore]].
+		 */
 		gpu_semaphore() = default;
 		gpu_semaphore(gpu_semaphore&&) = default;
 		auto operator=(gpu_semaphore&&) -> gpu_semaphore& = default;
