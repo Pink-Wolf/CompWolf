@@ -1,6 +1,7 @@
 #include "private/vulkan_graphics_environments/vulkan_gpu_connection.hpp"
 #include "compwolf_vulkan.hpp"
 
+#include "private/vulkan_graphics_environments/vulkan_graphics_environment.hpp"
 #include <stdexcept>
 #include <algorithm>
 #include <cstring>
@@ -8,13 +9,11 @@
 namespace compwolf::vulkan
 {
 	vulkan_gpu_connection::vulkan_gpu_connection(
-		vulkan_handle::instance vulkan_instance,
-		vulkan_handle::physical_device vulkan_physical_device,
-		const event<>& environment_destruction_event)
-		: _destructing(&environment_destruction_event),
-		_vulkan_instance(vulkan_instance), _vulkan_physical_device(vulkan_physical_device)
+		vulkan_graphics_environment& environment,
+		vulkan_handle::physical_device vulkan_physical_device)
+		: _environment(&environment), _vulkan_physical_device(vulkan_physical_device)
 	{
-		auto instance = to_vulkan(vulkan_instance);
+		auto instance = to_vulkan(environment.vulkan_instance());
 		auto physicalDevice = to_vulkan(vulkan_physical_device);
 
 		VkPhysicalDeviceProperties properties;
@@ -140,5 +139,25 @@ namespace compwolf::vulkan
 				thread.queue = from_vulkan(queue);
 			}
 		}
+	}
+
+	auto vulkan_gpu_connection::destructing() const noexcept -> const event<>&
+	{
+		return _environment->destructing();
+	}
+
+	auto vulkan_gpu_connection::vulkan_instance() const noexcept -> vulkan_handle::instance
+	{
+		return _environment->vulkan_instance();
+	}
+
+	auto vulkan_gpu_connection::inputs() const noexcept -> const input_state&
+	{
+		return _environment->inputs();
+	}
+
+	auto vulkan_gpu_connection::inputs() noexcept -> input_state&
+	{
+		return _environment->inputs();
 	}
 }

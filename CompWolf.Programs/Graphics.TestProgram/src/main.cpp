@@ -20,6 +20,12 @@ int main()
 	};
 	compwolf::vulkan::vulkan_window w(e, ws);
 
+	e.inputs().char_newly_down().subscribe([](const compwolf::input_key_state& key)
+		{
+			std::cout << key.character();
+		}
+	);
+
 	while (w.running())
 	{
 		e.update();

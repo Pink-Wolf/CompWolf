@@ -9,18 +9,18 @@
 
 namespace compwolf::vulkan
 {
+	class vulkan_graphics_environment;
+
 	/** A Vulkan-implementation of [[GpuConnection]].
 	 * @see GpuConnection
 	 * @see vulkan_graphics_environment
 	 */
 	class vulkan_gpu_connection
 	{
-		// This is the environment's event, as the gpu is only destructed when the environment is destructed.
-		const event<>* _destructing;
+		vulkan_graphics_environment* _environment;
 		gpu_work_type_set _work_types{};
 		std::vector<vulkan_gpu_thread_family> _thread_families{};
 
-		vulkan_handle::instance _vulkan_instance{};
 		vulkan_handle::physical_device _vulkan_physical_device{};
 		unique_deleter_ptr<vulkan_handle::device_t> _vulkan_device{};
 
@@ -36,10 +36,9 @@ namespace compwolf::vulkan
 		/** Should be called by [[vulkan_graphics_environment]].
 		 * Constructs a [[vulkan_gpu_connection]] representing the given [[vulkan_handle::physical_device]].
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
-		 * @see vulkan_gpu_connection
+		 * @see gpu_connection
 		 */
-		vulkan_gpu_connection(vulkan_handle::instance, vulkan_handle::physical_device,
-			const event<>& environment_destruction_event);
+		vulkan_gpu_connection(vulkan_graphics_environment&, vulkan_handle::physical_device);
 
 	public: // accessors
 		auto work_types() const noexcept -> gpu_work_type_set
@@ -48,7 +47,16 @@ namespace compwolf::vulkan
 		}
 
 		/** Returns an event that is invoked right before the gpu is destructed. */
-		auto destructing() const noexcept -> const event<>& { return *_destructing; }
+		auto destructing() const noexcept -> const event<>&;
+
+		/** Returns the [[input_state]] denoting the inputs that the gpu's [[graphic__environment]] is currently receiving.
+		 * @see input_state
+		 */
+		auto inputs() const noexcept -> const input_state&;
+		/** Returns the [[input_state]] denoting the inputs that the gpu's [[graphic__environment]] is currently receiving.
+		 * @see input_state
+		 */
+		auto inputs() noexcept -> input_state&;
 
 	public: // vulkan-specific
 		/** Returns the GPU's threads. */
@@ -58,10 +66,7 @@ namespace compwolf::vulkan
 		}
 
 		/** Returns the [[vulkan_handle::instance]] that the GPU is on. */
-		auto vulkan_instance() const noexcept -> vulkan_handle::instance
-		{
-			return _vulkan_instance;
-		}
+		auto vulkan_instance() const noexcept -> vulkan_handle::instance;
 		/** Returns the [[vulkan_handle::physical_device]] that the [[vulkan_gpu_connection]] represents. */
 		auto vulkan_physical_device() const noexcept -> vulkan_handle::physical_device
 		{

@@ -39,22 +39,22 @@ namespace compwolf
 
 	private:
 		value_type _value;
-		event<update_parameters&> _value_updating;
-		event<update_parameters&> _value_updated;
+		event<const update_parameters&> _value_updating;
+		event<const update_parameters&> _value_updated;
 
 	public: // accessors
 		/** Returns the value. */
-		inline auto& value() const noexcept { return _value; }
+		auto value() const noexcept -> const value_type& { return _value; }
 
 		/** Returns the event invoked before the value is changed. */
-		inline auto& value_updating() noexcept { return _value_updating; }
+		auto value_updating() noexcept -> event<const update_parameters&>& { return _value_updating; }
 		/** @overload Returns the event invoked before the value is changed. */
-		inline auto& value_updating() const noexcept { return _value_updating; }
+		auto value_updating() const noexcept -> const event<const update_parameters&>& { return _value_updating; }
 
 		/** Returns the event invoked after the value is changed. */
-		inline auto& value_updated() noexcept { return _value_updated; }
+		auto value_updated() noexcept -> event<const update_parameters&>& { return _value_updated; }
 		/** @overload Returns the event invoked after the value is changed. */
-		inline auto& value_updated() const noexcept { return _value_updated; }
+		auto value_updated() const noexcept -> const event<const update_parameters&>& { return _value_updated; }
 
 	public: // modifiers
 		/** Sets the value to the given input. */

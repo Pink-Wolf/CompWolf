@@ -45,10 +45,34 @@ namespace compwolf::vulkan
 			);
 
 			glfwSetInputMode(glfwWindow, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
-			glfwSetKeyCallback(glfwWindow, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+			glfwSetKeyCallback(glfwWindow, [](GLFWwindow* glfwWindow, int key, int, int action, int mods)
 				{
 					window* this_window = static_cast<window*>(glfwGetWindowUserPointer(glfwWindow));
-					std::cout << key;
+					auto& gpu = const_cast<vulkan_gpu_connection&>(this_window->gpu());
+
+					bool pressed_down;
+					switch (action)
+					{
+					case GLFW_PRESS: pressed_down = true; break;
+					case GLFW_RELEASE: pressed_down = false; break;
+					default: return;
+					}
+
+					bool capitalized
+						= ((mods & GLFW_MOD_SHIFT) != 0)
+						!= ((mods & GLFW_MOD_CAPS_LOCK) != 0);
+
+					char character;
+					if (GLFW_KEY_A <= key && key <= GLFW_KEY_Z) character = 'a' + (key - 65);
+					else if (key <= 128) character = key;
+					else if (key == GLFW_KEY_ENTER) character = '\n';
+					else if (key == GLFW_KEY_TAB) character = '	';
+					else character = 0;
+
+					if (character != 0)
+					{
+						gpu.inputs().set_char_state(character, pressed_down, capitalized);
+					}
 				}
 			);
 		}

@@ -47,7 +47,7 @@ namespace compwolf::vulkan
 				for (auto& physical_device : physicalDevices)
 				{
 					auto vulkan_physical_device = from_vulkan(physical_device);
-					vulkan_gpu_connection new_gpu(vulkan_instance(), vulkan_physical_device, destructing());
+					vulkan_gpu_connection new_gpu(*this, vulkan_physical_device);
 					_gpus.push_back(std::move(new_gpu));
 				}
 			}
