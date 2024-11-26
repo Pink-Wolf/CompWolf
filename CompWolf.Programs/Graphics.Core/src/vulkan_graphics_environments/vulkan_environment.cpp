@@ -6,11 +6,6 @@
 
 namespace compwolf::vulkan
 {
-	void vulkan_environment::vulkan_teardown::operator()(pointer instance) const noexcept
-	{
-		vkDestroyInstance(to_vulkan(instance), nullptr);
-	}
-
 	/******************************** constructors ********************************/
 
 	vulkan_environment::vulkan_environment(const vulkan_graphics_environment_settings& settings)
@@ -62,6 +57,11 @@ namespace compwolf::vulkan
 				throw std::runtime_error(message);
 		}
 
-		_vulkan_instance.reset(from_vulkan(instance));
+		_vulkan_instance = unique_deleter_ptr<vulkan_handle::instance_t>(from_vulkan(instance),
+			[](vulkan_handle::instance instance)
+			{
+				return vkDestroyInstance(to_vulkan(instance), nullptr);
+			}
+		);
 	}
 }

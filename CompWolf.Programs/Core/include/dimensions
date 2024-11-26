@@ -1,0 +1,10 @@
+/** Contains [[dimension]], which allows defining multidimensional std::array.
+ *
+ * This also includes array and matrix versions of the following types up to a 4x4 matrix:
+ * * float
+ * * double
+ * * int
+ * * bool
+ * These types are named [type][dimension], for example float2 and int3x3.
+ */
+#include "private/other/dimension.hpp"

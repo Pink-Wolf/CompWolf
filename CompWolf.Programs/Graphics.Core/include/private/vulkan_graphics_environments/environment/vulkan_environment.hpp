@@ -4,6 +4,7 @@
 #include "../vulkan_graphics_environment_settings.hpp"
 #include "../vulkan_handle.hpp"
 #include <freeables>
+#include <unique_deleter_ptr>
 #include <memory>
 
 namespace compwolf::vulkan
@@ -14,12 +15,7 @@ namespace compwolf::vulkan
 	 */
 	class vulkan_environment : public basic_freeable
 	{
-		struct vulkan_teardown
-		{
-			using pointer = vulkan_handle::instance;
-			void operator()(pointer) const noexcept;
-		};
-		std::unique_ptr<vulkan_handle::instance_t, vulkan_teardown> _vulkan_instance;
+		unique_deleter_ptr<vulkan_handle::instance_t> _vulkan_instance;
 
 	public: // constructors
 		/** @overload Constructs a freed [[vulkan_environment]].

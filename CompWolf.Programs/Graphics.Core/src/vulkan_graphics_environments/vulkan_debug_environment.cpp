@@ -36,11 +36,12 @@ namespace compwolf::vulkan
 			throw std::runtime_error(message);
 		}
 
-		_vulkan_debugger.reset(from_vulkan(debugMessenger));
-		_vulkan_debugger.get_deleter().teardown_function =
-			[instance, vkDestroyDebugUtilsMessengerEXT](vulkan_handle::vulkan_debug_messenger messenger)
+
+		_vulkan_debugger = unique_deleter_ptr<vulkan_handle::vulkan_debug_messenger_t>(from_vulkan(debugMessenger),
+			[vkDestroyDebugUtilsMessengerEXT, instance](vulkan_handle::vulkan_debug_messenger debug_messenger)
 			{
-				vkDestroyDebugUtilsMessengerEXT(instance, to_vulkan(messenger), nullptr);
-			};
+				vkDestroyDebugUtilsMessengerEXT(instance, to_vulkan(debug_messenger), nullptr);
+			}
+		);
 	}
 }

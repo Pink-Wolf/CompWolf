@@ -1,0 +1,7 @@
+// Contains extensions to the standard library's type_traits.
+
+// Including this also includes type_traits.
+#include <type_traits>
+
+#include "private/compwolf_type_traits/explicitly_convertible_to.hpp"
+#include "private/compwolf_type_traits/dereferenceable_to.hpp"

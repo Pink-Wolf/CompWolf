@@ -4,12 +4,11 @@
 #include "compwolf_vulkan.hpp"
 #include <type_traits>
 #include <sstream>
+#include <functional>
 
 namespace compwolf
 {
-	template <typename OnMessageType>
-		requires std::invocable<OnMessageType, std::string>
-	VkBool32 vulkan_debug_callback(
+	inline VkBool32 vulkan_debug_callback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
 		VkDebugUtilsMessageTypeFlagsEXT message_type,
 		const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
@@ -37,14 +36,12 @@ namespace compwolf
 		std::stringstream messageStream("CompWolf debugger: ");
 		messageStream << type_string << ' ' << severity_string << ":\n" << callback_data->pMessage << '\n';
 
-		auto& reporter = *static_cast<OnMessageType*>(user_data);
+		auto& reporter = *static_cast<const std::function<void(std::string_view)>*>(user_data);
 		reporter(messageStream.view());
 
 		return VK_FALSE; // Debug callback must return VK_FALSE
 	};
-	template <typename OnMessageType>
-		requires std::invocable<OnMessageType, std::string>
-	inline constexpr auto vulkan_debug_messenger_create_info(OnMessageType* reporter) -> VkDebugUtilsMessengerCreateInfoEXT
+	inline constexpr auto vulkan_debug_messenger_create_info(const std::function<void(std::string_view)>* reporter) -> VkDebugUtilsMessengerCreateInfoEXT
 	{
 		VkDebugUtilsMessengerCreateInfoEXT create_info{
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -53,8 +50,8 @@ namespace compwolf
 		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
 			| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
 			| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-		.pfnUserCallback = vulkan_debug_callback<OnMessageType>,
-		.pUserData = const_cast<std::remove_const_t<OnMessageType>*>(reporter),
+		.pfnUserCallback = vulkan_debug_callback,
+		.pUserData = const_cast<std::function<void(std::string_view)>*>(reporter),
 		};
 
 		return create_info;

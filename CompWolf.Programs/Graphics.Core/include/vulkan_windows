@@ -1,0 +1,8 @@
+// Contains [[vulkan_window]], a vulkan implementation of [[window]].
+
+// Including this also includes [[windows]].
+#include "windows"
+
+#include "private/vulkan_windows/window_surface.hpp"
+#include "private/vulkan_windows/window_swapchain.hpp"
+#include "private/vulkan_windows/vulkan_window.hpp"

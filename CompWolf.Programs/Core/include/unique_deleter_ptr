@@ -1,0 +1,2 @@
+// Contains [[unique_deleter_ptr]], a std::unique_ptr with a lambda as its deleter.
+#include "private/other/unique_deleter_ptr.hpp"

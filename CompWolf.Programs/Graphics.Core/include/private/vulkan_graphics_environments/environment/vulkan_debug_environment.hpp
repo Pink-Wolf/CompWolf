@@ -4,6 +4,7 @@
 #include "../vulkan_graphics_environment_settings.hpp"
 #include "../vulkan_handle.hpp"
 #include <freeables>
+#include <unique_deleter_ptr>
 #include <memory>
 #include <functional>
 
@@ -15,17 +16,7 @@ namespace compwolf::vulkan
 	 */
 	class vulkan_debug_environment : public basic_freeable
 	{
-		struct vulkan_debug_teardown
-		{
-			using pointer = vulkan_handle::vulkan_debug_messenger;
-			std::function<void(pointer)> teardown_function{};
-			void operator()(pointer p) const noexcept
-			{
-				teardown_function(p);
-			}
-		};
-		using debugger_type = std::unique_ptr<vulkan_handle::vulkan_debug_messenger_t, vulkan_debug_teardown>;
-		debugger_type _vulkan_debugger = debugger_type(nullptr, vulkan_debug_teardown());
+		unique_deleter_ptr<vulkan_handle::vulkan_debug_messenger_t> _vulkan_debugger;
 
 	public: // constructors
 		/** @overload Constructs a freed [[vulkan_debug_environment]].

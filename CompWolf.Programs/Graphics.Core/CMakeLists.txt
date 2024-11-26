@@ -9,11 +9,16 @@ set(DEPENDENT_COMPWOLF_TARGETS
     "Core"
 )
 set(SOURCES
-    "src/vulkan_gpu_connection.cpp"
-    "src/glfw_environment.cpp"
-    "src/vulkan_environment.cpp"
-    "src/vulkan_debug_environment.cpp"
-    "src/vulkan_graphics_environment.cpp"
+    "src/vulkan_graphics_environments/vulkan_gpu_connection.cpp"
+    "src/vulkan_graphics_environments/glfw_environment.cpp"
+    "src/vulkan_graphics_environments/vulkan_environment.cpp"
+    "src/vulkan_graphics_environments/vulkan_debug_environment.cpp"
+    "src/vulkan_graphics_environments/vulkan_graphics_environment.cpp"
+    "src/vulkan_sync/gpu_fence.cpp"
+    "src/vulkan_sync/gpu_semaphore.cpp"
+    "src/vulkan_windows/window_surface.cpp"
+    "src/vulkan_windows/window_swapchain.cpp"
+    "src/vulkan_windows/vulkan_window.cpp"
 )
 set(RESOURCES
     "resources/CompWolf.Graphics.simple_vertex_shader.vert"

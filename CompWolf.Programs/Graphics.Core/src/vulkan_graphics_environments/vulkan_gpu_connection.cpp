@@ -119,7 +119,12 @@ namespace compwolf::vulkan
 				throw std::runtime_error(message);
 		}
 
-		_vulkan_device = from_vulkan(logicDevice);
+		_vulkan_device = unique_deleter_ptr<vulkan_handle::device_t>(from_vulkan(logicDevice),
+			[](vulkan_handle::device d)
+			{
+				vkDestroyDevice(to_vulkan(d), nullptr);
+			}
+		);
 
 		for (uint32_t family_index = 0; family_index < _thread_families.size(); ++family_index)
 		{
@@ -133,15 +138,5 @@ namespace compwolf::vulkan
 				thread.queue = from_vulkan(queue);
 			}
 		}
-	}
-
-	/******************************** CompWolf::freeable ********************************/
-
-	void vulkan_gpu_connection::free() noexcept
-	{
-		if (empty()) return;
-
-		vkDestroyDevice(to_vulkan(_vulkan_device), nullptr);
-		_vulkan_device = nullptr;
 	}
 }

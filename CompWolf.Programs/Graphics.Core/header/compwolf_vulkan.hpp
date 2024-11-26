@@ -3,6 +3,7 @@
 
 #include "private/vulkan_graphics_environments/vulkan_handle.hpp"
 #include <concepts>
+#include <version_numbers>
 
 #define GLFW_INCLUDE_VULKAN
 #include <glfw3.h>
@@ -19,7 +20,26 @@ namespace compwolf::vulkan
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkDevice, vulkan_handle::device)
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkQueue, vulkan_handle::queue)
 
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkFence, vulkan_handle::fence)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSemaphore, vulkan_handle::semaphore)
+
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, GLFWwindow*, vulkan_handle::glfw_window)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSurfaceKHR, vulkan_handle::surface)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkRenderPass, vulkan_handle::render_pass)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSwapchainKHR, vulkan_handle::swapchain)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkFramebuffer, vulkan_handle::frame_buffer)
+
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkImageView, vulkan_handle::image_view)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSampler, vulkan_handle::sampler)
+
 	inline uint32_t to_vulkan(version_number a) { return VK_MAKE_API_VERSION(0, a.major, a.minor, a.patch); }
+
+	struct vulkan_handle::surface_format_info_t
+	{
+		VkSurfaceCapabilitiesKHR capabilities;
+		VkSurfaceFormatKHR format;
+		VkPresentModeKHR present_mode;
+	};
 		
 	/** Invokes the given getter to get the size of its data, and then invokes it again to get the data.
 	 * The getter must take a [size_pointer], and [data_pointer], where [size_pointer] and [data_pointer] are pointers to where the getter should write the size/data respectively.

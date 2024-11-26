@@ -3,5 +3,4 @@
 #include "private/graphics_environments/gpu_work_type_set.hpp"
 #include "private/graphics_environments/gpu_connection.hpp"
 
-#include "private/graphics_environments/graphics_boundary_classes.hpp"
 #include "private/graphics_environments/graphics_environment.hpp"

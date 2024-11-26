@@ -79,13 +79,13 @@ namespace compwolf
 		using key_type = std::vector<value_type>::size_type;
 
 	private:
-		std::vector<value_type> _observers;
+		mutable std::vector<value_type> _observers;
 
 	public: // modifiers
 		/** Subscribes the given functor to the event.
 		 * @return a key to identify the functor, if you later wishes to unsubscribe it from the event.
 		 */
-		key_type subscribe(value_type observer) noexcept
+		key_type subscribe(value_type observer) const noexcept
 		{
 			auto key = _observers.size();
 			_observers.emplace_back(std::move(observer));
@@ -94,14 +94,14 @@ namespace compwolf
 		/** Unsubscribes the functor represented by the given key from the event.
 		 * The key was generated when the functor subscribed to the event.
 		 */
-		void unsubscribe(key_type observer_key) noexcept
+		void unsubscribe(key_type observer_key) const noexcept
 		{
 			_observers[observer_key] = value_type();
 		}
 
 	public: // operators
 		/** Invokes all subscribed functions/functors, passing along the given value to them. */
-		void invoke() const
+		void invoke()
 		{
 			for (auto& observer : std::vector<value_type>(_observers)) // copy vector so it cannot be modified during loop
 			{
@@ -110,7 +110,7 @@ namespace compwolf
 			}
 		}
 		/** Invokes all subscribed functions/functors, passing along the given value to them. */
-		void operator()() const
+		void operator()()
 		{
 			invoke();
 		}

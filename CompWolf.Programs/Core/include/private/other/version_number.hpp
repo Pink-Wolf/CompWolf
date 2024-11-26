@@ -1,5 +1,5 @@
-#ifndef COMPWOLF_VERSION_NUMBER_HEADER
-#define COMPWOLF_VERSION_NUMBER_HEADER
+#ifndef COMPWOLF_VERSION_NUMBER
+#define COMPWOLF_VERSION_NUMBER
 
 namespace compwolf
 {
@@ -20,4 +20,4 @@ namespace compwolf
 	extern const version_number compwolf_version;
 }
 
-#endif // ! COMPWOLF_VERSION_NUMBER_HEADER
+#endif // ! COMPWOLF_VERSION_NUMBER

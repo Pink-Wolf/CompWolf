@@ -2,7 +2,6 @@
 #define COMPWOLF_GRAPHICS_ENVIRONMENT
 
 #include "graphics_environment_settings.hpp"
-#include "graphics_boundary_classes.hpp"
 #include <freeables>
 #include <events>
 #include <thread>
@@ -19,15 +18,15 @@ namespace compwolf
 	 * Furthermore, remember to make destructors call [[freeable::free]].
 	 * 
 	 * The term "main graphics thread" refers to the thread this was constructed on.
-	 * @typeparam GraphicsBoundaryClasses A [[graphics_boundary_classes]] denoting the boundary classes that the environment will use.
+	 * @typeparam GpuType The boundary class representing one or more GPUs on a machine.
 	 * @warning It is undefined behaviour to construct or destruct a [[graphics_environment]] on a thread other than the one that started the program.
 	 */
-	template<GraphicsBoundaryClasses BoundaryCollection>
+	template<GpuConnection GpuType>
 	class graphics_environment : public basic_freeable
 	{
 	public:
-		/** The boundary classes used by this [[graphics_environment]]. */
-		using boundary_classes = BoundaryCollection;
+		/** The boundary class representing one or more GPUs on a machine. */
+		using gpu_type = GpuType;
 
 	private:
 		graphics_environment_settings _settings;
@@ -76,9 +75,9 @@ namespace compwolf
 		/** Returns the GPUs that the environment can use.
 		 * An item in this array may be representing multiple actual GPUs.
 		 */
-		virtual auto gpus() const noexcept -> const std::vector<typename boundary_classes::gpu_type>& = 0;
+		virtual auto gpus() const noexcept -> const std::vector<typename gpu_type>& = 0;
 
-	public: // update
+	public: // modifiers
 		/** Handles any jobs from outside the program, which has been received since the last call to [[graphics_environment]]::update.
 		 * Jobs includes for example updating what keyboard keys are being pressed.
 		 * 
