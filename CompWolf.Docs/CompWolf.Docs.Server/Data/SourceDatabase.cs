@@ -435,9 +435,13 @@ namespace CompWolf.Docs.Server.Data
                                     case "throws":
                                         commentTarget = throwCommentLines;
                                         break;
-                                    case "overload":
+                                    case "customoverload":
                                         isOverload = true;
                                         commentTarget = overloadCommentLines;
+                                        break;
+                                    case "overload":
+                                        isOverload = true;
+                                        commentTarget = mainCommentLines;
                                         break;
                                     case "mainoverload":
                                         commentTarget = overloadCommentLines;
@@ -459,7 +463,7 @@ namespace CompWolf.Docs.Server.Data
                         }
                     }
 
-                    mainComment = isOverload ? "" : string.Join(Newline, mainCommentLines).Trim();
+                    mainComment = string.Join(Newline, mainCommentLines).Trim();
                     returnComment = string.Join(Newline, returnCommentLines).Trim();
                     throwComment = string.Join(Newline, throwCommentLines).Trim();
                     overloadComment = string.Join(Newline, overloadCommentLines).Trim();
@@ -468,6 +472,12 @@ namespace CompWolf.Docs.Server.Data
                     templateParameterComments = templateParameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
                         .ToDictionary();
                     warnings = warningsLines.Select(x => string.Join(Newline, x.Select(x => x.Trim()))).ToList();
+
+                    if (isOverload)
+                    {
+                        if (overloadComment.Length == 0) overloadComment = mainComment;
+                        mainComment = "";
+                    }
                 }
                 catch (Exception e)
                 {
