@@ -349,11 +349,14 @@ namespace CompWolf.Docs.Server.Data
                         if (nestedEntities.TryGetValue("constructors", out var constructors))
                         {
                             nestedEntities.Remove("constructors");
+
+                            foreach (var item in constructors)
+                                item.Type = EntityTypes.Function;
                             constructor = CombineEntities(constructors);
+
                             if (constructor is not null)
                             {
                                 constructor.Name = entityName;
-                                constructor.Type = EntityTypes.Function;
 
                                 if (nestedEntities.TryGetValue("", out _) is false)
                                     nestedEntities[""] = [];
