@@ -11,17 +11,16 @@ namespace compwolf
 {
 	/** Base class for setting up GPU-logic, which is required by most other logic in the library.
 	 * 
-	 * This class is abstract; its pure virtual functions are:
+	 * This class is abstract; a derived type should generally implement/override:
 	 * * [[graphics_environment::gpus]],
-	 * * [[graphics_environment::update]],
-	 * * [[graphics_environment::on_free]].
-	 * Furthermore, remember to make destructors call [[freeable::free]].
+	 * * [[graphics_environment::update]].
 	 * 
 	 * The term "main graphics thread" refers to the thread this was constructed on.
 	 * @typeparam GpuType The boundary class representing one or more GPUs on a machine.
+	 * Should inherit from [[gpu_connection]].
 	 * @warning It is undefined behaviour to construct or destruct a [[graphics_environment]] on a thread other than the one that started the program.
 	 */
-	template<GpuConnection GpuType>
+	template<typename GpuType>
 	class graphics_environment
 	{
 	public:
@@ -97,7 +96,7 @@ namespace compwolf
 
 	public: // modifiers
 		/** Handles any jobs from outside the program, which has been received since the last call to [[graphics_environment]]::update.
-		 * Jobs includes for example updating what keyboard keys are being pressed.
+		 * Jobs includes, for example, updating what keyboard keys are being pressed.
 		 * 
 		 * Must be called from the main graphics thread.
 		 * @throws any exception thrown by code handling the jobs.

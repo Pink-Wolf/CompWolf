@@ -9,8 +9,6 @@
 
 namespace compwolf::vulkan
 {
-	class vulkan_graphics_environment;
-
 	/** A Vulkan implementation of [[graphics_environment]].
 	 * @warning It is undefined behaviour to construct or destruct a [[vulkan_graphics_environment]] on a thread other than the one that started the program.
 	 */

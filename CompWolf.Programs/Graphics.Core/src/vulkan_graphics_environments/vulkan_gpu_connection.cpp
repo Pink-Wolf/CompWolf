@@ -11,7 +11,8 @@ namespace compwolf::vulkan
 	vulkan_gpu_connection::vulkan_gpu_connection(
 		vulkan_graphics_environment& environment,
 		vulkan_handle::physical_device vulkan_physical_device)
-		: _environment(&environment), _vulkan_physical_device(vulkan_physical_device)
+		: gpu_connection<vulkan_graphics_environment>(environment, 0)
+		, _vulkan_physical_device(vulkan_physical_device)
 	{
 		auto instance = to_vulkan(environment.vulkan_instance());
 		auto physicalDevice = to_vulkan(vulkan_physical_device);
@@ -90,7 +91,7 @@ namespace compwolf::vulkan
 					.pQueuePriorities = queue_priority.data(),
 				};
 
-				_work_types |= connection.work_types;
+				work_types() |= connection.work_types;
 				queueCreateInfos.push_back(std::move(queueCreateInfo));
 				_thread_families.push_back(std::move(connection));
 			}
@@ -141,23 +142,8 @@ namespace compwolf::vulkan
 		}
 	}
 
-	auto vulkan_gpu_connection::destructing() const noexcept -> const event<>&
-	{
-		return _environment->destructing();
-	}
-
 	auto vulkan_gpu_connection::vulkan_instance() const noexcept -> vulkan_handle::instance
 	{
-		return _environment->vulkan_instance();
-	}
-
-	auto vulkan_gpu_connection::inputs() const noexcept -> const input_state&
-	{
-		return _environment->inputs();
-	}
-
-	auto vulkan_gpu_connection::inputs() noexcept -> input_state&
-	{
-		return _environment->inputs();
+		return environment().vulkan_instance();
 	}
 }

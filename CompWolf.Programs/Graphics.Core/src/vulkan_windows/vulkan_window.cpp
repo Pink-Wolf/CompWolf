@@ -71,7 +71,7 @@ namespace compwolf::vulkan
 
 					if (character != 0)
 					{
-						gpu.inputs().set_char_state(character, pressed_down, capitalized);
+						gpu.environment().inputs().set_char_state(character, pressed_down, capitalized);
 					}
 				}
 			);
