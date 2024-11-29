@@ -19,10 +19,7 @@ namespace compwolf
 		/** The parameter type of the event's subscribers. */
 		using parameter_type = ParameterType;
 		/** The type of functor that can subscribe to the event. */
-		using value_type = std::conditional_t<std::is_void_v<parameter_type>
-			, std::function<void()>
-			, std::function<void(parameter_type)>
-		>;
+		using value_type = std::function<void(parameter_type)>;
 		/** The type of object used to internally represent a subscriber. */
 		using event_type = event<ParameterType>;
 		/** The type of object used to internally represent a subscriber. */
@@ -33,7 +30,49 @@ namespace compwolf
 
 	public: // accessors
 		constexpr auto internal_key() const noexcept -> internal_key_type { return _internal_key; }
-		constexpr auto target_event() const noexcept -> const event_type& { return _event; }
+		constexpr auto target_event() const noexcept -> const event_type& { return *_event; }
+
+	public: // constructors
+		constexpr event_key() noexcept = default;
+		constexpr event_key(event_key&& other) noexcept
+		{
+			_event = other._event;
+			_internal_key = other._internal_key;
+
+			other._event = nullptr;
+		}
+		constexpr ~event_key() noexcept;
+
+		constexpr auto operator==(event_key&& other) noexcept -> event_key&
+		{
+			this->~event_key();
+			return *new(this)event_key(std::move(other));
+		}
+
+		/** Should only be constructed by [[event]]. */
+		constexpr event_key(const event_type& e, internal_key_type k) noexcept
+			: _event(&e), _internal_key(k)
+		{}
+	};
+	template <>
+	class event_key<void>
+	{
+	public:
+		/** The parameter type of the event's subscribers. */
+		using parameter_type = void;
+		/** The type of functor that can subscribe to the event. */
+		using value_type = std::function<void()>;
+		/** The type of object used to internally represent a subscriber. */
+		using event_type = event<void>;
+		/** The type of object used to internally represent a subscriber. */
+		using internal_key_type = std::vector<value_type>::size_type;
+	private:
+		const event_type* _event = nullptr;
+		internal_key_type _internal_key;
+
+	public: // accessors
+		constexpr auto internal_key() const noexcept -> internal_key_type { return _internal_key; }
+		constexpr auto target_event() const noexcept -> const event_type& { return *_event; }
 
 	public: // constructors
 		constexpr event_key() noexcept = default;
@@ -168,6 +207,10 @@ namespace compwolf
 
 	template <typename ParameterType>
 	constexpr event_key<ParameterType>::~event_key() noexcept
+	{
+		if (_event) _event->unsubscribe(std::move(*this));
+	}
+	constexpr event_key<void>::~event_key() noexcept
 	{
 		if (_event) _event->unsubscribe(std::move(*this));
 	}
