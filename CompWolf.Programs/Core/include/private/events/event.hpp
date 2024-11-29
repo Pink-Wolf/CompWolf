@@ -43,7 +43,7 @@ namespace compwolf
 		}
 		constexpr ~event_key() noexcept;
 
-		constexpr auto operator==(event_key&& other) noexcept -> event_key&
+		auto operator==(event_key&& other) noexcept -> event_key&
 		{
 			this->~event_key();
 			return *new(this)event_key(std::move(other));
@@ -54,6 +54,7 @@ namespace compwolf
 			: _event(&e), _internal_key(k)
 		{}
 	};
+	/** @hidden */
 	template <>
 	class event_key<void>
 	{
@@ -85,7 +86,7 @@ namespace compwolf
 		}
 		constexpr ~event_key() noexcept;
 
-		constexpr auto operator==(event_key&& other) noexcept -> event_key&
+		auto operator==(event_key&& other) noexcept -> event_key&
 		{
 			this->~event_key();
 			return *new(this)event_key(std::move(other));
@@ -205,11 +206,13 @@ namespace compwolf
 		}
 	};
 
+	/** @hidden */
 	template <typename ParameterType>
 	constexpr event_key<ParameterType>::~event_key() noexcept
 	{
 		if (_event) _event->unsubscribe(std::move(*this));
 	}
+	/** @hidden */
 	constexpr event_key<void>::~event_key() noexcept
 	{
 		if (_event) _event->unsubscribe(std::move(*this));
