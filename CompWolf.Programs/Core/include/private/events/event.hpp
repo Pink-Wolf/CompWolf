@@ -19,7 +19,10 @@ namespace compwolf
 		/** The parameter type of the event's subscribers. */
 		using parameter_type = ParameterType;
 		/** The type of functor that can subscribe to the event. */
-		using value_type = std::function<void(parameter_type)>;
+		using value_type = std::conditional_t<std::is_void_v<parameter_type>
+			, std::function<void()>
+			, std::function<void(parameter_type)>
+		>;
 		/** The type of object used to internally represent a subscriber. */
 		using event_type = event<ParameterType>;
 		/** The type of object used to internally represent a subscriber. */
@@ -30,7 +33,7 @@ namespace compwolf
 
 	public: // accessors
 		constexpr auto internal_key() const noexcept -> internal_key_type { return _internal_key; }
-		constexpr auto event() const noexcept -> const event_type& { return _event; }
+		constexpr auto target_event() const noexcept -> const event_type& { return _event; }
 
 	public: // constructors
 		constexpr event_key() noexcept = default;

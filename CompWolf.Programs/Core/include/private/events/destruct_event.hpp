@@ -58,12 +58,14 @@ namespace compwolf
 		{
 			invoke();
 			event<>::operator=(other);
+			return *this;
 		}
 		destruct_event(event<>&& other) : event<>(std::move(other)) {}
 		auto operator=(event<>&& other) -> destruct_event&
 		{
 			invoke();
 			event<>::operator=(std::move(other));
+			return *this;
 		}
 		~destruct_event() noexcept { invoke(); }
 	};
