@@ -21,6 +21,9 @@ namespace compwolf::vulkan
 		 * @see vulkan_gpu_thread
 		 */
 		std::vector<vulkan_gpu_thread> threads;
+
+		/** The amount of [[vulkan_gpu_program_manager]] currently on the family's threads. */
+		std::size_t program_manager_count;
 	};
 }
 

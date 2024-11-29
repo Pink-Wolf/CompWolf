@@ -1,4 +1,4 @@
-#include <private/vulkan_sync/gpu_fence.hpp>
+#include <private/vulkan_programs/vulkan_gpu_fence.hpp>
 
 #include "compwolf_vulkan.hpp"
 #include <stdexcept>
@@ -8,9 +8,9 @@ namespace compwolf::vulkan
 {
 	/******************************** constructors ********************************/
 
-	gpu_fence::gpu_fence(const vulkan_gpu_connection& target_gpu, bool signaled)
+	vulkan_gpu_fence::vulkan_gpu_fence(vulkan_gpu_connection& target_gpu, bool signaled)
+		: gpu_fence(target_gpu)
 	{
-		_device = &target_gpu;
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 
 		VkFenceCreateInfo createInfo{
@@ -24,18 +24,24 @@ namespace compwolf::vulkan
 		switch (result)
 		{
 		case VK_SUCCESS: break;
-		default: throw std::runtime_error("Could not create gpu fence.");
+		default:
+			const char* message;
+			GET_VULKAN_ERROR_STRING(result, message,
+				"Could not create a gpu fence: ")
+				throw std::runtime_error(message);
 		}
 
 		_vulkan_fence = unique_deleter_ptr<vulkan_handle::fence_t>(from_vulkan(fence),
 			[logicDevice](vulkan_handle::fence f)
 			{
-				vkDestroyFence(logicDevice, to_vulkan(f), nullptr);
+				auto fence = to_vulkan(f);
+				vkWaitForFences(logicDevice, 1, &fence, VK_TRUE, UINT64_MAX);
+				vkDestroyFence(logicDevice, fence, nullptr);
 			}
 		);
 	}
 
-	auto gpu_fence::signaled() const noexcept -> bool
+	auto vulkan_gpu_fence::completed() const noexcept -> bool
 	{
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 		auto fence = to_vulkan(vulkan_fence());
@@ -45,7 +51,7 @@ namespace compwolf::vulkan
 
 	/******************************** modifiers ********************************/
 
-	void gpu_fence::wait() const noexcept
+	void vulkan_gpu_fence::wait() const noexcept
 	{
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 		auto fence = to_vulkan(vulkan_fence());
@@ -53,7 +59,7 @@ namespace compwolf::vulkan
 		vkWaitForFences(logicDevice, 1, &fence, VK_TRUE, UINT64_MAX);
 	}
 
-	void gpu_fence::reset() noexcept
+	void vulkan_gpu_fence::reset() noexcept
 	{
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 		auto fence = to_vulkan(vulkan_fence());

@@ -52,7 +52,7 @@ TEST(Event, invoke_after_unsubscribing) {
 	int i = 0;
 	auto k = e.subscribe([&i]() { ++i; });
 	e();
-	e.unsubscribe(k);
+	e.unsubscribe(std::move(k));
 	e();
 
 	ASSERT_EQ(i, 1);
@@ -60,8 +60,8 @@ TEST(Event, invoke_after_unsubscribing) {
 TEST(Event, unsubscribe_during_invoke) {
 	compwolf::event<> e;
 	int i = 0;
-	compwolf::event<>::key_type k;
-	k = e.subscribe([&e, &i, &k]() { ++i; e.unsubscribe(k); });
+	compwolf::event<>::key_type k
+		= e.subscribe([&e, &i, &k]() { ++i; e.unsubscribe(std::move(k)); });
 	e();
 	e();
 	e();
@@ -72,12 +72,11 @@ TEST(Event, unsubscribe_multiple_during_invoke) {
 	compwolf::event<> e;
 	int i1, i2, i3, i4, i5;
 	i1 = i2 = i3 = i4 = i5 = 0;
-	compwolf::event<>::key_type k1, k2, k3, k4, k5;
-	k1 = e.subscribe([&e, &i1, &k1]() { i1 += 1; if (i1 >= 1) e.unsubscribe(k1); });
-	k2 = e.subscribe([&e, &i2, &k2]() { i2 += 1; if (i2 >= 3) e.unsubscribe(k2); });
-	k3 = e.subscribe([&e, &i3, &k3]() { i3 += 1; if (i3 >= 3) e.unsubscribe(k3); });
-	k4 = e.subscribe([&e, &i4, &k4]() { i4 += 1; if (i4 >= 8) e.unsubscribe(k4); });
-	k5 = e.subscribe([&e, &i5, &k5]() { i5 += 1; if (i5 >= 5) e.unsubscribe(k5); });
+	compwolf::event<>::key_type k1 = e.subscribe([&e, &i1, &k1]() { i1 += 1; if (i1 >= 1) e.unsubscribe(std::move(k1)); });
+	compwolf::event<>::key_type k2 = e.subscribe([&e, &i2, &k2]() { i2 += 1; if (i2 >= 3) e.unsubscribe(std::move(k2)); });
+	compwolf::event<>::key_type k3 = e.subscribe([&e, &i3, &k3]() { i3 += 1; if (i3 >= 3) e.unsubscribe(std::move(k3)); });
+	compwolf::event<>::key_type k4 = e.subscribe([&e, &i4, &k4]() { i4 += 1; if (i4 >= 8) e.unsubscribe(std::move(k4)); });
+	compwolf::event<>::key_type k5 = e.subscribe([&e, &i5, &k5]() { i5 += 1; if (i5 >= 5) e.unsubscribe(std::move(k5)); });
 	for (size_t i = 0; i < 10; ++i)
 	{
 		e();

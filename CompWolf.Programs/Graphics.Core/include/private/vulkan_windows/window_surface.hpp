@@ -16,13 +16,17 @@ namespace compwolf::vulkan
 	class window_surface
 	{
 	private: // fields
-		const vulkan_gpu_connection* _gpu;
+		vulkan_gpu_connection* _gpu;
 
 		unique_deleter_ptr<vulkan_handle::surface_t> _vulkan_surface;
 		unique_deleter_ptr<vulkan_handle::surface_format_info_t> _format;
 		unique_deleter_ptr<vulkan_handle::render_pass_t> _render_pass;
 
 	public: // accessors
+		/** Returns the gpu that the window is on.
+		 * @uniqueoverload
+		 */
+		auto gpu() noexcept -> vulkan_gpu_connection& { return *_gpu; }
 		/** Returns the gpu that the window is on. */
 		auto gpu() const noexcept -> const vulkan_gpu_connection& { return *_gpu; }
 
@@ -50,7 +54,7 @@ namespace compwolf::vulkan
 		auto operator=(window_surface&&) -> window_surface& = default;
 
 		/** Should be called by [[vulkan_window]]. */
-		window_surface(const vulkan_graphics_environment*, const vulkan_gpu_connection*,
+		window_surface(vulkan_graphics_environment*, vulkan_gpu_connection*,
 			window_settings&, vulkan_handle::glfw_window);
 	};
 }

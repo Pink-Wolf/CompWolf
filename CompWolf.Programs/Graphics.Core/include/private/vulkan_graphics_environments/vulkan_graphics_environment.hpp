@@ -47,6 +47,11 @@ namespace compwolf::vulkan
 
 	public: // compwolf::graphics_environment
 		/** @see compwolf::graphics_environment */
+		auto gpus() noexcept -> std::vector<vulkan_gpu_connection>& final
+		{
+			return _gpus;
+		}
+		/** @see compwolf::graphics_environment */
 		auto gpus() const noexcept -> const std::vector<vulkan_gpu_connection>& final
 		{
 			return _gpus;

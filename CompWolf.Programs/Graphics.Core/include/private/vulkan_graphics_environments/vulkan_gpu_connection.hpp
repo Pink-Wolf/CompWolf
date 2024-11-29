@@ -39,8 +39,15 @@ namespace compwolf::vulkan
 		vulkan_gpu_connection(vulkan_graphics_environment&, vulkan_handle::physical_device);
 
 	public: // vulkan-specific
-		/** Returns the GPU's threads. */
+		/** Returns the GPU's threads.
+		 * @uniqueoverload
+		 */
 		auto thread_families() const noexcept -> const std::vector<vulkan_gpu_thread_family>&
+		{
+			return _thread_families;
+		}
+		/** Returns the GPU's threads. */
+		auto thread_families() noexcept -> std::vector<vulkan_gpu_thread_family>&
 		{
 			return _thread_families;
 		}

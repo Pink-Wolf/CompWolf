@@ -6,6 +6,7 @@
 #include <events>
 #include <thread>
 #include <vector>
+#include <events>
 
 namespace compwolf
 {
@@ -28,10 +29,11 @@ namespace compwolf
 		using gpu_type = GpuType;
 
 	private:
-		destruct_event<> _destructing;
 		graphics_environment_settings _settings;
 		input_state _inputs;
 		std::thread::id _main_graphics_thread;
+
+		event<> _updating;
 
 	public: // constructors
 		/** Constructs an invalid [[graphics_environment]].
@@ -84,15 +86,21 @@ namespace compwolf
 		/** Returns the GPUs that the environment can use.
 		 * An item in this array may be representing multiple actual GPUs.
 		 */
+		virtual auto gpus() noexcept -> std::vector<typename gpu_type>& = 0;
+		/** Returns the GPUs that the environment can use.
+		 * An item in this array may be representing multiple actual GPUs.
+		 * @uniqueoverload
+		 */
 		virtual auto gpus() const noexcept -> const std::vector<typename gpu_type>& = 0;
-
-		/** Returns an event that is invoked right before the environment is destructed. */
-		auto destructing() const noexcept -> const event<>&
-			{ return _destructing; }
 
 		/** Returns whether this is valid, that is one not constructed by the default constructor. */
 		operator bool() const noexcept
 			{ return _main_graphics_thread == std::thread::id(); }
+
+
+		/** Returns an event that is invoked right before [[graphics_environment::update]]. */
+		auto updating() const noexcept -> const event<>&
+		{ return _updating; }
 
 	public: // modifiers
 		/** Handles any jobs from outside the program, which has been received since the last call to [[graphics_environment]]::update.
@@ -103,6 +111,7 @@ namespace compwolf
 		 */
 		virtual void update()
 		{
+			_updating.invoke();
 			inputs().update_last_frame_data();
 		}
 	};

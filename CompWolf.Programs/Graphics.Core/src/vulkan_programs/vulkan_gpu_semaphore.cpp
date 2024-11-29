@@ -1,4 +1,4 @@
-#include <private/vulkan_sync/gpu_semaphore.hpp>
+#include <private/vulkan_programs/vulkan_gpu_semaphore.hpp>
 
 #include "compwolf_vulkan.hpp"
 #include <stdexcept>
@@ -8,9 +8,9 @@ namespace compwolf::vulkan
 {
 	/******************************** constructors ********************************/
 
-	gpu_semaphore::gpu_semaphore(const vulkan_gpu_connection& target_gpu)
+	vulkan_gpu_semaphore::vulkan_gpu_semaphore(vulkan_gpu_connection& target_gpu)
 	{
-		_device = &target_gpu;
+		_gpu = &target_gpu;
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 
 		VkSemaphoreCreateInfo createInfo{
@@ -23,7 +23,11 @@ namespace compwolf::vulkan
 		switch (result)
 		{
 		case VK_SUCCESS: break;
-		default: throw std::runtime_error("Could not create gpu semaphore.");
+		default:
+			const char* message;
+			GET_VULKAN_ERROR_STRING(result, message,
+				"Could not create a gpu semaphore: ")
+				throw std::runtime_error(message);
 		}
 
 		_vulkan_semaphore = unique_deleter_ptr<vulkan_handle::semaphore_t>(from_vulkan(semaphore),

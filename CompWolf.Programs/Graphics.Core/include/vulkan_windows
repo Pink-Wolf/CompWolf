@@ -4,5 +4,7 @@
 #include "windows"
 
 #include "private/vulkan_windows/window_surface.hpp"
+#include "private/vulkan_windows/swapchain_frame.hpp"
 #include "private/vulkan_windows/window_swapchain.hpp"
+#include "private/vulkan_windows/vulkan_camera.hpp"
 #include "private/vulkan_windows/vulkan_window.hpp"

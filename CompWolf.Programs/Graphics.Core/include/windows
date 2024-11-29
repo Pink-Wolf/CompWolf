@@ -1,4 +1,5 @@
 // Contains [[window]], which represents a window on a screen.
 
 #include "private/windows/window_settings.hpp"
+#include "private/windows/window_camera.hpp"
 #include "private/windows/window.hpp"

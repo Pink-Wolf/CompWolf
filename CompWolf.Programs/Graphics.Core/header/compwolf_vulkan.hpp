@@ -1,6 +1,8 @@
 #ifndef COMPWOLF_GRAPHICS_COMPWOLF_VULKAN
 #define COMPWOLF_GRAPHICS_COMPWOLF_VULKAN
 
+#include <cstdint> // vulkan usually uses uint32_t, which cstdint defines
+
 #include "private/vulkan_graphics_environments/vulkan_handle.hpp"
 #include <concepts>
 #include <version_numbers>
@@ -22,6 +24,8 @@ namespace compwolf::vulkan
 
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkFence, vulkan_handle::fence)
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSemaphore, vulkan_handle::semaphore)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkCommandBuffer, vulkan_handle::command)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkCommandPool, vulkan_handle::command_pool)
 
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, GLFWwindow*, vulkan_handle::glfw_window)
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSurfaceKHR, vulkan_handle::surface)

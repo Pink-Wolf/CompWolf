@@ -58,6 +58,20 @@ namespace compwolf::vulkan
 		/** Represents a VkSemaphore-pointer */
 		using semaphore = semaphore_t*;
 
+		/** Dereference type of [[vulkan_handle::command]]
+		 * @see vulkan_handle::command
+		 */
+		struct command_t;
+		/** Represents a VkCommandBuffer-pointer */
+		using command = command_t*;
+
+		/** Dereference type of [[vulkan_handle::command_pool]]
+		 * @see vulkan_handle::command_pool
+		 */
+		struct command_pool_t;
+		/** Represents a VkCommandPool-pointer */
+		using command_pool = command_pool_t*;
+
 
 		/** Dereference type of [[vulkan_handle::glfw_window]]
 		 * @see vulkan_handle::glfw_window

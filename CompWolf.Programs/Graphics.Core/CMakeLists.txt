@@ -14,10 +14,13 @@ set(SOURCES
     "src/vulkan_graphics_environments/vulkan_environment.cpp"
     "src/vulkan_graphics_environments/vulkan_debug_environment.cpp"
     "src/vulkan_graphics_environments/vulkan_graphics_environment.cpp"
-    "src/vulkan_sync/gpu_fence.cpp"
-    "src/vulkan_sync/gpu_semaphore.cpp"
+    "src/vulkan_programs/vulkan_gpu_fence.cpp"
+    "src/vulkan_programs/vulkan_gpu_semaphore.cpp"
+    "src/vulkan_programs/vulkan_gpu_program_manager.cpp"
+    "src/vulkan_programs/vulkan_gpu_program.cpp"
     "src/vulkan_windows/window_surface.cpp"
     "src/vulkan_windows/window_swapchain.cpp"
+    "src/vulkan_windows/vulkan_camera.cpp"
     "src/vulkan_windows/vulkan_window.cpp"
 )
 set(RESOURCES

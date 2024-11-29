@@ -6,12 +6,24 @@
 #include "swapchain_frame.hpp"
 #include "window_surface.hpp"
 #include <unique_deleter_ptr>
-#include <owneds>
+#include <events>
 #include <vector>
 #include <cstddef>
 
 namespace compwolf::vulkan
 {
+	class vulkan_window;
+	/** Arguments for vulkan_window::drawing. */
+	struct window_draw_parameters
+	{
+		/** The window. */
+		vulkan_window* target_window;
+		/** The frame that is being drawn. */
+		swapchain_frame* target_frame;
+		/** The index of the frame that is being drawn. */
+		std::size_t target_frame_index;
+	};
+
 	/** The swapchain of a window, as in the actual images that are being drawn and shown on a window.
 	 * This should generally not be accessed directly, and should only be constructed by [[vulkan_window]].
 	 * @see vulkan_window
@@ -19,12 +31,16 @@ namespace compwolf::vulkan
 	class window_swapchain
 	{
 	private: // fields
-		const vulkan_gpu_connection* _gpu;
+		vulkan_gpu_connection* _gpu;
 		unique_deleter_ptr<vulkan_handle::swapchain_t> _vulkan_swapchain;
 		std::vector<swapchain_frame> _frames;
 		std::size_t _current_frame_index;
 
 	public: // accessors
+		/** Returns the gpu that the window is on.
+		 * @uniqueoverload
+		 */
+		auto gpu() noexcept -> vulkan_gpu_connection& { return *_gpu; }
 		/** Returns the gpu that the window is on. */
 		auto gpu() const noexcept -> const vulkan_gpu_connection& { return *_gpu; }
 
@@ -47,7 +63,7 @@ namespace compwolf::vulkan
 			return !!_vulkan_swapchain;
 		}
 
-	private: // modifiers
+	public: // modifiers
 		/** Makes the window display the current frame, and makes a new frame the current one. */
 		void to_next_frame();
 
@@ -66,7 +82,7 @@ namespace compwolf::vulkan
 
 		/** Should be called by [[vulkan_window]]. */
 		window_swapchain(window_settings&,
-			vulkan_handle::glfw_window, const window_surface&);
+			vulkan_handle::glfw_window, window_surface&);
 	};
 }
 

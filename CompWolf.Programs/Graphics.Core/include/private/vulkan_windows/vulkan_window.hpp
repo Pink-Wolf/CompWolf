@@ -6,6 +6,7 @@
 #include <unique_deleter_ptr>
 #include "window_surface.hpp"
 #include "window_swapchain.hpp"
+#include <vulkan_programs>
 
 namespace compwolf::vulkan
 {
@@ -18,6 +19,8 @@ namespace compwolf::vulkan
 		unique_deleter_ptr<vulkan_handle::glfw_window_t> _glfw_window;
 		window_surface _surface;
 		window_swapchain _swapchain;
+
+		event<const window_draw_parameters&> _drawing;
 
 	public: // vulkan-related
 		/** Returns the surface's [[vulkan_handle::glfw_window]], representing a GLFWwindow-pointer. */
@@ -39,6 +42,10 @@ namespace compwolf::vulkan
 			return !!_glfw_window;
 		}
 
+		/** Returns an event invoked when the image is being drawn. */
+		auto drawing() const noexcept -> const event<const window_draw_parameters&>&
+		{ return _drawing; }
+
 	public: // constructors
 		/** Constructs an invalid [[vulkan_window]].
 		 * Using this environment, except [[vulkan_window::operator bool]], is undefined behaviour.
@@ -46,17 +53,21 @@ namespace compwolf::vulkan
 		 */
 		vulkan_window() = default;
 		vulkan_window(vulkan_window&&) = default;
-		auto operator=(vulkan_window&&) -> vulkan_window& = default;
+		auto operator=(vulkan_window&& other) -> vulkan_window&
+		{
+			this->~vulkan_window();
+			return *new(this)vulkan_window(std::move(other));
+		}
 
 	private:
-		vulkan_window(const vulkan_graphics_environment*, const vulkan_gpu_connection*, window_settings settings);
+		vulkan_window(vulkan_graphics_environment*, vulkan_gpu_connection*, window_settings settings);
 	public:
 		/** Constructs a window on the given gpu, with the given settings.
 		 * @throws std::runtime_error if there was an error during setup due to causes outside of the program.
 		 * @throws std::invalid_argument if the given settings have invalid settings.
 		 * @overload
 		 */
-		vulkan_window(const vulkan_gpu_connection& gpu, window_settings settings)
+		vulkan_window(vulkan_gpu_connection& gpu, window_settings settings)
 			: vulkan_window(nullptr, &gpu, settings)
 		{}
 
@@ -65,7 +76,7 @@ namespace compwolf::vulkan
 		 * @throws std::invalid_argument if the given settings have invalid settings.
 		 * @overload
 		 */
-		vulkan_window(const vulkan_graphics_environment& environment, window_settings settings)
+		vulkan_window(vulkan_graphics_environment& environment, window_settings settings)
 			: vulkan_window(&environment, nullptr, settings)
 		{}
 
@@ -77,9 +88,7 @@ namespace compwolf::vulkan
 		void close() noexcept final
 		{
 			window::close();
-			_swapchain = window_swapchain();
-			_surface = window_surface();
-			_glfw_window = nullptr;
+			*this = vulkan_window();
 		}
 	};
 }

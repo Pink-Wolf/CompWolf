@@ -1,0 +1,9 @@
+// Contains [[vulkan_gpu_program]], a vulkan implementation of [[gpu_program]].
+
+// Including this also includes [[gpu_programs]].
+#include "gpu_programs"
+
+#include "private/vulkan_programs/vulkan_gpu_fence.hpp"
+#include "private/vulkan_programs/vulkan_gpu_semaphore.hpp"
+#include "private/vulkan_programs/vulkan_gpu_program_manager.hpp"
+#include "private/vulkan_programs/vulkan_gpu_program.hpp"

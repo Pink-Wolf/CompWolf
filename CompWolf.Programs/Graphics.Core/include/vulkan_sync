@@ -1,4 +1,0 @@
-// Contains classes for syncing work on a GPU.
-
-#include "private/vulkan_sync/gpu_fence.hpp"
-#include "private/vulkan_sync/gpu_semaphore.hpp"

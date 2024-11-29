@@ -3,12 +3,12 @@
 
 #include <stdexcept>
 #include <algorithm>
-#include <vulkan_sync>
+#include <vulkan_programs>
 
 namespace compwolf::vulkan
 {
 	window_swapchain::window_swapchain(window_settings& settings,
-		vulkan_handle::glfw_window window, const window_surface& surface)
+		vulkan_handle::glfw_window window, window_surface& surface)
 		: _gpu(&surface.gpu())
 	{
 		auto glfwWindow = to_vulkan(window);
@@ -68,7 +68,11 @@ namespace compwolf::vulkan
 			{
 			case VK_SUCCESS: break;
 			case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR: throw std::runtime_error("Could not create the swapchain for a window; something is already displaying images on the window.");
-			default: throw std::runtime_error("Could not create swapchain for a window; unknown error from vulkan-function.");
+			default:
+				const char* message;
+				GET_VULKAN_ERROR_STRING(result, message,
+					"Could not create swapchain for a window: ")
+					throw std::runtime_error(message);
 			}
 
 			_vulkan_swapchain = unique_deleter_ptr<vulkan_handle::swapchain_t>(from_vulkan(swapchain),
@@ -90,7 +94,11 @@ namespace compwolf::vulkan
 					case VK_SUCCESS:
 					case VK_INCOMPLETE:
 						break;
-					default: throw std::runtime_error("Could not get a window's swapchain-images");
+					default:
+						const char* message;
+						GET_VULKAN_ERROR_STRING(result, message,
+							"Could not get a window's swapchain's images: ")
+							throw std::runtime_error(message);
 					}
 				}
 			);
@@ -126,7 +134,11 @@ namespace compwolf::vulkan
 				switch (result)
 				{
 				case VK_SUCCESS: break;
-				default: throw std::runtime_error("Could not get connection to a window's swapchain-images");
+				default:
+					const char* message;
+					GET_VULKAN_ERROR_STRING(result, message,
+						"Could not get a window's swapchain's images: ")
+						throw std::runtime_error(message);
 				}
 
 				_frames[i].image_ptr() = unique_deleter_ptr<vulkan_handle::image_view_t>(from_vulkan(view),
@@ -158,7 +170,11 @@ namespace compwolf::vulkan
 				switch (result)
 				{
 				case VK_SUCCESS: break;
-				default: throw std::runtime_error("Could not set up \"framebuffer\" for pipeline.");
+				default:
+					const char* message;
+					GET_VULKAN_ERROR_STRING(result, message,
+						"Could not set up a framebuffer for a window's swapchain: ")
+						throw std::runtime_error(message);
 				}
 
 				frame.frame_buffer_ptr() = unique_deleter_ptr<vulkan_handle::frame_buffer_t>(from_vulkan(framebuffer),
@@ -166,6 +182,16 @@ namespace compwolf::vulkan
 					{
 						vkDeviceWaitIdle(logicDevice);
 						vkDestroyFramebuffer(logicDevice, to_vulkan(f), nullptr);
+					}
+				);
+			}
+
+			for (auto& frame : _frames)
+			{
+				frame.draw_manager() = vulkan_gpu_program_manager::new_manager_for(gpu()
+					, gpu_program_manager_settings
+					{
+						.type = { gpu_work_type::draw, gpu_work_type::present },
 					}
 				);
 			}
@@ -180,7 +206,7 @@ namespace compwolf::vulkan
 		auto swapchain = to_vulkan(vulkan_swapchain());
 
 		uint32_t index;
-		gpu_fence fence(gpu());
+		vulkan_gpu_fence fence(gpu());
 		auto result = vkAcquireNextImageKHR(logicDevice, swapchain, UINT64_MAX, VK_NULL_HANDLE, to_vulkan(fence.vulkan_fence()), &index);
 
 		switch (result)
@@ -188,12 +214,16 @@ namespace compwolf::vulkan
 		case VK_SUCCESS:
 		case VK_SUBOPTIMAL_KHR:
 			break;
-		default: throw std::runtime_error("Could not get next frame.");
+		default:
+			const char* message;
+			GET_VULKAN_ERROR_STRING(result, message,
+				"Could not get the next frame image for a window: ")
+				throw std::runtime_error(message);
 		}
 
 		_current_frame_index = static_cast<std::size_t>(index);
 
 		fence.wait();
-		//current_frame().draw_job.wait();
+		current_frame().draw_manager().wait();
 	}
 }

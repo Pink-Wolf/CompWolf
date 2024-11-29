@@ -48,10 +48,6 @@ namespace compwolf
 			{ return _work_types; }
 	public:
 
-		/** Returns an event that is invoked right before the environment is destructed. */
-		auto destructing() const noexcept -> const event<>&
-		{ return environment().destructing(); }
-
 	public: // constructors
 		/** Constructs an invalid [[gpu_connection]].
 		 * Using this is undefined behaviour.

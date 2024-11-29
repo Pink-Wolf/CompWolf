@@ -11,12 +11,12 @@ namespace compwolf::vulkan
 	static std::optional<vulkan_handle::surface_format_info_t> get_present_device_info(
 		const vulkan_gpu_connection& gpu, VkSurfaceKHR surface
 	);
-	static auto find_best_gpu(const vulkan_graphics_environment& environment, window_settings& settings,
-		vulkan_handle::surface surface, vulkan_handle::surface_format_info out_info) -> const vulkan_gpu_connection*;
+	static auto find_best_gpu(vulkan_graphics_environment& environment, window_settings& settings,
+		vulkan_handle::surface surface, vulkan_handle::surface_format_info out_info) -> vulkan_gpu_connection*;
 
 
-	window_surface::window_surface(const vulkan_graphics_environment* optional_environment,
-		const vulkan_gpu_connection* optional_gpu,
+	window_surface::window_surface(vulkan_graphics_environment* optional_environment,
+		vulkan_gpu_connection* optional_gpu,
 		window_settings& settings,
 		vulkan_handle::glfw_window window)
 	{
@@ -33,7 +33,11 @@ namespace compwolf::vulkan
 			switch (result)
 			{
 			case VK_SUCCESS: break;
-			default: throw std::runtime_error("Could not get a window's surface; unknown error from glfw/vulkan-function.");
+			default:
+				const char* message;
+				GET_VULKAN_ERROR_STRING(result, message,
+					"Could not create a window's surface: ")
+					throw std::runtime_error(message);
 			}
 
 			_vulkan_surface = unique_deleter_ptr<vulkan_handle::surface_t>(from_vulkan(surface),
@@ -65,7 +69,7 @@ namespace compwolf::vulkan
 		}
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 
-		VkRenderPass renderPass;
+		VkRenderPass renderPass, backgroundRenderPass;
 		{
 			VkAttachmentDescription colorAttachment{
 				.format = surface_format.format.format,
@@ -101,7 +105,11 @@ namespace compwolf::vulkan
 			switch (result)
 			{
 			case VK_SUCCESS: break;
-			default: throw std::runtime_error("Could not set up \"render pass\" for drawing on a window.");
+			default:
+				const char* message;
+				GET_VULKAN_ERROR_STRING(result, message,
+					"Could not create a window's \"render pass\" for drawing on it: ")
+					throw std::runtime_error(message);
 			}
 
 			_render_pass = unique_deleter_ptr<vulkan_handle::render_pass_t>(from_vulkan(renderPass),
@@ -113,12 +121,12 @@ namespace compwolf::vulkan
 		}
 	}
 
-	static auto find_best_gpu(const vulkan_graphics_environment& environment, window_settings& settings,
-		vulkan_handle::surface surface, vulkan_handle::surface_format_info out_info) -> const vulkan_gpu_connection*
+	static auto find_best_gpu(vulkan_graphics_environment& environment, window_settings& settings,
+		vulkan_handle::surface surface, vulkan_handle::surface_format_info out_info) -> vulkan_gpu_connection*
 	{
 		auto vkSurface = to_vulkan(surface);
 
-		const vulkan_gpu_connection* best_gpu = nullptr;
+		vulkan_gpu_connection* best_gpu = nullptr;
 		float best_gpu_score = -1;
 		for (auto& gpu : environment.gpus())
 		{
@@ -211,7 +219,11 @@ namespace compwolf::vulkan
 				case VK_SUCCESS:
 				case VK_INCOMPLETE:
 					break;
-				default: throw std::runtime_error("Could not get ways to present images on a window");
+				default:
+					const char* message;
+					GET_VULKAN_ERROR_STRING(result, message,
+						"Could not get information about window's surface (present mode): ")
+						throw std::runtime_error(message);
 				}
 			}
 		);
@@ -345,6 +357,7 @@ namespace compwolf::vulkan
 		case VK_FORMAT_B8G8R8A8_SRGB:
 		case VK_FORMAT_A8B8G8R8_SRGB_PACK32:
 			is_srgb_format = true;
+			break;
 		default: break;
 		}
 
@@ -354,6 +367,7 @@ namespace compwolf::vulkan
 		case VK_COLOR_SPACE_SRGB_NONLINEAR_KHR:
 		case VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT:
 			is_srgb_space = true;
+			break;
 		default: break;
 		}
 

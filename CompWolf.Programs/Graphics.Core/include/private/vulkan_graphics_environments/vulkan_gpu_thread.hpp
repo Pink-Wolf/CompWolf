@@ -15,6 +15,9 @@ namespace compwolf::vulkan
 		 * This should only be referenced when working with a Vulkan library directly.
 		 */
 		vulkan_handle::queue queue;
+
+		/** The amount of [[vulkan_gpu_program_manager]] currently on the thread. */
+		std::size_t program_manager_count;
 	};
 }
 
