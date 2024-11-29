@@ -14,12 +14,12 @@ TEST(Listenable, single_observer_pair) {
 	test_listenable x(-1);
 	int old_before, new_before, old_after, new_after;
 
-	x.value_updating().subscribe([&old_before, &new_before](test_listenable::update_parameters p)
+	auto key1 = x.value_updating().subscribe([&old_before, &new_before](test_listenable::update_parameters p)
 		{
 			old_before = (p.old_value.value *= 2);
 			new_before = (p.new_value.value *= 3);
 		});
-	x.value_updated().subscribe([&old_after, &new_after](test_listenable::update_parameters p)
+	auto key2 = x.value_updated().subscribe([&old_after, &new_after](test_listenable::update_parameters p)
 		{
 			old_after = (p.old_value.value *= 5);
 			new_after = (p.new_value.value *= 7);
@@ -39,22 +39,22 @@ TEST(Listenable, multiple_observer_pair) {
 	int old_before1, new_before1, old_after1, new_after1,
 		old_before2, new_before2, old_after2, new_after2;
 
-	x.value_updating().subscribe([&old_before1, &new_before1](test_listenable::update_parameters p)
+	auto key1 = x.value_updating().subscribe([&old_before1, &new_before1](test_listenable::update_parameters p)
 		{
 			old_before1 = (p.old_value.value *= 2);
 			new_before1 = (p.new_value.value *= 3);
 		});
-	x.value_updating().subscribe([&old_before2, &new_before2](test_listenable::update_parameters p)
+	auto key2 = x.value_updating().subscribe([&old_before2, &new_before2](test_listenable::update_parameters p)
 		{
 			old_before2 = (p.old_value.value *= 5);
 			new_before2 = (p.new_value.value *= 7);
 		});
-	x.value_updated().subscribe([&old_after1, &new_after1](test_listenable::update_parameters p)
+	auto key3 = x.value_updated().subscribe([&old_after1, &new_after1](test_listenable::update_parameters p)
 		{
 			old_after1 = (p.old_value.value *= 11);
 			new_after1 = (p.new_value.value *= 13);
 		});
-	x.value_updated().subscribe([&old_after2, &new_after2](test_listenable::update_parameters p)
+	auto key4 = x.value_updated().subscribe([&old_after2, &new_after2](test_listenable::update_parameters p)
 		{
 			old_after2 = (p.old_value.value *= 17);
 			new_after2 = (p.new_value.value *= 19);

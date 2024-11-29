@@ -9,7 +9,7 @@ TEST(Event, empty_invoke) {
 TEST(Event, invoke_method) {
 	compwolf::event<> e;
 	int i = 0;
-	e.subscribe([&i]() { ++i; });
+	auto key = e.subscribe([&i]() { ++i; });
 
 	e.invoke();
 
@@ -18,7 +18,7 @@ TEST(Event, invoke_method) {
 TEST(Event, invoke) {
 	compwolf::event<> e;
 	int i = 0;
-	e.subscribe([&i]() { ++i; });
+	auto key = e.subscribe([&i]() { ++i; });
 
 	e();
 
@@ -27,7 +27,7 @@ TEST(Event, invoke) {
 TEST(Event, multiple_invokes) {
 	compwolf::event<> e;
 	int i = 0;
-	e.subscribe([&i]() { ++i; });
+	auto key = e.subscribe([&i]() { ++i; });
 
 	e();
 	e();
@@ -38,11 +38,11 @@ TEST(Event, multiple_invokes) {
 TEST(Event, invoke_multiple_subscribers) {
 	compwolf::event<> e;
 	int i = 0;
-	e.subscribe([&i]() { i += 100; });
+	auto key1 = e.subscribe([&i]() { i += 100; });
 	e();
-	e.subscribe([&i]() { i += 10; });
+	auto key2 = e.subscribe([&i]() { i += 10; });
 	e();
-	e.subscribe([&i]() { i += 1; });
+	auto key3 = e.subscribe([&i]() { i += 1; });
 	e();
 
 	ASSERT_EQ(i, 321);
@@ -50,9 +50,9 @@ TEST(Event, invoke_multiple_subscribers) {
 TEST(Event, invoke_after_unsubscribing) {
 	compwolf::event<> e;
 	int i = 0;
-	auto k = e.subscribe([&i]() { ++i; });
+	auto key = e.subscribe([&i]() { ++i; });
 	e();
-	e.unsubscribe(std::move(k));
+	e.unsubscribe(std::move(key));
 	e();
 
 	ASSERT_EQ(i, 1);
@@ -60,8 +60,7 @@ TEST(Event, invoke_after_unsubscribing) {
 TEST(Event, unsubscribe_during_invoke) {
 	compwolf::event<> e;
 	int i = 0;
-	compwolf::event<>::key_type k
-		= e.subscribe([&e, &i, &k]() { ++i; e.unsubscribe(std::move(k)); });
+	compwolf::event<>::key_type k = e.subscribe([&e, &i, &k]() { ++i; e.unsubscribe(std::move(k)); });
 	e();
 	e();
 	e();
@@ -88,7 +87,7 @@ TEST(Event, unsubscribe_multiple_during_invoke) {
 TEST(Event, parameter_invokes) {
 	compwolf::event<int> e;
 	int i = 0;
-	e.subscribe([&i](int j) { i += j; });
+	auto key = e.subscribe([&i](int j) { i += j; });
 
 	e(1);
 	e(10);
@@ -99,8 +98,8 @@ TEST(Event, parameter_invokes) {
 TEST(Event, reference_parameter_invokes) {
 	compwolf::event<int&> e;
 	int i = 0;
-	e.subscribe([&i](int& j) { i += j; j *= 2; });
-	e.subscribe([&i](int& j) { i += j; j *= 2; });
+	auto key1 = e.subscribe([&i](int& j) { i += j; j *= 2; });
+	auto key2 = e.subscribe([&i](int& j) { i += j; j *= 2; });
 
 	int param = 1;
 	e(param); // 1 + 2 =  3
