@@ -60,7 +60,7 @@ namespace compwolf::vulkan
 		/** Returns the gpu that the manager is on. */
 		auto gpu() noexcept -> vulkan_gpu_connection& { return *_gpu; }
 		/** Returns the gpu that the manager is on.
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto gpu() const noexcept -> const vulkan_gpu_connection& { return *_gpu; }
 
@@ -96,7 +96,7 @@ namespace compwolf::vulkan
 
 	public: // modifiers
 		/** Waits until all of the programs are done, and then returns.
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		void wait() const noexcept
 		{

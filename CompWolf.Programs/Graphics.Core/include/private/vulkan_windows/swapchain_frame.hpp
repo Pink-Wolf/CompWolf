@@ -27,7 +27,7 @@ namespace compwolf::vulkan
 			{ return _frame_buffer; }
 
 		/** Returns the [[vulkan_gpu_program_manager]] for handling drawing on the frame.
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto draw_manager() const noexcept -> const vulkan_gpu_program_manager& { return _draw_manager; }
 		/** Returns the [[vulkan_gpu_program_manager]] for handling drawing on the frame. */

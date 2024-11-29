@@ -23,7 +23,7 @@ namespace compwolf
 	public: // accessors
 		/** Returns the environment that the gpu is on.
 		 * @see graphics_environment
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto environment() const noexcept -> const environment_type&
 			{ return *_environment; }
@@ -36,7 +36,7 @@ namespace compwolf
 
 		/** Returns the type of work that the gpu can do.
 		 * @see gpu_work_type_set
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto work_types() const noexcept -> gpu_work_type_set
 			{ return _work_types; }

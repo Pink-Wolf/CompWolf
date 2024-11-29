@@ -38,7 +38,7 @@ namespace compwolf::vulkan
 
 	public: // accessors
 		/** Returns the gpu that the window is on.
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto gpu() noexcept -> vulkan_gpu_connection& { return *_gpu; }
 		/** Returns the gpu that the window is on. */

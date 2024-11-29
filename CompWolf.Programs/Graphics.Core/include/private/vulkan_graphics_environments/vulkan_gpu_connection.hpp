@@ -40,7 +40,7 @@ namespace compwolf::vulkan
 
 	public: // vulkan-specific
 		/** Returns the GPU's threads.
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto thread_families() const noexcept -> const std::vector<vulkan_gpu_thread_family>&
 		{

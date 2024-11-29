@@ -27,7 +27,7 @@ namespace compwolf
 
 	public: // accessors
 		/** Returns the gpu that the program is on.
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto gpu() noexcept -> environment_type::gpu_type& { return *_gpu; }
 		/** Returns the gpu that the program is on. */

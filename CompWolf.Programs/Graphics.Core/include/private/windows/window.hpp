@@ -34,7 +34,7 @@ namespace compwolf
 
 	public: // accessors
 		/** Returns the gpu that the window is on.
-		 * @uniqueoverload
+		 * @customoverload
 		 */
 		auto gpu() const noexcept -> const environment_type::gpu_type& { return *_gpu; };
 		/** Returns the gpu that the window is on. */
