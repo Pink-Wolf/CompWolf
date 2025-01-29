@@ -29,9 +29,9 @@ namespace compwolf
 		/** Returns the gpu that the program is on.
 		 * @customoverload
 		 */
-		auto gpu() noexcept -> environment_type::gpu_type& { return *_gpu; }
+		auto gpu() noexcept -> typename environment_type::gpu_type& { return *_gpu; }
 		/** Returns the gpu that the program is on. */
-		auto gpu() const noexcept -> const environment_type::gpu_type& { return *_gpu; }
+		auto gpu() const noexcept -> const typename environment_type::gpu_type& { return *_gpu; }
 
 	public: // modifiers
 		/** Runs the program.

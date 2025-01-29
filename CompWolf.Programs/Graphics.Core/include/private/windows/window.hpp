@@ -36,9 +36,9 @@ namespace compwolf
 		/** Returns the gpu that the window is on.
 		 * @customoverload
 		 */
-		auto gpu() const noexcept -> const environment_type::gpu_type& { return *_gpu; };
+		auto gpu() const noexcept -> const typename environment_type::gpu_type& { return *_gpu; };
 		/** Returns the gpu that the window is on. */
-		auto gpu() noexcept -> environment_type::gpu_type& { return *_gpu; };
+		auto gpu() noexcept -> typename environment_type::gpu_type& { return *_gpu; };
 
 		/** Returns the width and height of the window, in pixels.
 		 * This size does not include any border around the window.

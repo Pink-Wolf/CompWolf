@@ -27,9 +27,9 @@ namespace compwolf
 		/** Returns the gpu that the fence is on.
 		 * @customoverload
 		 */
-		auto gpu() noexcept -> environment_type::gpu_type& { return *_gpu; }
+		auto gpu() noexcept -> typename environment_type::gpu_type& { return *_gpu; }
 		/** Returns the gpu that the fence is on. */
-		auto gpu() const noexcept -> const environment_type::gpu_type& { return *_gpu; }
+		auto gpu() const noexcept -> const typename environment_type::gpu_type& { return *_gpu; }
 
 		/** Returns whether the work is done. */
 		virtual auto completed() const noexcept -> bool = 0;
