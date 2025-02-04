@@ -30,7 +30,7 @@ int main()
 				);
 
 				{
-					e.inputs().char_newly_down().subscribe([](const compwolf::input_key_state& key)
+					auto event_key = e.inputs().char_newly_down().subscribe([](const compwolf::input_key_state& key)
 						{
 							std::cout << key.character();
 						}

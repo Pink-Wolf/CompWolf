@@ -120,9 +120,9 @@ namespace compwolf
 
 	public: // modifiers
 		/** Subscribes the given functor to the event.
-		 * @return a key to identify the functor, if you later wishes to unsubscribe it from the event.
+		 * @return a key to identify the functor. This key automatically unsubscribes the functor when destroyed.
 		 */
-		key_type subscribe(value_type observer) const noexcept
+		[[nodiscard("The given functor only stays subscribed while the key is not destructed.")]] key_type subscribe(value_type observer) const noexcept
 		{
 			auto key = _observers.size();
 			_observers.emplace_back(std::move(observer));
@@ -173,9 +173,9 @@ namespace compwolf
 
 	public: // modifiers
 		/** Subscribes the given functor to the event.
-		 * @return a key to identify the functor, if you later wishes to unsubscribe it from the event.
+		 * @return a key to identify the functor. This key automatically unsubscribes the functor when destroyed.
 		 */
-		key_type subscribe(value_type observer) const noexcept
+		[[nodiscard("The given functor only stays subscribed while the key is not destructed.")]] key_type subscribe(value_type observer) const noexcept
 		{
 			auto key = _observers.size();
 			_observers.emplace_back(std::move(observer));
