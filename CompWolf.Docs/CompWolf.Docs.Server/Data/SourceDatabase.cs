@@ -196,15 +196,11 @@ namespace CompWolf.Docs.Server.Data
                     }
                     var attributeLessDeclaration = parameterLessDeclaration;
                     {
-                        var parameterIndex = parameterLessDeclaration.IndexOf('[');
-                        if (parameterIndex >= 0)
-                        {
-                            var operatorMatch = Regex.Match(parameterLessDeclaration[..parameterIndex], @"operator\s*$");
-                            if (operatorMatch.Success) parameterIndex = parameterLessDeclaration.IndexOf('[', parameterIndex + 1);
-                        }
+                        var parameterIndex = parameterLessDeclaration.IndexOf("[[");
                         if (parameterIndex >= 0)
                             attributeLessDeclaration = parameterLessDeclaration[..parameterIndex]
-                                + parameterLessDeclaration[parameterLessDeclaration.IndexOf(']', parameterIndex)..];
+                                + ' '
+                                + parameterLessDeclaration[(2 + parameterLessDeclaration.IndexOf("]]", parameterIndex))..];
                     }
 
                     var declarationAfterColon = "";
