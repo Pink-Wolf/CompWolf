@@ -187,34 +187,35 @@ namespace CompWolf.Docs.Server.Data
                         : -1;
                     var noTemplateDeclaration = entityDeclaration[(templateEndIndex + 1)..];
 
-                    var parameterLessDeclaration = noTemplateDeclaration;
+                    var attributeLessDeclaration = noTemplateDeclaration;
+                    {
+                        var parameterIndex = noTemplateDeclaration.IndexOf("[[");
+                        if (parameterIndex >= 0)
+                            attributeLessDeclaration = noTemplateDeclaration[..parameterIndex]
+                                + ' '
+                                + noTemplateDeclaration[(2 + noTemplateDeclaration.IndexOf("]]", parameterIndex))..];
+                    }
+
+                    var parameterLessDeclaration = attributeLessDeclaration;
                     {
                         var parameterIndex = parameterLessDeclaration.IndexOf('(');
                         hasParameters = parameterIndex >= 0;
                         if (hasParameters)
                             parameterLessDeclaration = parameterLessDeclaration[..parameterIndex];
                     }
-                    var attributeLessDeclaration = parameterLessDeclaration;
-                    {
-                        var parameterIndex = parameterLessDeclaration.IndexOf("[[");
-                        if (parameterIndex >= 0)
-                            attributeLessDeclaration = parameterLessDeclaration[..parameterIndex]
-                                + ' '
-                                + parameterLessDeclaration[(2 + parameterLessDeclaration.IndexOf("]]", parameterIndex))..];
-                    }
 
                     var declarationAfterColon = "";
                     {
-                        var colonIndex = attributeLessDeclaration.IndexOf(':');
-                        if (colonIndex >= 0 && attributeLessDeclaration[colonIndex + 1] != ':')
+                        var colonIndex = parameterLessDeclaration.IndexOf(':');
+                        if (colonIndex >= 0 && parameterLessDeclaration[colonIndex + 1] != ':')
                         {
-                            var index = entityDeclaration.Length - attributeLessDeclaration.Length + colonIndex;
+                            var index = entityDeclaration.Length - parameterLessDeclaration.Length + colonIndex;
                             declarationAfterColon = entityDeclaration[(index + 1)..];
                             entityDeclaration = entityDeclaration[..index].TrimEnd();
                         }
                     }
 
-                    cleanedDeclarationWords = attributeLessDeclaration
+                    cleanedDeclarationWords = parameterLessDeclaration
                         .Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)
                         .Select(x => x.EndsWith(';') ? x[..(x.Length - 1)] : x)
                         .ToList();
