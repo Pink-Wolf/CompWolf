@@ -374,15 +374,26 @@ namespace CompWolf.Docs.Server.Data
                             if (entityType == EntityTypes.Function)
                             {
                                 {
-                                    var declEnding = processedDeclaration[processedDeclaration.LastIndexOf(')')..];
+                                    var parameterEnd = processedDeclaration.LastIndexOf(')');
+                                    var declEnding = processedDeclaration[parameterEnd..];
                                     if (declEnding.Contains("final") || declEnding.Contains("override"))
                                         continue; // Do not include overrides
+
+                                    processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, parameterEnd)];
                                 }
 
-                                processedDeclaration = processedDeclaration[..processedDeclaration.IndexOf('(')];
-
                                 entityName = processedDeclaration;
-                                for (int i = processedDeclaration.Length - 1; i >= 0; --i)
+
+                                var operatorMatch = Regex.Match(entityName, @"(?:explicit)?\s+operator\s*");
+                                if (operatorMatch.Success)
+                                {
+                                    entityName = entityName[operatorMatch.Index..].Trim();
+                                }
+                                else if (entityName.StartsWith("operator") && char.IsWhiteSpace( entityName["operator".Length]))
+                                {
+                                    entityName = entityName.TrimEnd();
+                                }
+                                else for (int i = processedDeclaration.Length - 1; i >= 0; --i)
                                 {
                                     if (char.IsWhiteSpace(processedDeclaration[i]))
                                     {
