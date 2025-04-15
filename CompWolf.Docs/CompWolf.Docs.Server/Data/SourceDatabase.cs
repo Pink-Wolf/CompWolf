@@ -402,13 +402,31 @@ namespace CompWolf.Docs.Server.Data
                                 : processedDeclaration[(entityStartIndex + entityName.Length)..]
                             ;
                         }
+                        //skip template specializations
+                        {
+                            bool isSpecialization = entityName.Contains('<');
+                            if (isSpecialization is false)
+                            {
+                                for (int i = 0; i < processedDeclaration.Length; ++i)
+                                {
+                                    var c = processedDeclaration[i];
+                                    if (char.IsWhiteSpace(c)) continue;
+                                    if (c == '<') isSpecialization = true;
+                                    break;
+                                }
+                            }
+                            if (isSpecialization)
+                            {
+                                continue;
+                            }
+                        }
                         //declarationAfterColon
                         {
                             var colonIndex = processedDeclaration.IndexOf(':');
                             if (colonIndex >= 0 && processedDeclaration[colonIndex + 1] != ':')
                             {
                                 declarationAfterColon = processedDeclaration[(colonIndex + 1)..];
-                                entityDeclaration = entityDeclaration[..(entityDeclaration.Length - declarationAfterColon.Length)].TrimEnd();
+                                entityDeclaration = entityDeclaration[..].TrimEnd();
                             }
                         }
                     }
@@ -463,7 +481,13 @@ namespace CompWolf.Docs.Server.Data
 
                     if (entityType == EntityTypes.Class)
                     {
-                        baseClasses = declarationAfterColon
+                        string baseClassString = declarationAfterColon;
+                        for (int i = baseClassString.IndexOf('<'); i >= 0; i = baseClassString.IndexOf('<'))
+                        {
+                            baseClassString = baseClassString[..i] + baseClassString[(GetEndOfBracketIndexInCode('<', '>', baseClassString, i) + 1)..];
+                        }
+
+                        baseClasses = baseClassString
                             .Split(",")
                             .Select(text =>
                             {
