@@ -35,7 +35,7 @@ namespace compwolf::vulkan
 
 	public: // constructors
 		/** Constructs an invalid [[vulkan_gpu_fence]].
-		 * Using this fence, except [[vulkan_gpu_fence::operator bool]], is undefined behaviour.
+		 * Using this fence is undefined behaviour.
 		 * @overload
 		 */
 		vulkan_gpu_fence() = default;

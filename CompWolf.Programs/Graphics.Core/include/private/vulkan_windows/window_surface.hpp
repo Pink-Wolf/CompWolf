@@ -46,7 +46,7 @@ namespace compwolf::vulkan
 
 	public: // constructor
 		/** Constructs an invalid [[window_surface]].
-		 * Using this environment, except [[window_surface::operator bool]], is undefined behaviour.
+		 * Using this environment is undefined behaviour.
 		 * @overload
 		 */
 		window_surface() = default;

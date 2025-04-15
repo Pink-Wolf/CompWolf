@@ -34,7 +34,7 @@ namespace compwolf::vulkan
 
 	public: // constructors
 		/** Constructs an invalid [[vulkan_gpu_semaphore]].
-		 * Using this semaphore, except [[vulkan_gpu_semaphore::operator bool]], is undefined behaviour.
+		 * Using this semaphore is undefined behaviour.
 		 * @overload
 		 */
 		vulkan_gpu_semaphore() = default;

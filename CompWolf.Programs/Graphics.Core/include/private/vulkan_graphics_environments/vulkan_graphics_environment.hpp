@@ -23,7 +23,7 @@ namespace compwolf::vulkan
 
 	public: // constructors
 		/** Constructs an invalid [[vulkan_graphics_environment]].
-		 * Using this environment, except [[graphics_environment::operator bool]], is undefined behaviour.
+		 * Using this environment is undefined behaviour.
 		 * @overload
 		 */
 		vulkan_graphics_environment() noexcept = default;

@@ -98,9 +98,11 @@ namespace compwolf::vulkan
 		/** Represents a VkSurfaceKHR-pointer */
 		using surface = surface_t*;
 
-		/** Forward declaration of a struct containing information used by [[window_surface]]. */
+		/** Forward declaration of a struct containing information used by [[window_surface]].
+		 * @customcode struct surface_format_info_t{};
+		 */
 		struct surface_format_info_t;
-		/** Pointer for [[surface_format_info_t]], a struct containing information used by [[window_surface]]. */
+		/** Pointer for [[vulkan_handle::surface_format_info_t]], a struct containing information used by [[window_surface]]. */
 		using surface_format_info = surface_format_info_t*;
 
 		/** Dereference type of [[vulkan_handle::render_pass]]

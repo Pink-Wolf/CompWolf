@@ -8,6 +8,7 @@ namespace compwolf
 {
 	namespace internal
 	{
+		/** @hidden */
 		template <typename T>
 			requires (std::is_default_constructible_v<T>)
 		struct default_value
@@ -32,9 +33,11 @@ namespace compwolf
 	struct owned
 	{
 	public:
+		/** Function used for creating the default/empty value. */
 		using default_getter = DefaultGetter;
-		static constexpr bool is_nothrow_new_default = noexcept(default_getter::function());
 		T value;
+	private:
+		static constexpr bool is_nothrow_new_default = noexcept(default_getter::function());
 	public: // getters
 		operator T& () noexcept { return value; }
 		operator const T& () const noexcept { return value; }
@@ -139,38 +142,38 @@ namespace compwolf
 
 	public: // getters
 		template <typename T>
-		auto operator *()
+		auto operator*()
 			noexcept(nothrow_dereferenceable_to<TPointer, T>)
 			-> T&
 		{
 			return *super::value;
 		}
 		template <typename T>
-		auto operator *() const
+		auto operator*() const
 			noexcept(nothrow_dereferenceable_to<TPointer, T>)
 			-> const T&
 		{
 			return *super::value;
 		}
 
-		auto operator ->() noexcept -> TPointer&
+		auto operator->() noexcept -> TPointer&
 		{
 			return super::value;
 		}
-		auto operator ->() const noexcept -> const TPointer&
+		auto operator->() const noexcept -> const TPointer&
 		{
 			return super::value;
 		}
 
 		template <typename T>
-		auto operator [](std::size_t i)
+		auto operator[](std::size_t i)
 			noexcept(noexcept(std::declval<TPointer>()[0]))
 			-> T&
 		{
 			return super::value[i];
 		}
 		template <typename T>
-		auto operator [](std::size_t i) const
+		auto operator[](std::size_t i) const
 			noexcept(noexcept(std::declval<TPointer>()[0]))
 			-> const T&
 		{

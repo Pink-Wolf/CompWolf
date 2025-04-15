@@ -83,7 +83,8 @@ namespace compwolf
 			}
 			return true;
 		}
-	public: // @hidden
+	public:
+		/** @hidden */
 #define COMPWOLF_DIMENSIONS_DEFINE_GETTER(getter, index)		\
 		constexpr auto& getter() noexcept						\
 			requires (has_element_at index)						\

@@ -91,7 +91,7 @@ namespace compwolf
 
 	public: // constructors
 		/** Constructs an invalid [[window]].
-		 * Using this window, except [[window::operator bool]], is undefined behaviour.
+		 * Using this window is undefined behaviour.
 		 * @overload
 		 */
 		window() = default;

@@ -49,7 +49,7 @@ namespace compwolf::vulkan
 
 	public: // constructors
 		/** Constructs an invalid [[vulkan_gpu_program]].
-		 * Using this program, except [[vulkan_gpu_program::operator bool]], is undefined behaviour.
+		 * Using this program is undefined behaviour.
 		 * @overload
 		 */
 		vulkan_gpu_program() = default;

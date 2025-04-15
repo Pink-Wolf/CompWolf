@@ -48,7 +48,7 @@ namespace compwolf::vulkan
 
 	public: // constructors
 		/** Constructs an invalid [[vulkan_window]].
-		 * Using this environment, except [[vulkan_window::operator bool]], is undefined behaviour.
+		 * Using this environment is undefined behaviour.
 		 * @overload
 		 */
 		vulkan_window() = default;

@@ -73,7 +73,7 @@ namespace compwolf::vulkan
 
 	public: // constructors
 		/** Constructs an invalid [[window_swapchain]].
-		 * Using this environment, except [[window_swapchain::operator bool]], is undefined behaviour.
+		 * Using this environment is undefined behaviour.
 		 * @overload
 		 */
 		window_swapchain() = default;

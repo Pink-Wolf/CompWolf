@@ -37,7 +37,7 @@ namespace compwolf
 
 	public: // constructors
 		/** Constructs an invalid [[graphics_environment]].
-		 * Using this environment, except [[graphics_environment::operator bool]], is undefined behaviour.
+		 * Using this environment is undefined behaviour.
 		 * @overload
 		 */
 		graphics_environment() noexcept = default;
