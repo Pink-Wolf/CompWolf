@@ -9,7 +9,7 @@ namespace compwolf
 	namespace internal
 	{
 		template <typename T>
-			requires std::is_default_constructible_v<T>
+			requires (std::is_default_constructible_v<T>)
 		struct default_value
 		{
 			static auto function()
@@ -28,7 +28,7 @@ namespace compwolf
 	 * @typeparam DefaultGetter Function returning the default value for this.
 	 */
 	template <typename T, typename DefaultGetter = internal::default_value<T>>
-		requires std::is_constructible_v<T, T&&>&& std::is_assignable_v<T&, T&&>
+		requires (std::is_constructible_v<T, T&&>&& std::is_assignable_v<T&, T&&>)
 	struct owned
 	{
 	public:
@@ -40,7 +40,7 @@ namespace compwolf
 		operator const T& () const noexcept { return value; }
 
 		template <typename TOut = bool>
-			requires is_explicitly_convertible_v<const T, TOut>
+			requires (is_explicitly_convertible_v<const T, TOut>)
 		explicit operator TOut() const
 			noexcept(is_nothrow_explicitly_convertible_v<const T, TOut>)
 		{
@@ -75,7 +75,7 @@ namespace compwolf
 		}
 
 		template <typename Arg>
-			requires std::is_constructible_v<T&, Arg&&>
+			requires (std::is_constructible_v<T&, Arg&&>)
 		owned(owned<Arg>&& other)
 			noexcept(std::is_nothrow_constructible_v<T&, Arg&&>
 				&& (std::is_rvalue_reference_v<owned<Arg>> && (!std::is_nothrow_assignable_v<Arg&, Arg&&> && !owned<Arg>::is_nothrow_new_default)))
@@ -88,7 +88,7 @@ namespace compwolf
 		}
 
 		template <typename Arg>
-			requires std::is_assignable_v<T&, Arg&&>
+			requires (std::is_assignable_v<T&, Arg&&>)
 		auto operator=(owned<Arg>&& other)
 			noexcept(std::is_nothrow_assignable_v<T&, Arg&&>
 				&& (std::is_rvalue_reference_v<owned<Arg>> && (!std::is_nothrow_assignable_v<Arg&, Arg&&> && !owned<Arg>::is_nothrow_new_default)))
@@ -103,7 +103,7 @@ namespace compwolf
 		}
 
 		template <typename... Args>
-			requires std::is_constructible_v<T, Args...>
+			requires (std::is_constructible_v<T, Args...>)
 		owned(Args&&... inputs)
 			noexcept(std::is_nothrow_constructible_v<T, Args&&...>)
 			: value(std::forward<Args>(inputs)...)
@@ -112,7 +112,7 @@ namespace compwolf
 		}
 
 		template <typename Arg>
-			requires std::is_assignable_v<T&, Arg&&>
+			requires (std::is_assignable_v<T&, Arg&&>)
 		auto operator=(Arg&& input)
 			noexcept(std::is_nothrow_assignable_v<T&, Arg&&>)
 			-> owned&

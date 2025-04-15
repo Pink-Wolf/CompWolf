@@ -15,7 +15,7 @@ namespace compwolf
 	template <typename From, typename To>
 	struct is_explicitly_convertible : std::false_type {};
 	template <typename From, typename To>
-		requires explicitly_convertible_to<From, To>
+		requires (explicitly_convertible_to<From, To>)
 	struct is_explicitly_convertible<From, To> : std::true_type {};
 	/** Whether an object of type From can be explicitly converted to the type To. */
 	template <typename From, typename To>
@@ -32,7 +32,7 @@ namespace compwolf
 	template <typename From, typename To>
 	struct is_nothrow_explicitly_convertible : std::false_type {};
 	template <typename From, typename To>
-		requires nothrow_explicitly_convertible_to<From, To>
+		requires (nothrow_explicitly_convertible_to<From, To>)
 	struct is_nothrow_explicitly_convertible<From, To> : std::true_type {};
 	/** Whether explicitly converting an object of type From to the type To is noexcept. */
 	template <typename From, typename To>

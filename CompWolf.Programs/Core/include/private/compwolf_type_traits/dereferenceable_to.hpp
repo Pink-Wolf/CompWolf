@@ -17,7 +17,7 @@ namespace compwolf
 	template <typename Pointer, typename Result>
 	struct is_dereferenceable_to : std::false_type {};
 	template <typename Pointer, typename Result>
-		requires dereferenceable_to<Pointer, Result>
+		requires (dereferenceable_to<Pointer, Result>)
 	struct is_dereferenceable_to<Pointer, Result> : std::true_type {};
 	/** Whether dereferencing an object of type Pointer returns an object of type Result. */
 	template <typename Pointer, typename Result>
@@ -36,7 +36,7 @@ namespace compwolf
 	template <typename Pointer, typename Result>
 	struct is_nothrow_dereferenceable_to : std::false_type {};
 	template <typename Pointer, typename Result>
-		requires nothrow_dereferenceable_to<Pointer, Result>
+		requires (nothrow_dereferenceable_to<Pointer, Result>)
 	struct is_nothrow_dereferenceable_to<Pointer, Result> : std::true_type {};
 	/** Whether dereferencing an object of type Pointer, and converting the result to Result, is noexcept. */
 	template <typename Pointer, typename Result>

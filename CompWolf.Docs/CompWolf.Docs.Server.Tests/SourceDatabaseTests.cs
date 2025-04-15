@@ -35,7 +35,7 @@ namespace CompWolf.Docs.Server.Tests
         [TestCase("{  }", 10, TestName = "{m}(Index past end)")]
         public void GetEndOfBracketIndex_Throws(string text, int startIndex)
         {
-            var actual = () => SourceDatabase.GetEndOfBracketIndex('{', '}', text, startIndex);
+            int actual() => SourceDatabase.GetEndOfBracketIndex('{', '}', text, startIndex);
             Assert.That(actual, Throws.Exception);
         }
         [TestCase(7, @"{....__}__ }", 0, TestName = "{m}(Basic)")]
@@ -97,7 +97,7 @@ namespace CompWolf.Docs.Server.Tests
             TestName = "{m}(C-style comment before namespace)")]
         public void Namespace_SplitText(string text, params string[] expectedRaw)
         {
-            var actual = SourceDatabase.Namespace.SplitText(text)
+            var actual = SourceDatabase.Namespace.SplitText(text, $"{nameof(SourceDatabaseTests)}.cs")
                 .Select(x => new SourceDatabase.Namespace()
                 {
                     Name = x.Name,
@@ -185,7 +185,7 @@ namespace CompWolf.Docs.Server.Tests
             TestName = "{m}(Alias: No comment)")]
         public void MemberEntity_SplitText(string text, params string[] expectedRaw)
         {
-            var actual = SourceDatabase.MemberEntity.SplitText(text)
+            var actual = SourceDatabase.MemberEntity.SplitText(text, $"{nameof(SourceDatabaseTests)}.cs")
                 .Select(x => new SourceDatabase.MemberEntity()
                 {
                     Comment = x.Comment.Trim(),
@@ -288,7 +288,7 @@ namespace CompWolf.Docs.Server.Tests
             TestName = "{m}(Ignore group within comment)")]
         public void MemberGroup_SplitText(string text, params string[] expectedRaw)
         {
-            var actual = SourceDatabase.MemberGroup.SplitText(text, true)
+            var actual = SourceDatabase.MemberGroup.SplitText(text, true, $"{nameof(SourceDatabaseTests)}.cs")
                 .Select(x => new SourceDatabase.MemberGroup()
                 {
                     GroupName = x.GroupName,
@@ -341,7 +341,7 @@ namespace CompWolf.Docs.Server.Tests
             @"[{
                 ""name"": ""test"",
                 ""type"":""function"",
-                ""description"": [""line1\rline2""],
+                ""descriptions"": [""line1\rline2""],
                 ""declarations"":[{
                     ""description"": """",
                     ""declaration"": ""void test();"",
@@ -353,7 +353,7 @@ namespace CompWolf.Docs.Server.Tests
             @"[{
                 ""name"": ""test"",
                 ""type"": ""function"",
-                ""description"": [""line1\r*line2""],
+                ""descriptions"": [""line1\r*line2""],
                 ""declarations"": [{
                     ""description"": """",
                     ""declaration"": ""void test();"",
@@ -368,7 +368,7 @@ namespace CompWolf.Docs.Server.Tests
             {
                 Name = "namespaceName",
                 Text = namespaceBody,
-            }).ToHashSet();
+            }, $"{nameof(SourceDatabaseTests)}.cs").ToHashSet();
 
             static IEnumerable<SourceEntity> FormatExpected(IEnumerable<SourceEntity> entities)
             {

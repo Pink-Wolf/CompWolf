@@ -12,7 +12,7 @@ namespace compwolf
 	 * The type must be copyable and movable.
 	 */
 	template<typename ValueType>
-		requires std::is_move_constructible_v<ValueType>&& std::is_move_assignable_v<ValueType>
+		requires (std::is_move_constructible_v<ValueType>&& std::is_move_assignable_v<ValueType>)
 	class listenable
 	{
 	public:
@@ -59,8 +59,8 @@ namespace compwolf
 	public: // modifiers
 		/** Sets the value to the given input. */
 		template <typename InputType>
-			requires std::is_assignable_v<value_type, InputType&&>
-				&& std::is_constructible_v<value_type, InputType&&>
+			requires (std::is_assignable_v<value_type, InputType&&>
+				&& std::is_constructible_v<value_type, InputType&&>)
 		auto& set_value(InputType&& input)
 			noexcept(std::is_nothrow_assignable_v<value_type, InputType&&>
 				&& std::is_nothrow_constructible_v<value_type, InputType&&>
@@ -110,14 +110,14 @@ namespace compwolf
 		}
 
 		template <typename... ValueParameterTypes>
-			requires std::is_constructible_v<value_type, ValueParameterTypes&&...>
+			requires (std::is_constructible_v<value_type, ValueParameterTypes&&...>)
 		listenable(ValueParameterTypes&&... value_arguments)
 			noexcept(std::is_nothrow_constructible_v<value_type, ValueParameterTypes&&...>)
 			: _value(std::forward<ValueParameterTypes>(value_arguments)...)
 		{}
 
 		template <typename InputType>
-			requires std::is_assignable_v<value_type, InputType&&>
+			requires (std::is_assignable_v<value_type, InputType&&>)
 		&& std::is_constructible_v<value_type, InputType&&>
 			auto& operator=(InputType&& input)
 			noexcept(std::is_nothrow_assignable_v<value_type, InputType&&>

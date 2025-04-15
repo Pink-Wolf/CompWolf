@@ -1,5 +1,9 @@
 ﻿using CompWolf.Docs.Server.Models;
+using Microsoft.AspNetCore.Routing.Template;
+using Microsoft.Extensions.Primitives;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -129,26 +133,144 @@ namespace CompWolf.Docs.Server.Data
             }
 
             var fileData = string.Join(Newline, await File.ReadAllLinesAsync(filePath));
-            var data = Namespace.SplitText(fileData)
-                .SelectMany(GetEntitiesFromNamespace)
+            var data = Namespace.SplitText(fileData, filePath)
+                .SelectMany(x => GetEntitiesFromNamespace(x, filePath))
                 .ToArray();
 
             _entityCache[filePath] = (data, fileTime);
 
             return data;
         }
-        public static IEnumerable<SourceEntity> GetEntitiesFromNamespace(Namespace space)
+        public static IEnumerable<SourceEntity> GetEntitiesFromNamespace(Namespace space, string filePath)
         {
             var namespaceName = space.Name;
             var text = space.Text;
 
-            foreach (var entityText in MemberEntity.SplitText(text))
+            foreach (var entityText in MemberEntity.SplitText(text, filePath))
             {
                 var entityComment = entityText.Comment.Trim();
                 var entityDeclaration = entityText.Declaration;
                 var entityBody = entityText.Body.Trim();
 
                 if (entityComment.Contains(@"@hidden")) continue; // @hidden
+
+                Dictionary<string, SourceEntity[]> nestedEntities = [];
+                SourceEntity? constructor = null;
+                EntityTypes entityType;
+                string entityName;
+                List<SourceEnumMember> enumElements = [];
+                string[] baseClasses = [];
+
+                string mainComment, returnComment, throwComment, overloadComment;
+                List<string> related, warnings;
+                Dictionary<string, string> parameterComments, templateParameterComments;
+                try
+                {
+                    List<string> mainCommentLines = [];
+                    Dictionary<string, List<string>> parameterCommentLines = [];
+                    Dictionary<string, List<string>> templateParameterCommentLines = [];
+                    List<string> returnCommentLines = [];
+                    List<string> throwCommentLines = [];
+                    List<string> overloadCommentLines = [];
+                    List<List<string>> warningsLines = [];
+                    List<string> customCodeLines = [];
+                    related = [];
+                    bool isOverload = false;
+                    bool hasCustomCode = false;
+                    if (entityComment.Length > 0)
+                    {
+                        var commentTarget = mainCommentLines;
+                        bool javaDocComment = entityComment[0] == '*';
+                        foreach (var rawLine in entityComment.Split(Newline))
+                        {
+                            var newCommentText = rawLine.Trim() + " ";
+                            if (javaDocComment && newCommentText[0] == '*')
+                                newCommentText = newCommentText[1..].TrimStart();
+
+                            var sectionMatch = Regex.Match(newCommentText, @"^@(\w+)\s");
+                            if (sectionMatch.Success)
+                            {
+                                newCommentText = newCommentText[sectionMatch.Length..].TrimStart();
+
+                                switch (sectionMatch.Groups[1].Value)
+                                {
+                                    case "param":
+                                        {
+                                            var splitCommentText = newCommentText.Split(' ', 2);
+                                            newCommentText = splitCommentText[1].TrimStart();
+                                            commentTarget = parameterCommentLines[splitCommentText[0]] = [];
+                                        }
+                                        break;
+                                    case "typeparam":
+                                        {
+                                            var splitCommentText = newCommentText.Split(' ', 2);
+                                            newCommentText = splitCommentText[1].TrimStart();
+                                            commentTarget = templateParameterCommentLines[splitCommentText[0]] = [];
+                                        }
+                                        break;
+                                    case "return":
+                                        commentTarget = returnCommentLines;
+                                        break;
+                                    case "throws":
+                                        commentTarget = throwCommentLines;
+                                        break;
+                                    case "customoverload":
+                                        isOverload = true;
+                                        commentTarget = overloadCommentLines;
+                                        break;
+                                    case "overload":
+                                        isOverload = true;
+                                        commentTarget = mainCommentLines;
+                                        break;
+                                    case "mainoverload":
+                                        commentTarget = overloadCommentLines;
+                                        break;
+                                    case "customcode":
+                                        hasCustomCode = true;
+                                        commentTarget = customCodeLines;
+                                        break;
+                                    case "warning":
+                                        warningsLines.Add([]);
+                                        commentTarget = warningsLines.Last();
+                                        break;
+                                    case "see":
+                                        related.Add(newCommentText.Trim());
+                                        goto skipLine;
+                                    default:
+                                        throw new FormatException($"Cannot deserialize Javadoc tag {sectionMatch.Groups[1]}");
+                                }
+                            }
+
+                            commentTarget.Add(newCommentText.Trim());
+                        skipLine:;
+                        }
+                    }
+
+                    mainComment = string.Join(Newline, mainCommentLines).Trim();
+                    returnComment = string.Join(Newline, returnCommentLines).Trim();
+                    throwComment = string.Join(Newline, throwCommentLines).Trim();
+                    overloadComment = string.Join(Newline, overloadCommentLines).Trim();
+                    parameterComments = parameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
+                        .ToDictionary();
+                    templateParameterComments = templateParameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
+                        .ToDictionary();
+                    warnings = warningsLines.Select(x => string.Join(Newline, x.Select(x => x.Trim()))).ToList();
+
+                    if (isOverload)
+                    {
+                        if (overloadComment.Length == 0) overloadComment = mainComment;
+                        mainComment = "";
+                    }
+
+                    if (hasCustomCode)
+                    {
+                        entityDeclaration = string.Join(Newline, customCodeLines);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new SourceDatabaseException(e, filePath, entityDeclaration, "Could not interpret comment");
+                }
 
                 try
                 {
@@ -167,85 +289,129 @@ namespace CompWolf.Docs.Server.Data
                 }
                 catch (Exception e)
                 {
-                    throw new SourceDatabaseException(e, entityDeclaration, "Could not correct declaration indention");
+                    throw new SourceDatabaseException(e, filePath, entityDeclaration, "Could not correct declaration indention");
                 }
-
-                List<string> cleanedDeclarationWords;
-                bool hasParameters;
-                Dictionary<string, SourceEntity[]> nestedEntities = [];
-                SourceEntity? constructor = null;
-                EntityTypes entityType;
-                string entityName;
-                List<SourceEnumMember> enumElements = [];
-                string[] baseClasses = [];
-
                 try
                 {
-                    var templateMatch = Regex.Match(entityDeclaration, @"^\s*template\s*<");
-                    var templateEndIndex = templateMatch.Success
-                        ? GetEndOfBracketIndexInCode('<', '>', entityDeclaration, templateMatch.Index + templateMatch.Length - 1)
-                        : -1;
-                    var noTemplateDeclaration = entityDeclaration[(templateEndIndex + 1)..];
+                    bool isStruct;
 
-                    var attributeLessDeclaration = noTemplateDeclaration;
+                    string declarationAfterColon = "";
                     {
-                        var parameterIndex = noTemplateDeclaration.IndexOf("[[");
-                        if (parameterIndex >= 0)
-                            attributeLessDeclaration = noTemplateDeclaration[..parameterIndex]
-                                + ' '
-                                + noTemplateDeclaration[(2 + noTemplateDeclaration.IndexOf("]]", parameterIndex))..];
-                    }
-
-                    var parameterLessDeclaration = attributeLessDeclaration;
-                    {
-                        var parameterIndex = parameterLessDeclaration.IndexOf('(');
-                        hasParameters = parameterIndex >= 0;
-                        if (hasParameters)
-                            parameterLessDeclaration = parameterLessDeclaration[..parameterIndex];
-                    }
-
-                    var declarationAfterColon = "";
-                    {
-                        var colonIndex = parameterLessDeclaration.IndexOf(':');
-                        if (colonIndex >= 0 && parameterLessDeclaration[colonIndex + 1] != ':')
+                        string processedDeclaration = entityDeclaration;
+                        // template
                         {
-                            var index = entityDeclaration.Length - parameterLessDeclaration.Length + colonIndex;
-                            declarationAfterColon = entityDeclaration[(index + 1)..];
-                            entityDeclaration = entityDeclaration[..index].TrimEnd();
+                            var templateMatch = Regex.Match(processedDeclaration, @"^\s*template\s*<");
+                            int newIndex = templateMatch.Success
+                                ? 1 + GetEndOfBracketIndexInCode('<', '>', processedDeclaration, templateMatch.Length - 1)
+                                : 0;
+                            processedDeclaration = processedDeclaration[newIndex..];
+                        }
+                        // template requires
+                        {
+                            var templateMatch = Regex.Match(processedDeclaration, @"^\s*requires\s*");
+                            if (templateMatch.Success)
+                            {
+                                int newIndex = templateMatch.Length;
+
+                                if (processedDeclaration[newIndex] != '(')
+                                    throw new FormatException("Requirements must be encompassed in paranthesis, to make it easier to pass.\nNote that this is not a requirement by C++, but by CompWolf.Docs");
+                                    
+                                newIndex = GetEndOfBracketIndexInCode('(', ')', processedDeclaration, newIndex) + 1;
+                                processedDeclaration = processedDeclaration[newIndex..];
+                            }
+                        }
+                        // attributes
+                        {
+                            var attributeMatch = Regex.Match(processedDeclaration, @"\[\s*\[");
+                            int newIndex = attributeMatch.Success
+                                ? 2 + GetEndOfBracketIndexInCode('[', ']', processedDeclaration, attributeMatch.Index + attributeMatch.Length - 1)
+                                : 0;
+                            processedDeclaration = processedDeclaration[..attributeMatch.Index] + processedDeclaration[newIndex..];
+                        }
+                        processedDeclaration = processedDeclaration.Trim();
+
+                        // type
+                        {
+                            bool IsType(string type) => processedDeclaration.StartsWith(type);
+                            isStruct = IsType("struct");
+                            entityType = isStruct ? EntityTypes.Class
+                                : IsType("class") ? EntityTypes.Class
+                                : IsType("concept") ? EntityTypes.Concept
+                                : IsType("enum") ? EntityTypes.Enum
+                                : IsType("using") ? EntityTypes.Alias
+                                : IsType("#define") ? EntityTypes.Macro
+                                : processedDeclaration.Contains('(') ? EntityTypes.Function
+                                : EntityTypes.Variable
+                            ;
+                        }
+                        //name
+                        {
+                            processedDeclaration = processedDeclaration[(isStruct ? "struct".Length : entityType switch
+                            {
+                                EntityTypes.Class => "class".Length,
+                                EntityTypes.Concept => "concept".Length,
+                                EntityTypes.Enum => "enum".Length,
+                                EntityTypes.Alias => "using".Length,
+                                EntityTypes.Macro => "#define".Length,
+                                EntityTypes.Variable => Regex.Match(processedDeclaration, @"\s", RegexOptions.RightToLeft).Index + 1,
+                                EntityTypes.Function => 0,
+                                _ => throw new ArgumentOutOfRangeException(nameof(space),
+                                    "Tried deserializing entity of unknown type")
+                            })..];
+                            processedDeclaration = processedDeclaration.TrimStart();
+
+                            if (entityType == EntityTypes.Enum)
+                            {
+                                var enumClassMatch = Regex.Match(processedDeclaration, @"^\s*(?:class|struct)\s");
+                                if (enumClassMatch.Success)
+                                    processedDeclaration = processedDeclaration[(enumClassMatch.Index + enumClassMatch.Length)..];
+                            }
+
+                            int entityStartIndex = 0;
+                            if (entityType == EntityTypes.Function)
+                            {
+                                processedDeclaration = processedDeclaration[..processedDeclaration.IndexOf('(')];
+
+                                entityName = processedDeclaration;
+                                for (int i = processedDeclaration.Length - 1; i >= 0; --i)
+                                {
+                                    if (char.IsWhiteSpace(processedDeclaration[i]))
+                                    {
+                                        entityStartIndex = i + 1;
+                                        entityName = processedDeclaration = processedDeclaration[entityStartIndex..];
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                entityName = processedDeclaration;
+                                for (int i = 0; i < processedDeclaration.Length; ++i)
+                                {
+                                    if (char.IsWhiteSpace(processedDeclaration[i]))
+                                    {
+                                        entityName = processedDeclaration[..i];
+                                        break;
+                                    }
+                                }
+                                if (entityName.EndsWith(';')) entityName = entityName[..(entityName.Length - 1)];
+                            }
+
+                            processedDeclaration = (entityStartIndex + entityName.Length >= processedDeclaration.Length)
+                                ? string.Empty
+                                : processedDeclaration[(entityStartIndex + entityName.Length)..]
+                            ;
+                        }
+                        //declarationAfterColon
+                        {
+                            var colonIndex = processedDeclaration.IndexOf(':');
+                            if (colonIndex >= 0 && processedDeclaration[colonIndex + 1] != ':')
+                            {
+                                declarationAfterColon = processedDeclaration[(colonIndex + 1)..];
+                                entityDeclaration = entityDeclaration[..(entityDeclaration.Length - declarationAfterColon.Length)].TrimEnd();
+                            }
                         }
                     }
-
-                    cleanedDeclarationWords = parameterLessDeclaration
-                        .Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)
-                        .Select(x => x.EndsWith(';') ? x[..(x.Length - 1)] : x)
-                        .ToList();
-
-                    bool IsType(string type) => cleanedDeclarationWords[0] == type;
-                    bool isStruct = IsType("struct");
-                    entityType = isStruct ? EntityTypes.Class
-                        : IsType("class") ? EntityTypes.Class
-                        : IsType("concept") ? EntityTypes.Concept
-                        : IsType("enum") ? EntityTypes.Enum
-                        : IsType("using") ? EntityTypes.Alias
-                        : IsType("#define") ? EntityTypes.Macro
-                        : hasParameters ? EntityTypes.Function
-                        : EntityTypes.Variable;
-
-                    if ((entityType == EntityTypes.Class) && string.IsNullOrEmpty(entityBody)) continue; // forward declaration of class
-
-                    entityName = entityType switch
-                    {
-                        EntityTypes.Class => cleanedDeclarationWords[1],
-                        EntityTypes.Function => cleanedDeclarationWords.Last(),
-                        EntityTypes.Macro => cleanedDeclarationWords.Last(),
-                        EntityTypes.Alias => cleanedDeclarationWords.Last(),
-                        EntityTypes.Concept => cleanedDeclarationWords.Last(),
-                        EntityTypes.Variable => cleanedDeclarationWords.Last(),
-                        EntityTypes.Enum => cleanedDeclarationWords.Last(),
-                        _ => throw new ArgumentOutOfRangeException(nameof(space),
-                            "Tried deserializing entity of unknown type")
-                    };
-                    entityName = entityName.Trim();
 
                     if (entityType == EntityTypes.Enum)
                     {
@@ -260,6 +426,7 @@ namespace CompWolf.Docs.Server.Data
                                     charCount = i + 1;
                                 }
                             }
+                            enumTextElements.Add(entityBody[charCount..]);
                         }
 
                         enumElements = enumTextElements
@@ -310,14 +477,14 @@ namespace CompWolf.Docs.Server.Data
                             .Select(x => x!)
                             .ToArray();
 
-                        nestedEntities = MemberGroup.SplitText(entityBody, isStruct)
+                        nestedEntities = MemberGroup.SplitText(entityBody, isStruct, filePath)
                             .Select(x => (x.GroupName.Trim(), x.TextPerVisibility
                                     .Where(x => x.Item1 != "private")
                                     .SelectMany(x => GetEntitiesFromNamespace(new()
                                     {
                                         Name = namespaceName,
                                         Text = x.Item2,
-                                    })
+                                    }, filePath)
                                         .Select(Value =>
                                         {
                                             if (x.Item1 == "protected")
@@ -379,107 +546,7 @@ namespace CompWolf.Docs.Server.Data
                 }
                 catch (Exception e)
                 {
-                    throw new SourceDatabaseException(e, entityDeclaration, "Could not interpret declaration");
-                }
-
-                string mainComment, returnComment, throwComment, overloadComment;
-                List<string> related, warnings;
-                Dictionary<string, string> parameterComments, templateParameterComments;
-                try
-                {
-                    List<string> mainCommentLines = [];
-                    Dictionary<string, List<string>> parameterCommentLines = [];
-                    Dictionary<string, List<string>> templateParameterCommentLines = [];
-                    List<string> returnCommentLines = [];
-                    List<string> throwCommentLines = [];
-                    List<string> overloadCommentLines = [];
-                    List<List<string>> warningsLines = [];
-                    related = [];
-                    bool isOverload = false;
-                    if (entityComment.Length > 0)
-                    {
-                        var commentTarget = mainCommentLines;
-                        bool javaDocComment = entityComment[0] == '*';
-                        foreach (var rawLine in entityComment.Split(Newline))
-                        {
-                            var newCommentText = rawLine.Trim() + " ";
-                            if (javaDocComment && newCommentText[0] == '*')
-                                newCommentText = newCommentText[1..].TrimStart();
-
-                            var sectionMatch = Regex.Match(newCommentText, @"^@(\w+)\s");
-                            if (sectionMatch.Success)
-                            {
-                                newCommentText = newCommentText[sectionMatch.Length..].TrimStart();
-
-                                switch (sectionMatch.Groups[1].Value)
-                                {
-                                    case "param":
-                                        {
-                                            var splitCommentText = newCommentText.Split(' ', 2);
-                                            newCommentText = splitCommentText[1].TrimStart();
-                                            commentTarget = parameterCommentLines[splitCommentText[0]] = [];
-                                        }
-                                        break;
-                                    case "typeparam":
-                                        {
-                                            var splitCommentText = newCommentText.Split(' ', 2);
-                                            newCommentText = splitCommentText[1].TrimStart();
-                                            commentTarget = templateParameterCommentLines[splitCommentText[0]] = [];
-                                        }
-                                        break;
-                                    case "return":
-                                        commentTarget = returnCommentLines;
-                                        break;
-                                    case "throws":
-                                        commentTarget = throwCommentLines;
-                                        break;
-                                    case "customoverload":
-                                        isOverload = true;
-                                        commentTarget = overloadCommentLines;
-                                        break;
-                                    case "overload":
-                                        isOverload = true;
-                                        commentTarget = mainCommentLines;
-                                        break;
-                                    case "mainoverload":
-                                        commentTarget = overloadCommentLines;
-                                        break;
-                                    case "warning":
-                                        warningsLines.Add([]);
-                                        commentTarget = warningsLines.Last();
-                                        break;
-                                    case "see":
-                                        related.Add(newCommentText.Trim());
-                                        goto skipLine;
-                                    default:
-                                        throw new FormatException($"Cannot deserialize Javadoc tag {sectionMatch.Groups[1]}");
-                                }
-                            }
-
-                            commentTarget.Add(newCommentText.Trim());
-                        skipLine:;
-                        }
-                    }
-
-                    mainComment = string.Join(Newline, mainCommentLines).Trim();
-                    returnComment = string.Join(Newline, returnCommentLines).Trim();
-                    throwComment = string.Join(Newline, throwCommentLines).Trim();
-                    overloadComment = string.Join(Newline, overloadCommentLines).Trim();
-                    parameterComments = parameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
-                        .ToDictionary();
-                    templateParameterComments = templateParameterCommentLines.Select(x => (x.Key.Trim(), string.Join(Newline, x.Value).Trim()))
-                        .ToDictionary();
-                    warnings = warningsLines.Select(x => string.Join(Newline, x.Select(x => x.Trim()))).ToList();
-
-                    if (isOverload)
-                    {
-                        if (overloadComment.Length == 0) overloadComment = mainComment;
-                        mainComment = "";
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new SourceDatabaseException(e, entityDeclaration, "Could not interpret comment");
+                    throw new SourceDatabaseException(e, filePath, entityDeclaration, "Could not interpret declaration");
                 }
 
                 yield return new()
@@ -493,8 +560,8 @@ namespace CompWolf.Docs.Server.Data
                             Description = overloadComment,
                             Declaration = entityDeclaration,
                         }],
-                    Warnings = warnings.ToArray(),
-                    Related = related.ToArray(),
+                    Warnings = [.. warnings],
+                    Related = [.. related],
                     TemplateParameterDescriptions = templateParameterComments,
                     Members = nestedEntities,
                     BaseClasses = baseClasses,
@@ -523,7 +590,7 @@ namespace CompWolf.Docs.Server.Data
             public override int GetHashCode()
                 => HashCode.Combine(Comment, Declaration, Body);
 
-            public static IEnumerable<MemberEntity> SplitText(string text)
+            public static IEnumerable<MemberEntity> SplitText(string text, string filePath)
             {
                 if (string.IsNullOrEmpty(text)) yield break;
 
@@ -583,7 +650,8 @@ namespace CompWolf.Docs.Server.Data
                             }
 
                             bodyIndex = declarationIndex;
-                            var macroMatch = Regex.Match(text[bodyIndex..], @"^\s*#define\s+\S+\s*");
+
+                            var macroMatch = Regex.Match(text[bodyIndex..], @"^\s*#define\s+\w+\s*");
                             if (macroMatch.Success)
                             {
                                 bodyIndex += macroMatch.Length;
@@ -593,8 +661,16 @@ namespace CompWolf.Docs.Server.Data
                                     bodyIndex = GetEndOfBracketIndexInCode('(', ')', text, bodyIndex) + 1;
                                 }
 
-                                endIndex = text.IndexOf(Newline, bodyIndex);
-                                if (endIndex < 0) endIndex = text.Length;
+                                endIndex = bodyIndex;
+                                do
+                                {
+                                    endIndex = text.IndexOf(Newline, endIndex) + Newline.Length - 1;
+                                    if (endIndex < Newline.Length - 1)
+                                    {
+                                        endIndex = text.Length;
+                                        break;
+                                    }
+                                } while (text[endIndex - Newline.Length] == '\\');
                             }
                             else
                             {
@@ -690,7 +766,7 @@ namespace CompWolf.Docs.Server.Data
                     }
                     catch (Exception e)
                     {
-                        throw new SourceDatabaseException(e, text, declarationIndex);
+                        throw new SourceDatabaseException(e, filePath, text, declarationIndex);
                     }
 
                     yield return member;
@@ -715,7 +791,7 @@ namespace CompWolf.Docs.Server.Data
             public override int GetHashCode()
                 => ToString().GetHashCode();
 
-            public static IEnumerable<MemberGroup> SplitText(string text, bool publicByDefault)
+            public static IEnumerable<MemberGroup> SplitText(string text, bool publicByDefault, string filePath)
             {
                 if (text.Length == 0) text = " ";
                 if (text[0] == '{') text = text[1..];
@@ -818,7 +894,7 @@ namespace CompWolf.Docs.Server.Data
                         }
                         catch (Exception e)
                         {
-                            throw new SourceDatabaseException(e, text, textIndex);
+                            throw new SourceDatabaseException(e, filePath, text, textIndex);
                         }
                     }
                     AddToGroup(currentGroup, currentVisibility, text[handledCharCount..]);
@@ -846,7 +922,7 @@ namespace CompWolf.Docs.Server.Data
             public override int GetHashCode()
                 => HashCode.Combine(Name, Text);
 
-            public static IEnumerable<Namespace> SplitText(string text)
+            public static IEnumerable<Namespace> SplitText(string text, string filePath)
             {
                 //After search, paranthesisLevel becomes endIndex
                 LinkedList<(string name, int nameIndex, int startIndex, int paranthesisLevel, List<string> subnamespaces)> namespaceData = [];
@@ -903,7 +979,7 @@ namespace CompWolf.Docs.Server.Data
                 }
                 catch (Exception e)
                 {
-                    throw new SourceDatabaseException(e, text, 0);
+                    throw new SourceDatabaseException(e, filePath, text, 0);
                 }
 
                 return namespaceData
@@ -1007,6 +1083,14 @@ namespace CompWolf.Docs.Server.Data
 
         public static int GetEndOfBracketIndexInCode(char startBracket, char endBracket, string text, int startIndex = 0)
             => GetEndOfBracket<int, IEnumerable<int>>(i => text[i] == startBracket, i => text[i] == endBracket, ForeachRelevantCharInCode(text, startIndex), 0);
+
+        public static int GetEndOfBracketIndexInCodeReversed(char startBracket, char endBracket, string text, int endIndex)
+        {
+            text = string.Concat(text[..(endIndex + 1)].Reverse());
+            return endIndex - GetEndOfBracketIndexInCode(endBracket, startBracket, text);
+        }
+        public static int GetEndOfBracketIndexInCodeReversed(char startBracket, char endBracket, string text)
+            => GetEndOfBracketIndexInCodeReversed(startBracket, endBracket, text, text.Length - 1);
 
         /// <summary> Returns the index after skipping non-relevant code at the given index of the given text.
         /// Returns -1 if the index points to relevant code. </summary>
@@ -1113,17 +1197,20 @@ namespace CompWolf.Docs.Server.Data
 
     public class SourceDatabaseException : AggregateException
     {
-        public SourceDatabaseException(Exception innerException, string sourceName)
-            : base($"Source: {sourceName}\n", innerException)
+        public SourceDatabaseException(Exception innerException, string filename)
+            : base($"Source file: {filename}\n", innerException)
         { }
-        public SourceDatabaseException(Exception innerException, string sourceText, int sourceIndex)
-            : base($"Source Text: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}\n", innerException)
+        public SourceDatabaseException(Exception innerException, string filename, string sourceName)
+            : base($"Source file: {filename}\nText: {sourceName}\n", innerException)
         { }
-        public SourceDatabaseException(Exception innerException, string sourceName, string exceptionMessage)
-            : base($"{exceptionMessage}\nSource: {sourceName}\n", innerException)
+        public SourceDatabaseException(Exception innerException, string filename, string sourceText, int sourceIndex)
+            : base($"Source file: {filename}\nText: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}\n", innerException)
         { }
-        public SourceDatabaseException(Exception innerException, string sourceText, int sourceIndex, string exceptionMessage)
-            : base($"{exceptionMessage}\nSource Text: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}\n", innerException)
+        public SourceDatabaseException(Exception innerException, string filename, string sourceName, string exceptionMessage)
+            : base($"Source file: {filename}\nText: {sourceName}\n{exceptionMessage}\n", innerException)
+        { }
+        public SourceDatabaseException(Exception innerException, string filename, string sourceText, int sourceIndex, string exceptionMessage)
+            : base($"Source file: {filename}\nText: {sourceText[sourceIndex..Math.Min(sourceIndex + 24, sourceText.Length)]}\n{exceptionMessage}\n", innerException)
         { }
     }
 }
