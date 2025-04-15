@@ -358,7 +358,7 @@ namespace CompWolf.Docs.Server.Data
                                 _ => throw new ArgumentOutOfRangeException(nameof(space),
                                     "Tried deserializing entity of unknown type")
                             })..];
-                            processedDeclaration = processedDeclaration.TrimStart();
+                            processedDeclaration = processedDeclaration.Trim();
 
                             if (entityType == EntityTypes.Enum)
                             {
@@ -370,6 +370,12 @@ namespace CompWolf.Docs.Server.Data
                             int entityStartIndex = 0;
                             if (entityType == EntityTypes.Function)
                             {
+                                {
+                                    var declEnding = processedDeclaration[processedDeclaration.LastIndexOf(')')..];
+                                    if (declEnding.Contains("final") || declEnding.Contains("override"))
+                                        continue; // Do not include overrides
+                                }
+
                                 processedDeclaration = processedDeclaration[..processedDeclaration.IndexOf('(')];
 
                                 entityName = processedDeclaration;

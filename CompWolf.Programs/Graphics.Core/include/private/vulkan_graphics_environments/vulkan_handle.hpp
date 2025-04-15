@@ -10,6 +10,7 @@ namespace compwolf::vulkan
 	{
 		/** Dereference type of [[vulkan_handle::instance]]
 		 * @see vulkan_handle::instance
+		 * @hidden
 		 */
 		struct instance_t;
 		/** Represents a VkInstance */
@@ -17,6 +18,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::physical_device]]
 		 * @see vulkan_handle::physical_device
+		 * @hidden
 		 */
 		struct physical_device_t;
 		/** Represents a VkPhysicalDevice */
@@ -24,6 +26,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::device]]
 		 * @see vulkan_handle::device
+		 * @hidden
 		 */
 		struct device_t;
 		/** Represents a VkDevice */
@@ -31,6 +34,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::queue]]
 		 * @see vulkan_handle::queue
+		 * @hidden
 		 */
 		struct queue_t;
 		/** Represents a VkQueue */
@@ -38,6 +42,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::vulkan_debug_messenger]]
 		 * @see vulkan_handle::vulkan_debug_messenger
+		 * @hidden
 		 */
 		struct vulkan_debug_messenger_t;
 		/** Represents a VkDebugUtilsMessengerEXT */
@@ -46,6 +51,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::fence]]
 		 * @see vulkan_handle::fence
+		 * @hidden
 		 */
 		struct fence_t;
 		/** Represents a VkFence-pointer */
@@ -53,6 +59,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::semaphore]]
 		 * @see vulkan_handle::semaphore
+		 * @hidden
 		 */
 		struct semaphore_t;
 		/** Represents a VkSemaphore-pointer */
@@ -60,6 +67,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::command]]
 		 * @see vulkan_handle::command
+		 * @hidden
 		 */
 		struct command_t;
 		/** Represents a VkCommandBuffer-pointer */
@@ -67,6 +75,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::command_pool]]
 		 * @see vulkan_handle::command_pool
+		 * @hidden
 		 */
 		struct command_pool_t;
 		/** Represents a VkCommandPool-pointer */
@@ -75,6 +84,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::glfw_window]]
 		 * @see vulkan_handle::glfw_window
+		 * @hidden
 		 */
 		struct glfw_window_t;
 		/** Represents a GLFWwindow-pointer */
@@ -82,18 +92,20 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::surface]]
 		 * @see vulkan_handle::surface
+		 * @hidden
 		 */
 		struct surface_t;
 		/** Represents a VkSurfaceKHR-pointer */
 		using surface = surface_t*;
 
-		/** Forward declaration of a struct containing information used by [[vulkan_surface]]. */
+		/** Forward declaration of a struct containing information used by [[window_surface]]. */
 		struct surface_format_info_t;
-		/** Pointer for [[surface_format_info_t]], a struct containing information used by [[vulkan_surface]]. */
+		/** Pointer for [[surface_format_info_t]], a struct containing information used by [[window_surface]]. */
 		using surface_format_info = surface_format_info_t*;
 
 		/** Dereference type of [[vulkan_handle::render_pass]]
 		 * @see vulkan_handle::render_pass
+		 * @hidden
 		 */
 		struct render_pass_t;
 		/** Represents a VkRenderPass-pointer */
@@ -101,6 +113,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::swapchain]]
 		 * @see vulkan_handle::swapchain
+		 * @hidden
 		 */
 		struct swapchain_t;
 		/** Represents a VkSwapchainKHR-pointer */
@@ -108,6 +121,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::frame_buffer]]
 		 * @see vulkan_handle::frame_buffer
+		 * @hidden
 		 */
 		struct frame_buffer_t;
 		/** Represents a VkFramebuffer-pointer */
@@ -116,6 +130,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::image_view]]
 		 * @see vulkan_handle::image_view
+		 * @hidden
 		 */
 		struct image_view_t;
 		/** Represents a VkImageView-pointer */
@@ -123,6 +138,7 @@ namespace compwolf::vulkan
 
 		/** Dereference type of [[vulkan_handle::sampler]]
 		 * @see vulkan_handle::sampler
+		 * @hidden
 		 */
 		struct sampler_t;
 		/** Represents a VkSampler-pointer */

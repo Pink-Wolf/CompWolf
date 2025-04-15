@@ -85,7 +85,7 @@ namespace compwolf
 		}
 
 	public: // constructors
-		/** Constructs an invalid [[window_image]].
+		/** Constructs an invalid [[window_camera]].
 		 * Using this image is undefined behaviour.
 		 * @overload
 		 */

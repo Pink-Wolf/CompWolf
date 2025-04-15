@@ -11,8 +11,8 @@ namespace compwolf::vulkan
 {
 	class vulkan_graphics_environment;
 
-	/** A Vulkan-implementation of [[GpuConnection]].
-	 * @see GpuConnection
+	/** A Vulkan-implementation of [[gpu_connection]].
+	 * @see gpu_connection
 	 * @see vulkan_graphics_environment
 	 */
 	class vulkan_gpu_connection : public gpu_connection<vulkan_graphics_environment>
@@ -23,7 +23,7 @@ namespace compwolf::vulkan
 		unique_deleter_ptr<vulkan_handle::device_t> _vulkan_device{};
 
 	public: // constructors
-		/** Constructs an invalid [[vulkan_gpu_environment]].
+		/** Constructs an invalid [[vulkan_gpu_connection]].
 		 * Using this is undefined behaviour.
 		 * @overload
 		 */

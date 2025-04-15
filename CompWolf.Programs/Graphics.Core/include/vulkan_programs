@@ -1,4 +1,4 @@
-// Contains [[vulkan_gpu_program]], a vulkan implementation of [[gpu_program]].
+// Contains [[vulkan_gpu_program]], a vulkan implementation of [[gpu_specific_program]].
 
 // Including this also includes [[gpu_programs]].
 #include "gpu_programs"
