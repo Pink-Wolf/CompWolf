@@ -1,11 +1,6 @@
 ﻿using CompWolf.Docs.Server.Models;
-using Microsoft.AspNetCore.Routing.Template;
-using Microsoft.Extensions.Primitives;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CompWolf.Docs.Server.Data
 {
@@ -344,6 +339,14 @@ namespace CompWolf.Docs.Server.Data
                                 : EntityTypes.Variable
                             ;
                         }
+                        // ignore forward declaration
+                        if (entityText.HasBody is false) switch (entityType)
+                            {
+                                case EntityTypes.Class:
+                                case EntityTypes.Function:
+                                    continue;
+                                default: break;
+                            }
                         //name
                         {
                             processedDeclaration = processedDeclaration[(isStruct ? "struct".Length : entityType switch
@@ -608,17 +611,19 @@ namespace CompWolf.Docs.Server.Data
             public string Comment { get; set; } = "";
             public string Declaration { get; set; } = "";
             public string Body { get; set; } = "";
+            public bool HasBody { get; set; } = true;
 
             public override string ToString()
-                => $"\r{Comment}\r{Declaration}\r{Body}\r";
+                => $"({(HasBody ? "has body" : "does not have body")})\r{Comment}\r{Declaration}\r{Body}\r";
             public override bool Equals(object? obj)
                 => obj is MemberEntity other
                 && Comment.Equals(other.Comment)
                 && Declaration.Equals(other.Declaration)
                 && Body.Equals(other.Body)
+                && HasBody.Equals(other.HasBody)
                 ;
             public override int GetHashCode()
-                => HashCode.Combine(Comment, Declaration, Body);
+                => HashCode.Combine(Comment, Declaration, Body, HasBody);
 
             public static IEnumerable<MemberEntity> SplitText(string text, string filePath)
             {
@@ -628,6 +633,7 @@ namespace CompWolf.Docs.Server.Data
                 {
                     MemberEntity member;
                     int endIndex;
+                    bool hasBody = true;
 
                     try
                     {
@@ -708,7 +714,9 @@ namespace CompWolf.Docs.Server.Data
                                 {
                                     switch (text[bodyIndex])
                                     {
-                                        case ';': break;
+                                        case ';':
+                                            hasBody = false;
+                                            break;
                                         case '{': break;
                                         case '=':
                                             if (Regex.Match(text[..bodyIndex], @"\soperator\s*$").Success)
@@ -731,8 +739,7 @@ namespace CompWolf.Docs.Server.Data
                                 endIndex = bodyIndex;
                                 switch (text[endIndex])
                                 {
-                                    case ';':
-                                        break;
+                                    case ';': break;
                                     case '{':
                                         endIndex = GetEndOfBracketIndexInCode('{', '}', text, endIndex);
                                         break;
@@ -768,6 +775,7 @@ namespace CompWolf.Docs.Server.Data
                                 Comment = "",
                                 Declaration = text[declarationStartIndex..bodyIndex],
                                 Body = endIndex > bodyIndex ? text[bodyIndex..endIndex] : "",
+                                HasBody = hasBody,
                             };
 
                             if (declarationStartIndex > Newline.Length)

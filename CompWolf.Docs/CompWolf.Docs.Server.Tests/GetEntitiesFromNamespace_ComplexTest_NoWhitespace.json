@@ -137,17 +137,6 @@
     "type": "Class"
   },
   {
-    "name": "forward_declared_class",
-    "declarations": [
-      {
-        "description": "",
-        "declaration": "class forward_declared_class;",
-        "protected": false
-      }
-    ],
-    "type": "Class"
-  },
-  {
     "name": "global_function",
     "declarations": [
       {

@@ -118,71 +118,78 @@ namespace CompWolf.Docs.Server.Tests
         [TestCase("", TestName = "{m}(Empty)")]
         [TestCase("         ", TestName = "{m}(Whitespace)")]
         [TestCase("{/*comment*/type name;}",
-            "comment", "type name", "",
+            "comment", "type name", "", "false",
             TestName = "{m}(Variable: Full text is encompassed in brackets)")]
         [TestCase("{/* \r type name; \r */type name;}",
-            "type name;", "type name", "",
+            "type name;", "type name", "", "false",
             TestName = "{m}(Variable: Ignore variable in comment)")]
 
         [TestCase("/*comment*/type name;",
-            "comment", "type name", "",
+            "comment", "type name", "", "false",
             TestName = "{m}(Variable)")]
         [TestCase("/*  comment  */  type  name  ;  ",
-            "comment", "type  name", "",
+            "comment", "type  name", "", "false",
             TestName = "{m}(Variable: Whitespace)")]
         [TestCase("type name;",
-            "", "type name", "",
+            "", "type name", "", "false",
             TestName = "{m}(Variable: No comment)")]
 
         [TestCase("/*comment*/class test{body};",
-            "comment", "class test", "{body",
+            "comment", "class test", "{body", "true",
             TestName = "{m}(Class)")]
         [TestCase("  /*  comment  */  class  test  {  body  }  ;  ",
-            "comment", "class  test", "{  body",
+            "comment", "class  test", "{  body", "true",
             TestName = "{m}(Class: Whitespace)")]
         [TestCase("class test{body};",
-            "", "class test", "{body",
+            "", "class test", "{body", "true",
             TestName = "{m}(Class: No comment)")]
         [TestCase("/*comment*/class test1{body1};/*comment*/class test2{body2};",
-            "comment", "class test1", "{body1",
-            "comment", "class test2", "{body2",
+            "comment", "class test1", "{body1", "true",
+            "comment", "class test2", "{body2", "true",
             TestName = "{m}(Class: Multiple)")]
 
         [TestCase("/*comment*/#define test body\r",
-            "comment", "#define test", "body",
+            "comment", "#define test", "body", "true",
             TestName = "{m}(Macro)")]
         [TestCase("  /*  comment  */  #define  test  body  \r",
-            "comment", "#define  test", "body",
+            "comment", "#define  test", "body", "true",
             TestName = "{m}(Macro: Whitespace)")]
         [TestCase("#define test body\r",
-            "", "#define test", "body",
+            "", "#define test", "body", "true",
             TestName = "{m}(Macro: No comment)")]
         [TestCase("/*comment*/#define test ;int test();\r",
-            "comment", "#define test", ";int test();",
+            "comment", "#define test", ";int test();", "true",
             TestName = "{m}(Macro: Function in macro)")]
 
         [TestCase("/*comment*/#define test() body\r",
-            "comment", "#define test()", "body",
+            "comment", "#define test()", "body", "true",
             TestName = "{m}(Parameter-macro)")]
         [TestCase("  /*  comment  */  #define  test  (  )  body  \r",
-            "comment", "#define  test  (  )", "body",
+            "comment", "#define  test  (  )", "body", "true",
             TestName = "{m}(Parameter-macro: Whitespace)")]
         [TestCase("#define test() body\r",
-            "", "#define test()", "body",
+            "", "#define test()", "body", "true",
             TestName = "{m}(Parameter-macro: No comment)")]
         [TestCase("/*comment*/#define test() body",
-            "comment", "#define test()", "body",
+            "comment", "#define test()", "body", "true",
             TestName = "{m}(Parameter-macro: end instead of newline)")]
 
         [TestCase("/*comment*/using name=body;",
-            "comment", "using name", "=body",
+            "comment", "using name", "=body", "true",
             TestName = "{m}(Alias)")]
         [TestCase("  /*  comment  */  using  name  =  body  ;  ",
-            "comment", "using  name", "=  body",
+            "comment", "using  name", "=  body", "true",
             TestName = "{m}(Alias: Whitespace)")]
         [TestCase("using name=body;",
-            "", "using name", "=body",
+            "", "using name", "=body", "true",
             TestName = "{m}(Alias: No comment)")]
+
+        [TestCase("class test;",
+            "", "class test", "", "false",
+            TestName = "{m}(Forward declaration: class)")]
+        [TestCase("void test();",
+            "", "void test()", "", "false",
+            TestName = "{m}(Forward declaration: function)")]
         public void MemberEntity_SplitText(string text, params string[] expectedRaw)
         {
             var actual = SourceDatabase.MemberEntity.SplitText(text, $"{nameof(SourceDatabaseTests)}.cs")
@@ -191,16 +198,18 @@ namespace CompWolf.Docs.Server.Tests
                     Comment = x.Comment.Trim(),
                     Declaration = x.Declaration.Trim(),
                     Body = x.Body.Trim(),
+                    HasBody = x.HasBody,
                 })
                 .ToHashSet();
             var expected = new HashSet<SourceDatabase.MemberEntity>();
-            for (int i = 0; i < expectedRaw.Length; i += 3)
+            for (int i = 0; i < expectedRaw.Length; i += 4)
             {
                 expected.Add(new()
                 {
                     Comment = expectedRaw[i + 0],
                     Declaration = expectedRaw[i + 1],
                     Body = expectedRaw[i + 2],
+                    HasBody = expectedRaw[i + 3] == "true"
                 });
             }
 
@@ -337,7 +346,21 @@ namespace CompWolf.Docs.Server.Tests
             TestName = "{m}(Empty)")]
         [TestCase("           ", "[]",
             TestName = "{m}(Whitespace)")]
-        [TestCase("/**line1\r*line2*/void test();",
+        [TestCase("class test;", "[]",
+            TestName = "{m}(Ignore forward declaration)")]
+        [TestCase("class test{};",
+            @"[{
+                ""name"": ""test"",
+                ""type"":""class"",
+                ""descriptions"": [],
+                ""declarations"":[{
+                    ""description"": """",
+                    ""declaration"": ""class test;"",
+                    ""protected"": false
+                }]
+            }]",
+            TestName = "{m}(Empty class)")]
+        [TestCase("/**line1\r*line2*/void test(){}",
             @"[{
                 ""name"": ""test"",
                 ""type"":""function"",
@@ -349,7 +372,7 @@ namespace CompWolf.Docs.Server.Tests
                 }]
             }]",
             TestName = "{m}(Ignore * at start of /**-comment's lines)")]
-        [TestCase("/*line1\r*line2*/void test();",
+        [TestCase("/*line1\r*line2*/void test(){}",
             @"[{
                 ""name"": ""test"",
                 ""type"": ""function"",
