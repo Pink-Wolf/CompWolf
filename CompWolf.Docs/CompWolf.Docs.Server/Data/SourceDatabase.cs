@@ -713,13 +713,14 @@ namespace CompWolf.Docs.Server.Data
                                 endIndex = bodyIndex;
                                 do
                                 {
-                                    endIndex = text.IndexOf(Newline, endIndex) + Newline.Length - 1;
-                                    if (endIndex < Newline.Length - 1)
+                                    endIndex = text.IndexOf(Newline, endIndex) + Newline.Length;
+                                    if (endIndex < Newline.Length)
                                     {
                                         endIndex = text.Length;
                                         break;
                                     }
-                                } while (text[endIndex - Newline.Length] == '\\');
+                                } while (text[endIndex - Newline.Length - 1] == '\\');
+                                --endIndex;
                             }
                             else
                             {
