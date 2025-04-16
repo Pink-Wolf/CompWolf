@@ -26,7 +26,7 @@ namespace compwolf
 	{
 	private:
 		using super = std::unique_ptr<T, internal::unique_deleter_ptr_deleter<T*>>;
-	public:
+	public: // constructors
 		using super::unique_ptr;
 
 		constexpr unique_deleter_ptr() noexcept(std::is_nothrow_default_constructible_v<T*>)
@@ -55,7 +55,7 @@ namespace compwolf
 	{
 	private:
 		using super = std::unique_ptr<T[], internal::unique_deleter_ptr_deleter<T*>>;
-	public:
+	public: // constructors
 		using super::unique_ptr;
 
 		constexpr unique_deleter_ptr() noexcept(std::is_nothrow_default_constructible_v<T*>)
