@@ -334,7 +334,7 @@ namespace CompWolf.Docs.Server.Data
                                 {
                                     declarationAfterColon = processedDeclaration[index..];
                                     processedDeclaration = processedDeclaration[..(index - 1)];
-                                    entityDeclaration = entityDeclaration[..(index - 1)].TrimEnd();
+                                    entityDeclaration = entityDeclaration[..(entityDeclaration.Length - declarationAfterColon.Length - 1)].TrimEnd();
                                     break;
                                 }
                             }
