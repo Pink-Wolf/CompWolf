@@ -1,11 +1,12 @@
 import { getHeader, getOverview } from "@/lib/api/getEntity"
 import HeaderViewer from "@/lib/api/viewer/Header"
-import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder, decodeStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
-export default async function HeaderPage({ params }) {
+export default async function HeaderPage(input) {
+    let params = await input.params
     if (params.project === "%5Bproject%5D") return <div />
-    const project = decodeURIComponent(params.project)
-    const header = decodeURIComponent(params.header)
+    const project = decodeStaticParamsEncoder(params.project)
+    const header = decodeStaticParamsEncoder(params.header)
 
     const data = await getHeader(project, header)
 
@@ -14,7 +15,7 @@ export default async function HeaderPage({ params }) {
 
 export async function generateMetadata({params}) {
     return {
-        title: `${params.header}`,
+        title: `${(await params).header}`,
     }
 }
 

@@ -1,12 +1,13 @@
 import EntityViewer from "@/lib/api/viewer/Entity"
 import { getOverview, getEntity } from "@/lib/api/getEntity"
-import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder, decodeStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
-export default async function EntityPage({ params }) {
+export default async function EntityPage(input) {
+    let params = await input.params
     if (params.project === "%5Bproject%5D") return <div />
-    let project = decodeURIComponent(params.project)
-    let header = decodeURIComponent(params.header)
-    let entity = decodeURIComponent(params.entity)
+    let project = decodeStaticParamsEncoder(params.project)
+    let header = decodeStaticParamsEncoder(params.header)
+    let entity = decodeStaticParamsEncoder(params.entity)
 
     const data = await getEntity(project, header, entity)
 
@@ -15,7 +16,7 @@ export default async function EntityPage({ params }) {
 
 export async function generateMetadata({params}) {
     return {
-        title: `${params.entity}`,
+        title: `${(await params).entity}`,
     }
 }
 

@@ -3,7 +3,7 @@ import Link from "next/link"
 import { getOverview } from "@/lib/api/getEntity"
 import MenuTree from "@/lib/MenuTree"
 import { Reference } from "@/lib/CodeComponents"
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
+import betterEncodeURIComponent, { decodeStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
 export const dynamic = 'force-static'
 
@@ -29,7 +29,7 @@ async function HeaderMenu() {
             }),
             Display: ({ children, path }) => Reference({
                 path: `${path}`,
-                children: decodeURIComponent(children),
+                children: decodeStaticParamsEncoder(children),
             }),
         }
     })

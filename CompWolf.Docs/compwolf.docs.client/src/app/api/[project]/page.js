@@ -1,10 +1,11 @@
 import { getProject, getOverview } from "@/lib/api/getEntity"
 import ProjectViewer from "@/lib/api/viewer/Project"
-import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder, decodeStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
-export default async function ProjectPage({ params }) {
+export default async function ProjectPage(input) {
+    let params = await input.params
     if (params.project === "%5Bproject%5D") return <div />
-    const project = decodeURIComponent(params.project)
+    const project = decodeStaticParamsEncoder(params.project)
 
     const data = await getProject(project)
 
@@ -13,7 +14,7 @@ export default async function ProjectPage({ params }) {
 
 export async function generateMetadata({params}) {
     return {
-        title: `${params.project}`,
+        title: `${(await params).project}`,
     }
 }
 

@@ -1,13 +1,14 @@
 import { getOverview, getEntity } from "@/lib/api/getEntity"
 import EntityViewer from "@/lib/api/viewer/Entity"
-import { generateStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsEncoder, decodeStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
-export default async function MemberPage({ params }) {
+export default async function MemberPage(input) {
+    let params = await input.params
     if (params.project === "%5Bproject%5D") return <div />
-    let project = decodeURIComponent(params.project)
-    let header = decodeURIComponent(params.header)
-    let entity = decodeURIComponent(params.entity)
-    let members = params.members.map(x => decodeURIComponent(x))
+    let project = decodeStaticParamsEncoder(params.project)
+    let header = decodeStaticParamsEncoder(params.header)
+    let entity = decodeStaticParamsEncoder(params.entity)
+    let members = params.members.map(x => decodeStaticParamsEncoder(x))
 
     const entities = [await getEntity(project, header, entity)]
 
@@ -38,9 +39,10 @@ function getMembers(entity, members) {
     })
 }
 
-export async function generateMetadata({params}) {
+export async function generateMetadata({ params }) {
+    let { members } = await params
     return {
-        title: `${params.members[params.members.length-1]}`,
+        title: `${members[members.length-1]}`,
     }
 }
 
