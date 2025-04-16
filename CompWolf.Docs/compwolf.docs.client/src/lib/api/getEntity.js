@@ -5,7 +5,9 @@ const EXAMPLE_URL = `${DATABASE_URL}examples/`
 const API_DOCS_URL = `${DATABASE_URL}api/docs/`
 const API_SOURCE_URL = `${DATABASE_URL}api/source/`
 
-async function getJson(path) {
+const cachedResults = new Map()
+
+async function getJsonNoCache(path) {
     const response = await fetch(path, {
         method: 'GET',
         cache: `no-cache`,
@@ -14,7 +16,18 @@ async function getJson(path) {
         },
     })
     if (!response.ok) throw new Error(`Could not get data from ${path} (${response.status}):\n${await response.text()}\n`)
+
     return await response.json()
+}
+async function getJson(path) {
+    if (process.env.CACHE_SERVER_DATA) {
+        let cachedResult = cachedResults.get(path)
+        if (cachedResult !== undefined) return await cachedResult
+
+        cachedResults.set(path, getJsonNoCache(path))
+        return await cachedResults.get(path)
+    }
+    else return getJsonNoCache(path)
 }
 async function postJson(path, data) {
     const response = await fetch(path, {
