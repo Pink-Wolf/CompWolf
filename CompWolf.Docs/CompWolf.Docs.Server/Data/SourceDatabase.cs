@@ -459,6 +459,14 @@ namespace CompWolf.Docs.Server.Data
                         }
                     }
 
+                    if (entityType == EntityTypes.Alias)
+                    {
+                        if (entityText.HasBody is false) // inherit
+                        {
+                            entityName = "using " + entityName;
+                        }
+                    }
+
                     if (entityType == EntityTypes.Enum)
                     {
                         List<string> enumTextElements = [];
