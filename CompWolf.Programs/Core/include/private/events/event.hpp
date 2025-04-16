@@ -43,7 +43,7 @@ namespace compwolf
 		}
 		constexpr ~event_key() noexcept;
 
-		auto operator==(event_key&& other) noexcept -> event_key&
+		auto operator=(event_key&& other) noexcept -> event_key&
 		{
 			this->~event_key();
 			return *new(this)event_key(std::move(other));
@@ -86,7 +86,7 @@ namespace compwolf
 		}
 		constexpr ~event_key() noexcept;
 
-		auto operator==(event_key&& other) noexcept -> event_key&
+		auto operator=(event_key&& other) noexcept -> event_key&
 		{
 			this->~event_key();
 			return *new(this)event_key(std::move(other));
