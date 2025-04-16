@@ -1,6 +1,6 @@
 import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
 
-const DATABASE_URL = `https://localhost:7112/`
+const DATABASE_URL = `https://127.0.0.1:7112/`
 const EXAMPLE_URL = `${DATABASE_URL}examples/`
 const API_DOCS_URL = `${DATABASE_URL}api/docs/`
 const API_SOURCE_URL = `${DATABASE_URL}api/source/`
