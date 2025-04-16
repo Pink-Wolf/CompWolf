@@ -324,6 +324,21 @@ namespace CompWolf.Docs.Server.Data
                             processedDeclaration = processedDeclaration[..attributeMatch.Index] + processedDeclaration[newIndex..];
                         }
                         processedDeclaration = processedDeclaration.Trim();
+                        // inheritance
+                        {
+                            foreach (var index in ForeachRelevantCharInCode(processedDeclaration, 1))
+                            {
+                                if ((index == 1 || processedDeclaration[index - 2] != ':')
+                                    && processedDeclaration[index - 1] == ':'
+                                    && processedDeclaration[index] != ':')
+                                {
+                                    declarationAfterColon = processedDeclaration[index..];
+                                    processedDeclaration = processedDeclaration[..(index - 1)];
+                                    entityDeclaration = entityDeclaration[..(index - 1)].TrimEnd();
+                                    break;
+                                }
+                            }
+                        }
 
                         // type
                         {
@@ -440,15 +455,6 @@ namespace CompWolf.Docs.Server.Data
                             if (isSpecialization)
                             {
                                 continue;
-                            }
-                        }
-                        //declarationAfterColon
-                        {
-                            var colonIndex = processedDeclaration.IndexOf(':');
-                            if (colonIndex >= 0 && processedDeclaration[colonIndex + 1] != ':')
-                            {
-                                declarationAfterColon = processedDeclaration[(colonIndex + 1)..];
-                                entityDeclaration = entityDeclaration[..].TrimEnd();
                             }
                         }
                     }
