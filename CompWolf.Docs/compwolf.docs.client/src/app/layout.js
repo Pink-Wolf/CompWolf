@@ -3,7 +3,7 @@ import Link from "next/link"
 import { getOverview } from "@/lib/api/getEntity"
 import MenuTree from "@/lib/MenuTree"
 import { Reference } from "@/lib/CodeComponents"
-import betterEncodeURIComponent, { decodeStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsPath, decodeStaticParamsEncoder } from "@/lib/betterEncodeURIComponent"
 
 export const dynamic = 'force-static'
 
@@ -22,7 +22,7 @@ async function HeaderMenu() {
                     name: header.name,
                     items: header.entities.map(entity => {
                         return {
-                            name: betterEncodeURIComponent(entity.name),
+                            name: generateStaticParamsPath(entity.name),
                         }
                     }),
                 }

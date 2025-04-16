@@ -1,4 +1,4 @@
-import betterEncodeURIComponent from "@/lib/betterEncodeURIComponent"
+import { generateStaticParamsPath } from "@/lib/betterEncodeURIComponent"
 
 const DATABASE_URL = `https://127.0.0.1:7112/`
 const EXAMPLE_URL = `${DATABASE_URL}examples/`
@@ -111,7 +111,7 @@ export async function getPathTo(name) {
 
     let memberSplitterIndex = name.indexOf("::")
     let isMember = memberSplitterIndex >= 0
-    let memberName = !isMember ? "" : name.substring(memberSplitterIndex + 2, name.length).split("::").map(x => betterEncodeURIComponent(x)).join("/")
+    let memberName = !isMember ? "" : name.substring(memberSplitterIndex + 2, name.length).split("::").map(x => generateStaticParamsPath(x)).join("/")
     if (isMember) {
         name = name.substring(0, memberSplitterIndex)
     }
@@ -122,7 +122,7 @@ export async function getPathTo(name) {
         project.headers?.find(header => {
             if (header.name === name) path = `/api/${project.name}/${header.name}/`
             header.entities?.find(entity => {
-                if (entity.name === name) path = `/api/${project.name}/${header.name}/${betterEncodeURIComponent(entity.name)}/${memberName}`
+                if (entity.name === name) path = `/api/${project.name}/${header.name}/${generateStaticParamsPath(entity.name)}/${memberName}`
 
                 return (path !== undefined)
             })
@@ -155,7 +155,7 @@ export function getPathToObject(target) {
 
     pathArray.push(target.name)
 
-    return '/' + pathArray.map(betterEncodeURIComponent).join('/')
+    return '/' + pathArray.map(generateStaticParamsPath).join('/')
 }
 export function getFullNameOfObject(target) {
     if (target.project === target) return target.name

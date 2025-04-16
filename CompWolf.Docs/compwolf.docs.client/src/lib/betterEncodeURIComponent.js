@@ -14,6 +14,12 @@ function encodeURIWhenAutoEncoded(str) {
     )
 }
 
+export function generateStaticParamsPath(str) {
+    return (process.env.GENERATE_STATIC_PARAMS_AUTO_ENCODES === "1")
+        ? betterEncodeURIComponent(betterEncodeURIComponent(str))
+        : betterEncodeURIComponent(str)
+}
+
 export function generateStaticParamsEncoder(str) {
     return betterEncodeURIComponent(str)
 }
