@@ -379,7 +379,9 @@ namespace CompWolf.Docs.Server.Data
                                     if (declEnding.Contains("final") || declEnding.Contains("override"))
                                         continue; // Do not include overrides
 
-                                    processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, parameterEnd)];
+                                    processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, parameterEnd)].TrimEnd();
+                                    if (processedDeclaration.EndsWith("noexcept")) // paranthesis were parameterized noexcept
+                                        processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, processedDeclaration.LastIndexOf(')'))].TrimEnd();
                                 }
 
                                 entityName = processedDeclaration;
