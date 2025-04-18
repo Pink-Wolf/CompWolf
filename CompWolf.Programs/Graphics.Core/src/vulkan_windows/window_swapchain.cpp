@@ -197,17 +197,23 @@ namespace compwolf::vulkan
 			}
 		}
 
-		to_next_frame();
+		vulkan_gpu_fence fence(gpu());
+		vulkan_gpu_semaphore semaphore;
+		to_next_frame(semaphore, fence);
+		fence.wait();
 	}
 
-	void window_swapchain::to_next_frame()
+	void window_swapchain::to_next_frame(vulkan_gpu_semaphore& semaphore, vulkan_gpu_fence& fence)
 	{
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 		auto swapchain = to_vulkan(vulkan_swapchain());
 
 		uint32_t index;
-		vulkan_gpu_fence fence(gpu());
-		auto result = vkAcquireNextImageKHR(logicDevice, swapchain, UINT64_MAX, VK_NULL_HANDLE, to_vulkan(fence.vulkan_fence()), &index);
+		auto result = vkAcquireNextImageKHR(logicDevice, swapchain, UINT64_MAX,
+			semaphore ? to_vulkan(semaphore.vulkan_semaphore()) : VK_NULL_HANDLE,
+			fence ? to_vulkan(fence.vulkan_fence()) : VK_NULL_HANDLE,
+			&index
+		);
 
 		switch (result)
 		{
@@ -222,8 +228,5 @@ namespace compwolf::vulkan
 		}
 
 		_current_frame_index = static_cast<std::size_t>(index);
-
-		fence.wait();
-		current_frame().draw_manager().wait();
 	}
 }

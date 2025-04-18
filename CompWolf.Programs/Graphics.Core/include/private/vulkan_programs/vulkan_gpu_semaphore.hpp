@@ -14,12 +14,6 @@ namespace compwolf::vulkan
 		/* The vulkan_gpu_semaphore, representing a VkSemaphore. */
 		unique_deleter_ptr<vulkan_handle::semaphore_t> _vulkan_semaphore;
 
-		/** Returns whether this is valid, that is one not constructed by the default constructor. */
-		operator bool() const noexcept
-		{
-			return !!_vulkan_semaphore;
-		}
-
 	public: // accessors
 		/** Returns the gpu that the semaphore is on.
 		 * @customoverload
@@ -27,6 +21,12 @@ namespace compwolf::vulkan
 		auto gpu() noexcept -> vulkan_gpu_connection& { return *_gpu; }
 		/** Returns the gpu that the semaphore is on. */
 		auto gpu() const noexcept -> const vulkan_gpu_connection& { return *_gpu; }
+
+		/** Returns whether this is valid, that is one not constructed by the default constructor. */
+		operator bool() const noexcept
+		{
+			return !!_vulkan_semaphore;
+		}
 
 	public: // vulkan-related
 		/* Returns the vulkan_gpu_semaphore, representing a VkSemaphore. */

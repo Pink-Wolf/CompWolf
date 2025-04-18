@@ -108,12 +108,7 @@ namespace compwolf::vulkan
 		auto queue = to_vulkan(thread.queue);
 
 		auto oldSemaphore = to_vulkan(manager().last_vulkan_semaphore());
-		auto& sync = manager().push_synchronization(gpu_program_sync
-			{
-				.semaphore = vulkan_gpu_semaphore(gpu_device),
-				.fence = vulkan_gpu_fence(gpu_device),
-			}
-			);
+		auto& sync = manager().new_synchronization();
 		auto fence = to_vulkan(sync.fence.vulkan_fence());
 		auto semaphore = to_vulkan(sync.semaphore.vulkan_semaphore());
 

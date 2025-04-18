@@ -2,7 +2,7 @@
 #include <vulkan_graphics_environments>
 #include <vulkan_windows>
 
-void debug_callback(std::string_view s)
+static void debug_callback(std::string_view s)
 {
 	std::cout << s;
 }
@@ -42,7 +42,7 @@ int main()
 						e.update();
 					}
 
-					std::cout << "Ending...\n";
+					std::cout << "\nEnding...\n";
 				}
 				std::cout << "destroying camera\n";
 			}

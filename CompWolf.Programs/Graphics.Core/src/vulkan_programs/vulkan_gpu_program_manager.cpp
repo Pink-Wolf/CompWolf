@@ -70,7 +70,7 @@ namespace compwolf::vulkan
 		std::size_t best_gpu_index = 0;
 		std::size_t best_family_index = 0;
 		float best_score = std::numeric_limits<float>::lowest();
-		float best_custom_score;
+		float best_custom_score = std::numeric_limits<float>::lowest();
 
 		for (auto& gpu : gpus)
 		{
@@ -110,6 +110,7 @@ namespace compwolf::vulkan
 		: _gpu(&gpu_in)
 		, _family_index(family_index_in)
 		, _thread_index(thread_index_in)
+		, _syncs_count(0)
 	{
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 
@@ -168,9 +169,20 @@ namespace compwolf::vulkan
 		auto i = find_family(settings, gpus);
 		if (!i) throw std::runtime_error("The machine's GPUs could not perform a job because of the type of work it requires.");
 
-		auto [gpu_index, family_index] = i.value();
+		auto& [gpu_index, family_index] = i.value();
 		auto& gpu = gpus[gpu_index];
 		auto thread_index = find_thread(gpu.thread_families()[family_index]);
 		return vulkan_gpu_program_manager(gpu, family_index, thread_index);
+	}
+
+	/******************************** modifiers ********************************/
+	auto vulkan_gpu_program_manager::new_synchronization(bool signaled) noexcept -> gpu_program_sync&
+	{
+		++_syncs_count;
+		if (_syncs_count > _syncs.size())
+			_syncs.emplace_back(vulkan_gpu_semaphore(gpu()), vulkan_gpu_fence(gpu(), signaled));
+		else
+			latest_synchronization()->fence.reset(); // note semaphore does not need to be reset to be re-used
+		return *latest_synchronization();
 	}
 }

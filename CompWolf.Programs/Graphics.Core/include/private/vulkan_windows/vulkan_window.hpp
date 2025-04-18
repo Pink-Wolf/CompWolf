@@ -22,6 +22,8 @@ namespace compwolf::vulkan
 
 		event<const window_draw_parameters&> _drawing;
 
+		gpu_program_sync _temp_sync;
+
 	public: // vulkan-related
 		/** Returns the surface's [[vulkan_handle::glfw_window]], representing a GLFWwindow-pointer. */
 		auto glfw_window() const noexcept -> const vulkan_handle::glfw_window { return _glfw_window.get(); }
@@ -57,6 +59,11 @@ namespace compwolf::vulkan
 		{
 			this->~vulkan_window();
 			return *new(this)vulkan_window(std::move(other));
+		}
+
+		~vulkan_window()
+		{
+			int test = 3;
 		}
 
 	private:

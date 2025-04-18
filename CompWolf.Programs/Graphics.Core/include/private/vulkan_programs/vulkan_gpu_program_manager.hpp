@@ -53,6 +53,7 @@ namespace compwolf::vulkan
 
 		unique_deleter_ptr<vulkan_handle::command_pool_t> _pool;
 		std::vector<gpu_program_sync> _syncs;
+		std::size_t _syncs_count;
 
 		destruct_event<> _destructing;
 
@@ -77,17 +78,34 @@ namespace compwolf::vulkan
 		/** Returns the index of the gpu-thread in the gpu-thread-family's threads-vector. */
 		auto thread_index() const noexcept -> std::size_t { return _thread_index; }
 
+		/** Returns whether there are currently any synchronization-data. */
+		auto has_sync() const noexcept -> bool
+		{
+			return _syncs_count > 0;
+		}
+
 		/** Returns a pointer to the manager's latest synchronization-data.
 		 * Waiting on the data's fence waits for all of the manager's programs to finish.
 		 * Returns nullptr if there are no synchronization data.
 		 */
 		auto latest_synchronization() const noexcept -> const gpu_program_sync*
-			{ return _syncs.empty() ? nullptr : &_syncs.back(); }
+		{
+			return has_sync() ? &_syncs[_syncs_count - 1] : nullptr;
+		}
+		/** Returns a pointer to the manager's latest synchronization-data.
+		 * Waiting on the data's fence waits for all of the manager's programs to finish.
+		 * Returns nullptr if there are no synchronization data.
+		 * @customoverload
+		 */
+		auto latest_synchronization() noexcept -> gpu_program_sync*
+		{
+			return has_sync() ? &_syncs[_syncs_count - 1] : nullptr;
+		}
 
 		/** Returns whether any of the programs are still running. */
 		auto working() const noexcept -> bool
 		{
-			return latest_synchronization() ? !latest_synchronization()->fence.completed() : false;
+			return has_sync() ? !latest_synchronization()->fence.completed() : false;
 		}
 
 		/** Returns an event that is invoked right before the manager is destructed. */
@@ -95,28 +113,18 @@ namespace compwolf::vulkan
 		{ return _destructing; }
 
 	public: // modifiers
-		/** Waits until all of the programs are done, and then returns.
-		 * @customoverload
-		 */
+		/** Waits until all of the programs are done, and then returns. */
 		void wait() const noexcept
 		{
-			if (latest_synchronization()) latest_synchronization()->fence.wait();
-		}
-		/** Waits until all of the programs are done, and then returns. */
-		void wait() noexcept
-		{
-			if (latest_synchronization()) latest_synchronization()->fence.wait();
-			_syncs.clear();
+			if (has_sync()) latest_synchronization()->fence.wait();
 		}
 
 		/** Replaces the manager's latest synchronization-data;
-		 * the new data should denote when all of the manager's programs are done.
-		 * @return the given synchronization-data.
+		 * the new data should be set to denote when all of the manager's programs are done.
+		 * @param signaled If true, then the sync denotes that the work has already been completed.
+		 * @return the new synchronization-data.
 		 */
-		auto push_synchronization(gpu_program_sync&& s) noexcept -> gpu_program_sync&
-		{
-			return _syncs.emplace_back(std::move(s));
-		}
+		auto new_synchronization(bool signaled = false) noexcept -> gpu_program_sync&;
 
 	public: // vulkan-related
 		/** Returns the manager's vulkan_command_pool, representing a VkCommandPool. */
@@ -127,8 +135,7 @@ namespace compwolf::vulkan
 		 */
 		auto last_vulkan_fence() const noexcept -> vulkan_handle::fence
 		{
-			if (_syncs.empty()) return nullptr;
-			return _syncs.back().fence.vulkan_fence();
+			return has_sync() ? latest_synchronization()->fence.vulkan_fence() : nullptr;
 		}
 
 		/** Returns the latest synchronization-object's vulkan_gpu_semaphore, representing a VkSemaphore.
@@ -136,8 +143,7 @@ namespace compwolf::vulkan
 		 */
 		auto last_vulkan_semaphore() const noexcept -> vulkan_handle::semaphore
 		{
-			if (_syncs.empty()) return nullptr;
-			return _syncs.back().semaphore.vulkan_semaphore();
+			return has_sync() ? latest_synchronization()->semaphore.vulkan_semaphore() : nullptr;
 		}
 
 	public: // constructors

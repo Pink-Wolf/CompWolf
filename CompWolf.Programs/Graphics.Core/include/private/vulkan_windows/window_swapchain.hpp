@@ -64,8 +64,11 @@ namespace compwolf::vulkan
 		}
 
 	public: // modifiers
-		/** Makes the window display the current frame, and makes a new frame the current one. */
-		void to_next_frame();
+		/** Makes the window display the current frame, and makes a new frame the current one.
+		 * @param semaphore A semaphore that tells when the frame has been acquired.
+		 * @param fence A fence that tells when the frame has been acquired.
+		 */
+		void to_next_frame(vulkan_gpu_semaphore& semaphore, vulkan_gpu_fence& fence);
 
 	public: // vulkan-related
 		/** Returns the swapchain's vulkan_swapchain, representing a VkSwapchainKHR. */
