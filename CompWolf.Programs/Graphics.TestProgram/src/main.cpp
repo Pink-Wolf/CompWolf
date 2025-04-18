@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vulkan_graphics_environments>
 #include <vulkan_windows>
+#include <chrono>
 
 static void debug_callback(std::string_view s)
 {
@@ -36,10 +37,27 @@ int main()
 						}
 					);
 
+					std::chrono::high_resolution_clock clock;
+					auto start_time = clock.now();
+					int frame_count = 0;
+					int frames_per_report = 60;
+
 					while (w.running())
 					{
 						w.update_image();
 						e.update();
+
+						++frame_count;
+						if (frame_count >= frames_per_report) [[unlikely]]
+						{
+							auto elapsed_time = std::chrono::duration<double>(clock.now() - start_time).count();
+							auto framerate = frame_count / elapsed_time;
+							std::cout << "framerate: " << framerate << std::endl;
+
+							frames_per_report = std::ceil(framerate);
+							frame_count = 0;
+							start_time = clock.now();
+						}
 					}
 
 					std::cout << "\nEnding...\n";
