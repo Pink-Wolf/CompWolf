@@ -10,9 +10,9 @@ namespace compwolf::vulkan
 	class vulkan_gpu_semaphore
 	{
 	private: // fields
-		vulkan_gpu_connection* _gpu;
+		vulkan_gpu_connection* _gpu{};
 		/* The vulkan_gpu_semaphore, representing a VkSemaphore. */
-		unique_deleter_ptr<vulkan_handle::semaphore_t> _vulkan_semaphore;
+		unique_deleter_ptr<vulkan_handle::semaphore_t> _vulkan_semaphore{};
 
 	public: // accessors
 		/** Returns the gpu that the semaphore is on.

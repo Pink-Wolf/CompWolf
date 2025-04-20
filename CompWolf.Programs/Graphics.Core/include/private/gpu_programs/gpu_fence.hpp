@@ -21,7 +21,7 @@ namespace compwolf
 		using environment_type = GraphicsEnvironmentType;
 
 	private:
-		environment_type::gpu_type* _gpu;
+		environment_type::gpu_type* _gpu{};
 
 	public: // accessors
 		/** Returns the gpu that the fence is on.

@@ -16,11 +16,11 @@ namespace compwolf::vulkan
 	class window_surface
 	{
 	private: // fields
-		vulkan_gpu_connection* _gpu;
+		vulkan_gpu_connection* _gpu{};
 
-		unique_deleter_ptr<vulkan_handle::surface_t> _vulkan_surface;
-		unique_deleter_ptr<vulkan_handle::surface_format_info_t> _format;
-		unique_deleter_ptr<vulkan_handle::render_pass_t> _render_pass;
+		unique_deleter_ptr<vulkan_handle::surface_t> _vulkan_surface{};
+		unique_deleter_ptr<vulkan_handle::surface_format_info_t> _format{};
+		unique_deleter_ptr<vulkan_handle::render_pass_t> _render_pass{};
 
 	public: // accessors
 		/** Returns the gpu that the window is on.

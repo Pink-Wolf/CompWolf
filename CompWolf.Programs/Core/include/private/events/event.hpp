@@ -26,7 +26,7 @@ namespace compwolf
 		using internal_key_type = std::vector<value_type>::size_type;
 	private:
 		const event_type* _event = nullptr;
-		internal_key_type _internal_key;
+		internal_key_type _internal_key{};
 
 	public: // accessors
 		constexpr auto internal_key() const noexcept -> internal_key_type { return _internal_key; }
@@ -69,7 +69,7 @@ namespace compwolf
 		using internal_key_type = std::vector<value_type>::size_type;
 	private:
 		const event_type* _event = nullptr;
-		internal_key_type _internal_key;
+		internal_key_type _internal_key{};
 
 	public: // accessors
 		constexpr auto internal_key() const noexcept -> internal_key_type { return _internal_key; }

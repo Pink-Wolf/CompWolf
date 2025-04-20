@@ -24,13 +24,13 @@ namespace compwolf
 		using environment_type = GraphicsEnvironmentType;
 
 	private:
-		environment_type::gpu_type* _gpu;
+		environment_type::gpu_type* _gpu{};
 
-		bool _running;
-		event<> _closing;
+		bool _running{};
+		event<> _closing{};
 
-		listenable<int2> _pixel_size;
-		event<void> _image_updating;
+		listenable<int2> _pixel_size{};
+		event<void> _image_updating{};
 
 	public: // accessors
 		/** Returns the gpu that the window is on.

@@ -55,7 +55,7 @@ namespace compwolf::vulkan
 		 */
 		vulkan_window() = default;
 		vulkan_window(vulkan_window&&) = default;
-		auto operator=(vulkan_window&& other) -> vulkan_window&
+		auto operator=(vulkan_window&& other) noexcept -> vulkan_window&
 		{
 			this->~vulkan_window();
 			return *new(this)vulkan_window(std::move(other));

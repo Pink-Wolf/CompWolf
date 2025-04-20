@@ -37,7 +37,7 @@ int main()
 						}
 					);
 
-					std::chrono::high_resolution_clock clock;
+					auto clock = std::chrono::high_resolution_clock();
 					auto start_time = clock.now();
 					int frame_count = 0;
 					int frames_per_report = 60;

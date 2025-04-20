@@ -41,14 +41,14 @@ namespace compwolf
 		using window_type = WindowType;
 
 	private:
-		window_type* _window;
+		window_type* _window{};
 
-		float _left, _right, _top, _bottom;
+		float _left{}, _right{}, _top{}, _bottom{};
 
 		/** The color the camera displays where there is nothing */
-		float3 _background_color;
+		float3 _background_color{};
 
-		event_key<> _window_destructing_key;
+		event_key<> _window_destructing_key{};
 
 	public: // accessors
 		/** The [[window]] that this image is on. */

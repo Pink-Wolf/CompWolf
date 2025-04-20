@@ -31,10 +31,10 @@ namespace compwolf::vulkan
 	class window_swapchain
 	{
 	private: // fields
-		vulkan_gpu_connection* _gpu;
-		unique_deleter_ptr<vulkan_handle::swapchain_t> _vulkan_swapchain;
-		std::vector<swapchain_frame> _frames;
-		std::size_t _current_frame_index;
+		vulkan_gpu_connection* _gpu{};
+		unique_deleter_ptr<vulkan_handle::swapchain_t> _vulkan_swapchain{};
+		std::vector<swapchain_frame> _frames{};
+		std::size_t _current_frame_index{};
 
 	public: // accessors
 		/** Returns the gpu that the window is on.
