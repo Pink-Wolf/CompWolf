@@ -38,7 +38,11 @@ namespace compwolf::vulkan
 						case VK_SUCCESS:
 						case VK_INCOMPLETE:
 							break;
-						default: throw std::runtime_error("Could not get the machine's graphics card");
+						default:
+							const char* message;
+							GET_VULKAN_ERROR_STRING(result, message,
+								"Could not get the machine's graphics card: ")
+								throw std::runtime_error(message);
 						}
 					}
 				);

@@ -15,7 +15,7 @@ namespace compwolf::vulkan
 		new(&_drawing_key)event_key(window().drawing().subscribe(
 			[this](const window_draw_parameters& draw_args)
 			{
-				if (_draw_programs.empty()) _draw_programs.resize(draw_args.target_frame_index);
+				if (_draw_programs.empty()) _draw_programs.resize(window().swapchain().frames().size());
 				auto& current_program = _draw_programs[draw_args.target_frame_index];
 
 				if (!current_program)

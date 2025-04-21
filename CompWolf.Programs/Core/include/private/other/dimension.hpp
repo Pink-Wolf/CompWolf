@@ -84,104 +84,50 @@ namespace compwolf
 			return true;
 		}
 	public:
-		/** @hidden */
-#define COMPWOLF_DIMENSIONS_DEFINE_GETTER(getter, index)		\
-		constexpr auto& getter() noexcept						\
-			requires (has_element_at index)						\
-		{														\
-			return at index;									\
-		}														\
-																\
-		constexpr auto& getter() const noexcept					\
-			requires (has_element_at index)						\
-		{														\
-			return at index;									\
-		}														\
+		/** Returns at(0). */
+		constexpr auto& x() noexcept requires (has_element_at({ 0 })) { return at({ 0 }); }
+		/** Returns at(1). */
+		constexpr auto& y() noexcept requires (has_element_at({ 1 })) { return at({ 1 }); }
+		/** Returns at(2). */
+		constexpr auto& z() noexcept requires (has_element_at({ 2 })) { return at({ 2 }); }
+		/** Returns at(3). */
+		constexpr auto& w() noexcept requires (has_element_at({ 3 })) { return at({ 3 }); }
 
-		/** Returns at(0).
-		 * @customcode constexpr auto& x() noexcept requires (has_element_at(0)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(x, ({ 0 }));
-		/** Returns at(1).
-		 * @customcode constexpr auto& y() noexcept requires (has_element_at(1)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(y, ({ 1 }));
-		/** Returns at(2).
-		 * @customcode constexpr auto& z() noexcept requires (has_element_at(2)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(z, ({ 2 }));
-		/** Returns at(3).
-		 * @customcode constexpr auto& w() noexcept requires (has_element_at(3)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(w, ({ 3 }));
+		/** Returns at(0, 0). */
+		constexpr auto& xx() noexcept requires (has_element_at({ 0, 0 })) { return at({ 0, 0 }); }
+		/** Returns at(0, 1). */
+		constexpr auto& xy() noexcept requires (has_element_at({ 0, 1 })) { return at({ 0, 1 }); }
+		/** Returns at(0, 2). */
+		constexpr auto& xz() noexcept requires (has_element_at({ 0, 2 })) { return at({ 0, 2 }); }
+		/** Returns at(0, 3). */
+		constexpr auto& xw() noexcept requires (has_element_at({ 0, 3 })) { return at({ 0, 3 }); }
 
-		/** Returns at(0, 0).
-		 * @customcode constexpr auto& xx() noexcept requires (has_element_at(0, 0)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(xx, ({ 0, 0 }));
-		/** Returns at(0, 1).
-		 * @customcode constexpr auto& xy() noexcept requires (has_element_at(0, 1)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(xy, ({ 0, 1 }));
-		/** Returns at(0, 2).
-		 * @customcode constexpr auto& xz() noexcept requires (has_element_at(0, 2)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(xz, ({ 0, 2 }));
-		/** Returns at(0, 3).
-		 * @customcode constexpr auto& xw() noexcept requires (has_element_at(0, 3)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(xw, ({ 0, 3 }));
+		/** Returns at(1, 0). */
+		constexpr auto& yx() noexcept requires (has_element_at({ 1, 0 })) { return at({ 1, 0 }); }
+		/** Returns at(1, 1). */
+		constexpr auto& yy() noexcept requires (has_element_at({ 1, 1 })) { return at({ 1, 1 }); }
+		/** Returns at(1, 2). */
+		constexpr auto& yz() noexcept requires (has_element_at({ 1, 2 })) { return at({ 1, 2 }); }
+		/** Returns at(1, 3). */
+		constexpr auto& yw() noexcept requires (has_element_at({ 1, 3 })) { return at({ 1, 3 }); }
 
-		/** Returns at(1, 0).
-		 * @customcode constexpr auto& yx() noexcept requires (has_element_at(1, 0)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(yx, ({ 1, 0 }));
-		/** Returns at(1, 1).
-		 * @customcode constexpr auto& yy() noexcept requires (has_element_at(1, 1)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(yy, ({ 1, 1 }));
-		/** Returns at(1, 2).
-		 * @customcode constexpr auto& yz() noexcept requires (has_element_at(1, 2)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(yz, ({ 1, 2 }));
-		/** Returns at(1, 3).
-		 * @customcode constexpr auto& yw() noexcept requires (has_element_at(1, 3)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(yw, ({ 1, 3 }));
+		/** Returns at(2, 0). */
+		constexpr auto& zx() noexcept requires (has_element_at({ 2, 0 })) { return at({ 2, 0 }); }
+		/** Returns at(2, 1). */
+		constexpr auto& zy() noexcept requires (has_element_at({ 2, 1 })) { return at({ 2, 1 }); }
+		/** Returns at(2, 2). */
+		constexpr auto& zz() noexcept requires (has_element_at({ 2, 2 })) { return at({ 2, 2 }); }
+		/** Returns at(2, 3). */
+		constexpr auto& zw() noexcept requires (has_element_at({ 2, 3 })) { return at({ 2, 3 }); }
 
-		/** Returns at(2, 0).
-		 * @customcode constexpr auto& zx() noexcept requires (has_element_at(2, 0)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(zx, ({ 2, 0 }));
-		/** Returns at(2, 1).
-		 * @customcode constexpr auto& zy() noexcept requires (has_element_at(2, 1)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(zy, ({ 2, 1 }));
-		/** Returns at(2, 2).
-		 * @customcode constexpr auto& zz() noexcept requires (has_element_at(2, 2)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(zz, ({ 2, 2 }));
-		/** Returns at(2, 3).
-		 * @customcode constexpr auto& zw() noexcept requires (has_element_at(2, 3)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(zw, ({ 2, 3 }));
-
-		/** Returns at(3, 0).
-		 * @customcode constexpr auto& wx() noexcept requires (has_element_at(3, 0)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(wx, ({ 3, 0 }));
-		/** Returns at(3, 1).
-		 * @customcode constexpr auto& wy() noexcept requires (has_element_at(3, 1)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(wy, ({ 3, 1 }));
-		/** Returns at(3, 2).
-		 * @customcode constexpr auto& wz() noexcept requires (has_element_at(3, 2)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(wz, ({ 3, 2 }));
-		/** Returns at(3, 3).
-		 * @customcode constexpr auto& ww() noexcept requires (has_element_at(3, 3)) {};
-		 */
-		COMPWOLF_DIMENSIONS_DEFINE_GETTER(ww, ({ 3, 3 }));
+		/** Returns at(3, 0). */
+		constexpr auto& wx() noexcept requires (has_element_at({ 3, 0 })) { return at({ 3, 0 }); }
+		/** Returns at(3, 1). */
+		constexpr auto& wy() noexcept requires (has_element_at({ 3, 1 })) { return at({ 3, 1 }); }
+		/** Returns at(3, 2). */
+		constexpr auto& wz() noexcept requires (has_element_at({ 3, 2 })) { return at({ 3, 2 }); }
+		/** Returns at(3, 3). */
+		constexpr auto& ww() noexcept requires (has_element_at({ 3, 3 })) { return at({ 3, 3 }); }
 	};
 
 #define COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(type)	\
@@ -198,8 +144,18 @@ namespace compwolf
 	using type##4x3 = dimensional_array<type, 4, 3>;	\
 	using type##4x4 = dimensional_array<type, 4, 4>		\
 
-	/** @hidden */
-	COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(float);
+	using float2 = dimensional_array<float, 2>;
+	using float3 = dimensional_array<float, 3>;
+	using float4 = dimensional_array<float, 4>;
+	using float2x2 = dimensional_array<float, 2, 2>;
+	using float2x3 = dimensional_array<float, 2, 3>;
+	using float2x4 = dimensional_array<float, 2, 4>;
+	using float3x2 = dimensional_array<float, 3, 2>;
+	using float3x3 = dimensional_array<float, 3, 3>;
+	using float3x4 = dimensional_array<float, 3, 4>;
+	using float4x2 = dimensional_array<float, 4, 2>;
+	using float4x3 = dimensional_array<float, 4, 3>;
+	using float4x4 = dimensional_array<float, 4, 4>;
 	/** @hidden */
 	COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(double);
 	/** @hidden */

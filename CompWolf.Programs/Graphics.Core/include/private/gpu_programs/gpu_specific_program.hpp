@@ -23,7 +23,7 @@ namespace compwolf
 		using fence_type = FenceType;
 
 	private:
-		environment_type::gpu_type* _gpu;
+		environment_type::gpu_type* _gpu{};
 
 	public: // accessors
 		/** Returns the gpu that the program is on.

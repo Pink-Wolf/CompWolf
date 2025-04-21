@@ -20,9 +20,9 @@ namespace compwolf::vulkan
 	class vulkan_gpu_program : public gpu_specific_program<vulkan_graphics_environment, vulkan_gpu_fence>
 	{
 	private:
-		vulkan_gpu_program_manager* _manager;
-		unique_deleter_ptr<vulkan_handle::command_t> _vulkan_command;
-		event_key<> _manager_destructing_key;
+		vulkan_gpu_program_manager* _manager{};
+		unique_deleter_ptr<vulkan_handle::command_t> _vulkan_command{};
+		event_key<> _manager_destructing_key{};
 
 	public: // accessors
 		/** Returns the manager that the program is on. */
