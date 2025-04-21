@@ -36,6 +36,8 @@ namespace compwolf::vulkan
 		std::vector<swapchain_frame> _frames{};
 		std::size_t _current_frame_index{};
 
+		gpu_program_sync _temp_sync;
+
 	public: // accessors
 		/** Returns the gpu that the window is on.
 		 * @customoverload
@@ -64,11 +66,8 @@ namespace compwolf::vulkan
 		}
 
 	public: // modifiers
-		/** Makes the window display the current frame, and makes a new frame the current one.
-		 * @param semaphore A semaphore that tells when the frame has been acquired.
-		 * @param fence A fence that tells when the frame has been acquired.
-		 */
-		void to_next_frame(vulkan_gpu_semaphore& semaphore, vulkan_gpu_fence& fence);
+		/** Makes the window display the current frame, and makes a new frame the current one. */
+		void to_next_frame();
 
 	public: // vulkan-related
 		/** Returns the swapchain's vulkan_swapchain, representing a VkSwapchainKHR. */

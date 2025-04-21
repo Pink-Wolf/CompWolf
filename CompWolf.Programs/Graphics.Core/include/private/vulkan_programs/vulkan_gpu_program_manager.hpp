@@ -116,7 +116,20 @@ namespace compwolf::vulkan
 		/** Waits until all of the programs are done, and then returns. */
 		void wait() const noexcept
 		{
-			if (has_sync()) latest_synchronization()->fence.wait();
+			for (std::size_t i = 0; i < _syncs_count; ++i)
+				_syncs[i].fence.wait();
+		}
+
+		/** Erases all elements from the container. */
+		void clear_syncs()
+		{
+			wait();
+			clear_syncs_unsafe();
+		}
+		/** Erases all elements from the container, without waiting for them to actually be finished. */
+		void clear_syncs_unsafe()
+		{
+			_syncs_count = 0;
 		}
 
 		/** Replaces the manager's latest synchronization-data;

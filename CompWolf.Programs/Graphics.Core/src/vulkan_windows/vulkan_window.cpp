@@ -84,12 +84,6 @@ namespace compwolf::vulkan
 		gpu = &_surface.gpu();
 		set_gpu(gpu);
 
-		_temp_sync = gpu_program_sync
-		{
-			.semaphore = vulkan_gpu_semaphore(*gpu),
-			.fence = vulkan_gpu_fence(*gpu, true),
-		};
-
 		_swapchain = window_swapchain(settings, glfw_window(), _surface);
 	}
 
@@ -127,16 +121,6 @@ namespace compwolf::vulkan
 			vkQueuePresentKHR(to_vulkan(thread.queue), &presentInfo);
 		}
 
-		{
-			// Use _temp_sync as we do not yet know what frame is next
-			_temp_sync.fence.reset();
-			swapchain().to_next_frame(_temp_sync.semaphore, _temp_sync.fence);
-
-			// Move _temp_sync into correct position
-			auto& draw_manager = swapchain().current_frame().draw_manager();
-			draw_manager.wait(); // At least wait until the old image has been drawn
-			auto& sync = draw_manager.new_synchronization(true);
-			std::swap(sync, _temp_sync);
-		}
+		swapchain().to_next_frame();
 	}
 }

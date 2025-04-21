@@ -182,7 +182,7 @@ namespace compwolf::vulkan
 		if (_syncs_count > _syncs.size())
 			_syncs.emplace_back(vulkan_gpu_semaphore(gpu()), vulkan_gpu_fence(gpu(), signaled));
 		else
-			latest_synchronization()->fence.reset(); // note semaphore does not need to be reset to be re-used
+			if (!signaled) latest_synchronization()->fence.reset(); // note semaphore does not need to be reset to be re-used
 		return *latest_synchronization();
 	}
 }
