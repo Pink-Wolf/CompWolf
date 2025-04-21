@@ -18,6 +18,7 @@ set(TESTS
     "tests/event.cpp"
     "tests/listenable.cpp"
     "tests/dimension.cpp"
+    "tests/type_list.cpp"
 )
 
 

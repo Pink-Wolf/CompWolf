@@ -5,3 +5,5 @@
 
 #include "private/compwolf_type_traits/explicitly_convertible_to.hpp"
 #include "private/compwolf_type_traits/dereferenceable_to.hpp"
+#include "private/compwolf_type_traits/size_of.hpp"
+#include "private/compwolf_type_traits/dependent_bool.hpp"
