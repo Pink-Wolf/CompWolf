@@ -130,6 +130,7 @@ namespace compwolf
 		constexpr auto& ww() noexcept requires (has_element_at({ 3, 3 })) { return at({ 3, 3 }); }
 	};
 
+	/** Defines various [[dimensional_array]] for the given type, up to 4x4. */
 #define COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(type)	\
 	using type##2 = dimensional_array<type, 2>;			\
 	using type##3 = dimensional_array<type, 3>;			\
@@ -144,18 +145,8 @@ namespace compwolf
 	using type##4x3 = dimensional_array<type, 4, 3>;	\
 	using type##4x4 = dimensional_array<type, 4, 4>		\
 
-	using float2 = dimensional_array<float, 2>;
-	using float3 = dimensional_array<float, 3>;
-	using float4 = dimensional_array<float, 4>;
-	using float2x2 = dimensional_array<float, 2, 2>;
-	using float2x3 = dimensional_array<float, 2, 3>;
-	using float2x4 = dimensional_array<float, 2, 4>;
-	using float3x2 = dimensional_array<float, 3, 2>;
-	using float3x3 = dimensional_array<float, 3, 3>;
-	using float3x4 = dimensional_array<float, 3, 4>;
-	using float4x2 = dimensional_array<float, 4, 2>;
-	using float4x3 = dimensional_array<float, 4, 3>;
-	using float4x4 = dimensional_array<float, 4, 4>;
+	/** @hidden */
+	COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(float);
 	/** @hidden */
 	COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(double);
 	/** @hidden */

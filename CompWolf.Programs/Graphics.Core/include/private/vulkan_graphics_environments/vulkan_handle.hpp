@@ -145,6 +145,29 @@ namespace compwolf::vulkan
 		struct sampler_t;
 		/** Represents a VkSampler-pointer */
 		using sampler = sampler_t*;
+
+
+		/** Dereference type of [[vulkan_handle::memory]]
+		 * @see vulkan_handle::memory
+		 * @hidden
+		 */
+		struct memory_t;
+		/** Represents a VkDeviceMemory-pointer */
+		using memory = memory_t*;
+		/** Dereference type of [[vulkan_handle::buffer]]
+		 * @see vulkan_handle::buffer
+		 * @hidden
+		 */
+		struct buffer_t;
+		/** Represents a VkBuffer-pointer */
+		using buffer = buffer_t*;
+		/** Dereference type of [[vulkan_handle::image]]
+		 * @see vulkan_handle::image
+		 * @hidden
+		 */
+		struct image_t;
+		/** Represents a VkImage-pointer */
+		using image = image_t*;
 	};
 }
 

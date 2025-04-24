@@ -8,16 +8,16 @@ namespace compwolf
 	/** Boundary class allowing the cpu to wait for the gpu to finish some work.
 	 * 
 	 * This class is abstract; a derived type should generally implement/override:
-	 * * [[window::completed]]
-	 * * [[window::wait]]
+	 * * [[gpu_fence::completed]]
+	 * * [[gpu_fence::wait]]
 	 * 
-	 * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this window works with.
+	 * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this fence works with.
 	 */
 	template <typename GraphicsEnvironmentType>
 	class gpu_fence
 	{
 	public:
-		/** The type of [[graphics_environment]] that this window works with. */
+		/** The type of [[graphics_environment]] that this fence works with. */
 		using environment_type = GraphicsEnvironmentType;
 
 	private:

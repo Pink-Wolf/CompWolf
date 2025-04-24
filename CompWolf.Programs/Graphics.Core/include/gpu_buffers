@@ -1,0 +1,4 @@
+// Contains [[gpu_buffer]], which represents some memory on the gpu.
+
+#include "private/gpu_buffers/gpu_buffer.hpp"
+#include "private/gpu_buffers/gpu_buffer_data.hpp"

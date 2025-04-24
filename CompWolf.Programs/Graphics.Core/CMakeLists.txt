@@ -22,6 +22,7 @@ set(SOURCES
     "src/vulkan_windows/window_swapchain.cpp"
     "src/vulkan_windows/vulkan_camera.cpp"
     "src/vulkan_windows/vulkan_window.cpp"
+    "src/vulkan_gpu_buffers/vulkan_gpu_buffer_internal.cpp"
 )
 set(RESOURCES
     "resources/CompWolf.Graphics.simple_vertex_shader.vert"

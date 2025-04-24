@@ -1,4 +1,4 @@
-// Contains [[vulkan_graphics_environment]], a vulkan implementation of [[graphics_environments]].
+// Contains [[vulkan_graphics_environment]], a vulkan implementation of [[graphics_environment]].
 
 // Including this also includes [[graphics_environments]].
 #include "graphics_environments"

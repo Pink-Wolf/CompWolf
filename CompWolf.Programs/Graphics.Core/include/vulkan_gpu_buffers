@@ -1,0 +1,6 @@
+// Contains [[vulkan_gpu_buffer]], a vulkan implementation of [[gpu_buffer]].
+
+// Including this also includes [[gpu_buffers]].
+#include "gpu_buffers"
+
+#include "private/vulkan_gpu_buffers/vulkan_gpu_buffer.hpp"

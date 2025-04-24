@@ -29,7 +29,7 @@ namespace compwolf::vulkan
 		 */
 		vulkan_gpu_connection() noexcept = default;
 		vulkan_gpu_connection(vulkan_gpu_connection&&) = default;
-		auto operator=(vulkan_gpu_connection&&)->vulkan_gpu_connection & = default;
+		auto operator=(vulkan_gpu_connection&&) -> vulkan_gpu_connection& = default;
 
 		/** Should be called by [[vulkan_graphics_environment]].
 		 * Constructs a [[vulkan_gpu_connection]] representing the given [[vulkan_handle::physical_device]].

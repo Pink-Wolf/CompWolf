@@ -35,6 +35,10 @@ namespace compwolf::vulkan
 
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkImageView, vulkan_handle::image_view)
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSampler, vulkan_handle::sampler)
+		
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkDeviceMemory, vulkan_handle::memory)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkBuffer, vulkan_handle::buffer)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkImage, vulkan_handle::image)
 
 	inline uint32_t to_vulkan(version_number a) { return VK_MAKE_API_VERSION(0, a.major, a.minor, a.patch); }
 
