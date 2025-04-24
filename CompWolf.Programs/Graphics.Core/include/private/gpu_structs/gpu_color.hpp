@@ -91,6 +91,8 @@ namespace compwolf
 		 */
 		explicit constexpr color_element(float f) noexcept { set(f); }
 
+	public: // operators
+
 		static constexpr auto operator+(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) + static_cast<uint8_t>(rhs))); }
 		static constexpr auto operator-(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) - static_cast<uint8_t>(rhs))); }
 		static constexpr auto operator*(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) * static_cast<uint8_t>(rhs))); }
