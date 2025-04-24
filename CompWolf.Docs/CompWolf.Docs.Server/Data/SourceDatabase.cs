@@ -171,6 +171,7 @@ namespace CompWolf.Docs.Server.Data
                     List<string> customCodeLines = [];
                     related = [];
                     bool isOverload = false;
+                    bool isCustomOverload = false;
                     bool hasCustomCode = false;
                     if (entityComment.Length > 0)
                     {
@@ -211,6 +212,7 @@ namespace CompWolf.Docs.Server.Data
                                         break;
                                     case "customoverload":
                                         isOverload = true;
+                                        isCustomOverload = true;
                                         commentTarget = overloadCommentLines;
                                         break;
                                     case "overload":
@@ -253,7 +255,12 @@ namespace CompWolf.Docs.Server.Data
 
                     if (isOverload)
                     {
-                        if (overloadComment.Length == 0) overloadComment = mainComment;
+                        if (isCustomOverload is false)
+                        {
+                            if (overloadComment.Length > 0)
+                                throw new NotImplementedException(@"""@overload"" and ""@mainoverload"" must not be followed by any text");
+                            overloadComment = mainComment;
+                        }
                         mainComment = "";
                     }
 

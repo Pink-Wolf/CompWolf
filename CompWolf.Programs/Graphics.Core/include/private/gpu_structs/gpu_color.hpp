@@ -62,7 +62,9 @@ namespace compwolf
 		constexpr explicit operator uint8_t() const noexcept{ return _data; }
 
 	public: // constructors
-		/** Constructs a [[color_element]] with no color. */
+		/** Constructs a [[color_element]] with no color.
+		 * @overload
+		 */
 		color_element() = default;
 		color_element(const color_element&) = default;
 		auto operator=(const color_element&) -> color_element& = default;
