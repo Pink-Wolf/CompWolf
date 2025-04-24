@@ -5,6 +5,6 @@
 // * compwolf::shader_int, compwolf::shader_int2, compwolf::shader_int3, compwolf::shader_int4
 // * compwolf::opague_color, compwolf::transparent_color
 
-#include "private/gpu_buffers/gpu_struct_info.hpp"
-#include "private/gpu_buffers/primitive_gpu_struct_info.hpp"
-#include "private/gpu_buffers/gpu_color.hpp"
+#include "private/gpu_structs/gpu_struct_info.hpp"
+#include "private/gpu_structs/primitive_gpu_struct_info.hpp"
+#include "private/gpu_structs/gpu_color.hpp"
