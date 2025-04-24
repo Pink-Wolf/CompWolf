@@ -1,9 +1,9 @@
 // Contains various types of data that can be send to the gpu, as well as the means to define new types.
 // The types that can by default be send are:
-// * float, compwolf::float2, compwolf::float3, compwolf::float4
-// * double, compwolf::double2, compwolf::double3, compwolf::double4
-// * compwolf::shader_int, compwolf::shader_int2, compwolf::shader_int3, compwolf::shader_int4
-// * compwolf::opague_color, compwolf::transparent_color
+// * float, float2, float3, float4
+// * double, double2, double3, double4
+// * [[shader_int]], shader_int2, shader_int3, shader_int4
+// * [[opague_color]], [[transparent_color]]
 
 #include "private/gpu_structs/gpu_struct_info.hpp"
 #include "private/gpu_structs/primitive_gpu_struct_info.hpp"

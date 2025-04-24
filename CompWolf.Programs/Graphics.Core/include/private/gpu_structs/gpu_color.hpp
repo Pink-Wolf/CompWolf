@@ -10,6 +10,7 @@
 
 namespace compwolf
 {
+	/** A primary color whose mix makes up [[opague_color]] and [[transparent_color]]. */
 	class color_element
 	{
 	private:
@@ -89,15 +90,15 @@ namespace compwolf
 		 * @customoverload
 		 */
 		explicit constexpr color_element(float f) noexcept { set(f); }
-	};
 
-	constexpr auto operator+(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) + static_cast<uint8_t>(rhs))); }
-	constexpr auto operator-(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) - static_cast<uint8_t>(rhs))); }
-	constexpr auto operator*(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) * static_cast<uint8_t>(rhs))); }
-	constexpr auto operator/(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) / static_cast<uint8_t>(rhs))); }
-	constexpr auto operator<=>(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) <=> static_cast<uint8_t>(rhs); }
-	constexpr auto operator==(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) == static_cast<uint8_t>(rhs); }
-	constexpr auto operator!=(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) != static_cast<uint8_t>(rhs); }
+		static constexpr auto operator+(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) + static_cast<uint8_t>(rhs))); }
+		static constexpr auto operator-(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) - static_cast<uint8_t>(rhs))); }
+		static constexpr auto operator*(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) * static_cast<uint8_t>(rhs))); }
+		static constexpr auto operator/(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) / static_cast<uint8_t>(rhs))); }
+		static constexpr auto operator<=>(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) <=> static_cast<uint8_t>(rhs); }
+		static constexpr auto operator==(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) == static_cast<uint8_t>(rhs); }
+		static constexpr auto operator!=(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) != static_cast<uint8_t>(rhs); }
+	};
 
 	class transparent_color;
 	/** A color made out of a mix of red, green, and blue. */
