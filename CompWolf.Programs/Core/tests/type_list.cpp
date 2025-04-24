@@ -162,6 +162,20 @@ TEST(TypeList, to_type_list_empty) {
 	EXPECT_EQ((to_type_list_empty_t::size), std::size_t(0));
 }
 
+using combine_type_lists_t = compwolf::combine_type_lists<
+	compwolf::type_list<
+		test_type<'a'>, test_type<'b'>
+	>, compwolf::type_list<
+		test_type<'c'>, test_type<'d'>
+>>;
+TEST(TypeList, combine_type_lists) {
+	EXPECT_EQ((combine_type_lists_t::at<0>()), test_type<'a'>());
+	EXPECT_EQ((combine_type_lists_t::at<1>()), test_type<'b'>());
+	EXPECT_EQ((combine_type_lists_t::at<2>()), test_type<'c'>());
+	EXPECT_EQ((combine_type_lists_t::at<3>()), test_type<'d'>());
+	EXPECT_EQ((combine_type_lists_t::size), std::size_t(4));
+}
+
 TEST(TypeList, is_type_list_v) {
 	EXPECT_EQ((compwolf::is_type_list_v<compwolf::type_list<int, float>>), true);
 	EXPECT_EQ((compwolf::is_type_list_v<compwolf::type_list<>>), true);

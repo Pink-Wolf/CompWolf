@@ -2,16 +2,17 @@
 #define COMPWOLF_GRAPHICS_PRIMITIVE_GPU_STRUCT_INFO
 
 #include "gpu_struct_info.hpp"
+#include <dimensions>
 #include <cstdint>
 
 namespace compwolf
 {
 	/** Defines the given type as a primitive type for the GPU. */
 #define COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(type)						\
+	template<>																	\
 	struct gpu_struct_info<type>												\
 	{																			\
-		using primitives = type_list<type>;										\
-		static consteval std::array<std::size_t, 1> primitive_offsets{ 0 };		\
+		using primitives = type_list<type_value_pair<type, 0>>;					\
 	}																			\
 
 	/** @hidden */

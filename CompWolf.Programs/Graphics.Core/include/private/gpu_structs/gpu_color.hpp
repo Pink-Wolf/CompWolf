@@ -92,33 +92,45 @@ namespace compwolf
 		 * @customoverload
 		 */
 		explicit constexpr color_element(float f) noexcept { set(f); }
-
-	public: // operators
-
-		static constexpr auto operator+(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) + static_cast<uint8_t>(rhs))); }
-		static constexpr auto operator-(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) - static_cast<uint8_t>(rhs))); }
-		static constexpr auto operator*(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) * static_cast<uint8_t>(rhs))); }
-		static constexpr auto operator/(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) / static_cast<uint8_t>(rhs))); }
-		static constexpr auto operator<=>(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) <=> static_cast<uint8_t>(rhs); }
-		static constexpr auto operator==(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) == static_cast<uint8_t>(rhs); }
-		static constexpr auto operator!=(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) != static_cast<uint8_t>(rhs); }
 	};
+
+	/** @hidden */
+	static constexpr auto operator+(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) + static_cast<uint8_t>(rhs))); }
+	/** @hidden */
+	static constexpr auto operator-(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) - static_cast<uint8_t>(rhs))); }
+	/** @hidden */
+	static constexpr auto operator*(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) * static_cast<uint8_t>(rhs))); }
+	/** @hidden */
+	static constexpr auto operator/(color_element lhs, color_element rhs) noexcept { return color_element(static_cast<uint8_t>(static_cast<uint8_t>(lhs) / static_cast<uint8_t>(rhs))); }
+	/** @hidden */
+	static constexpr auto operator<=>(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) <=> static_cast<uint8_t>(rhs); }
+	/** @hidden */
+	static constexpr auto operator==(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) == static_cast<uint8_t>(rhs); }
+	/** @hidden */
+	static constexpr auto operator!=(color_element lhs, color_element rhs) noexcept { return static_cast<uint8_t>(lhs) != static_cast<uint8_t>(rhs); }
 
 	class transparent_color;
 	/** A color made out of a mix of red, green, and blue. */
 	class opaque_color : public dimensional_array<color_element, 3>
 	{
+	public:
 		/** Returns the amount of red used to make the color. */
 		constexpr auto& r() noexcept { return x(); }
-		/** Returns the amount of red used to make the color. */
+		/** Returns the amount of red used to make the color.
+		 * @customoverload
+		 */
 		constexpr auto& r() const noexcept { return x(); }
 		/** Returns the amount of green used to make the color. */
 		constexpr auto& g() noexcept { return y(); }
-		/** Returns the amount of green used to make the color. */
+		/** Returns the amount of green used to make the color.
+		 * @customoverload
+		 */
 		constexpr auto& g() const noexcept { return y(); }
 		/** Returns the amount of blue used to make the color. */
 		constexpr auto& b() noexcept { return z(); }
-		/** Returns the amount of blue used to make the color. */
+		/** Returns the amount of blue used to make the color.
+		 * @customoverload
+		 */
 		constexpr auto& b() const noexcept { return z(); }
 
 		/** A black color. */
@@ -143,14 +155,14 @@ namespace compwolf
 		}
 		/** Constructs a color from mixing the given amount of red, green, and blue,
 		 * The values in initializer_list are red, green, and blue respectively.
-		 * The floats are converted to single_colors.
+		 * The floats are converted to [[color_element]]s.
 		 */
 		constexpr opaque_color(std::initializer_list<float> v) noexcept
 		{
 			auto i = v.begin();
-			if (i) { r() = single_color(*i); ++i; }
-			if (i) { g() = single_color(*i); ++i; }
-			if (i) { b() = single_color(*i); ++i; }
+			if (i) { r() = color_element(*i); ++i; }
+			if (i) { g() = color_element(*i); ++i; }
+			if (i) { b() = color_element(*i); ++i; }
 		}
 
 		constexpr operator transparent_color() const noexcept;
@@ -158,28 +170,37 @@ namespace compwolf
 	/** A color made out of a mix of red, green, blue, and alpha. */
 	class transparent_color : public dimensional_array<color_element, 4>
 	{
+	public:
 		/** Returns the amount of red used to make the color. */
 		constexpr auto& r() noexcept { return x(); }
-		/** Returns the amount of red used to make the color. */
+		/** Returns the amount of red used to make the color.
+		 * @customoverload
+		 */
 		constexpr auto& r() const noexcept { return x(); }
 		/** Returns the amount of green used to make the color. */
 		constexpr auto& g() noexcept { return y(); }
-		/** Returns the amount of green used to make the color. */
+		/** Returns the amount of green used to make the color.
+		 * @customoverload
+		 */
 		constexpr auto& g() const noexcept { return y(); }
 		/** Returns the amount of blue used to make the color. */
 		constexpr auto& b() noexcept { return z(); }
-		/** Returns the amount of blue used to make the color. */
+		/** Returns the amount of blue used to make the color.
+		 * @customoverload
+		 */
 		constexpr auto& b() const noexcept { return z(); }
 		/** Returns the amount of alpha used to make the color. */
 		constexpr auto& a() noexcept { return w(); }
-		/** Returns the amount of alpha used to make the color. */
+		/** Returns the amount of alpha used to make the color.
+		 * @customoverload
+		 */
 		constexpr auto& a() const noexcept { return w(); }
 
 		/** A black color. */
 		transparent_color() = default;
 		transparent_color(const transparent_color&) = default;
 		auto operator=(const transparent_color&) -> transparent_color& = default;
-		opaque_color(transparent_color&&) = default;
+		transparent_color(transparent_color&&) = default;
 		auto operator=(transparent_color&&) -> transparent_color& = default;
 
 		/** Constructs a color from mixing the given amount of red, green, and blue, and using the given alpha. */
@@ -198,15 +219,15 @@ namespace compwolf
 		}
 		/** Constructs a color from mixing the given amount of red, green, and blue, and using the given alpha.
 		 * The values in initializer_list are red, green, blue, and alpha respectively.
-		 * The floats are converted to single_colors.
+		 * The floats are converted to [[color_element]]s.
 		 */
 		constexpr transparent_color(std::initializer_list<float> v) noexcept
 		{
 			auto i = v.begin();
-			if (i) { r() = single_color(*i); ++i; }
-			if (i) { g() = single_color(*i); ++i; }
-			if (i) { b() = single_color(*i); ++i; }
-			if (i) { a() = *i; ++i; }
+			if (i) { r() = color_element(*i); ++i; }
+			if (i) { g() = color_element(*i); ++i; }
+			if (i) { b() = color_element(*i); ++i; }
+			if (i) { a() = color_element(*i); ++i; }
 		}
 
 		constexpr operator opaque_color() const noexcept;

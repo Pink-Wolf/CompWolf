@@ -128,6 +128,92 @@ namespace compwolf
 		constexpr auto& wz() noexcept requires (has_element_at({ 3, 2 })) { return at({ 3, 2 }); }
 		/** Returns at(3, 3). */
 		constexpr auto& ww() noexcept requires (has_element_at({ 3, 3 })) { return at({ 3, 3 }); }
+
+
+		/** Returns at(0).
+		 * @customoverload
+		 */
+		constexpr auto& x() const noexcept requires (has_element_at({ 0 })) { return at({ 0 }); }
+		/** Returns at(1).
+		 * @customoverload
+		 */
+		constexpr auto& y() const noexcept requires (has_element_at({ 1 })) { return at({ 1 }); }
+		/** Returns at(2).
+		 * @customoverload
+		 */
+		constexpr auto& z() const noexcept requires (has_element_at({ 2 })) { return at({ 2 }); }
+		/** Returns at(3).
+		 * @customoverload
+		 */
+		constexpr auto& w() const noexcept requires (has_element_at({ 3 })) { return at({ 3 }); }
+
+		/** Returns at(0, 0).
+		 * @customoverload
+		 */
+		constexpr auto& xx() const noexcept requires (has_element_at({ 0, 0 })) { return at({ 0, 0 }); }
+		/** Returns at(0, 1).
+		 * @customoverload
+		 */
+		constexpr auto& xy() const noexcept requires (has_element_at({ 0, 1 })) { return at({ 0, 1 }); }
+		/** Returns at(0, 2).
+		 * @customoverload
+		 */
+		constexpr auto& xz() const noexcept requires (has_element_at({ 0, 2 })) { return at({ 0, 2 }); }
+		/** Returns at(0, 3).
+		 * @customoverload
+		 */
+		constexpr auto& xw() const noexcept requires (has_element_at({ 0, 3 })) { return at({ 0, 3 }); }
+
+		/** Returns at(1, 0).
+		 * @customoverload
+		 */
+		constexpr auto& yx() const noexcept requires (has_element_at({ 1, 0 })) { return at({ 1, 0 }); }
+		/** Returns at(1, 1).
+		 * @customoverload
+		 */
+		constexpr auto& yy() const noexcept requires (has_element_at({ 1, 1 })) { return at({ 1, 1 }); }
+		/** Returns at(1, 2).
+		 * @customoverload
+		 */
+		constexpr auto& yz() const noexcept requires (has_element_at({ 1, 2 })) { return at({ 1, 2 }); }
+		/** Returns at(1, 3).
+		 * @customoverload
+		 */
+		constexpr auto& yw() const noexcept requires (has_element_at({ 1, 3 })) { return at({ 1, 3 }); }
+
+		/** Returns at(2, 0).
+		 * @customoverload
+		 */
+		constexpr auto& zx() const noexcept requires (has_element_at({ 2, 0 })) { return at({ 2, 0 }); }
+		/** Returns at(2, 1).
+		 * @customoverload
+		 */
+		constexpr auto& zy() const noexcept requires (has_element_at({ 2, 1 })) { return at({ 2, 1 }); }
+		/** Returns at(2, 2).
+		 * @customoverload
+		 */
+		constexpr auto& zz() const noexcept requires (has_element_at({ 2, 2 })) { return at({ 2, 2 }); }
+		/** Returns at(2, 3).
+		 * @customoverload
+		 */
+		constexpr auto& zw() const noexcept requires (has_element_at({ 2, 3 })) { return at({ 2, 3 }); }
+
+		/** Returns at(3, 0).
+		 * @customoverload
+		 */
+		constexpr auto& wx() const noexcept requires (has_element_at({ 3, 0 })) { return at({ 3, 0 }); }
+		/** Returns at(3, 1).
+		 * @customoverload
+		 */
+		constexpr auto& wy() const noexcept requires (has_element_at({ 3, 1 })) { return at({ 3, 1 }); }
+		/** Returns at(3, 2).
+		 * @customoverload
+		 */
+		constexpr auto& wz() const noexcept requires (has_element_at({ 3, 2 })) { return at({ 3, 2 }); }
+		/** Returns at(3, 3).
+		 * @customoverload
+		 */
+		constexpr auto& ww() const noexcept requires (has_element_at({ 3, 3 })) { return at({ 3, 3 }); }
 	};
 
 	/** Defines various [[dimensional_array]] for the given type, up to 4x4. */

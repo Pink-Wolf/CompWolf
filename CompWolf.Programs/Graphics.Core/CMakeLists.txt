@@ -30,6 +30,7 @@ set(RESOURCES
 )
 set(TESTS
     "tests/vulkan_graphics_environment.cpp"
+    "tests/new_gpu_struct_info.cpp"
 )
 
 

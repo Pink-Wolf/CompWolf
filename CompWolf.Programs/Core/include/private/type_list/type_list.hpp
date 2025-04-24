@@ -48,6 +48,20 @@ namespace compwolf
 		{
 			using type = type_list<T>;
 		};
+
+		/** @hidden */
+		template <typelist... TypeLists>
+		struct combine_type_lists
+		{
+			using type = type_list<>;
+		};
+		template <typelist Head, typename... Tail>
+		struct combine_type_lists<Head, Tail...>
+		{
+			using type = typename Head::template and_type_list<
+				typename combine_type_lists<Tail...>::type
+			>;
+		};
 	}
 
 	/** A random-access container of types.
@@ -88,14 +102,6 @@ namespace compwolf
 		using to_other_container = TypeList<Ts...>;
 	};
 
-	/** A [[type_list]] containing the types used in the given template instance.
-	 * For example:
-	 * * std::vector<int> would give compwolf::type_list<int>.
-	 * * std::tuple<int, float> would give compwolf::type_list<int, float>.
-	 */
-	template <typename TemplateInstance>
-	using to_type_list = internal::to_type_list<TemplateInstance>::type;
-
 	/** A random-access container of types.
 	 * The advantage of this over [[std::tuple]] is that this is explicitly a type list, and therefore contains relevant functionality like [[type_list::at]].
 	 */
@@ -130,6 +136,18 @@ namespace compwolf
 		template <template <typename...> typename TypeList>
 		using to_other_container = TypeList<>;
 	};
+
+	/** A [[type_list]] containing the types used in the given template instance.
+	 * For example:
+	 * * std::vector<int> would give compwolf::type_list<int>.
+	 * * std::tuple<int, float> would give compwolf::type_list<int, float>.
+	 */
+	template <typename TemplateInstance>
+	using to_type_list = internal::to_type_list<TemplateInstance>::type;
+
+	/** A single [[type_list]] with the elements of the given [[type_list]]s. */
+	template <typelist... TypeLists>
+	using combine_type_lists = internal::combine_type_lists<TypeLists...>::type;
 }
 
 #endif // ! COMPWOLF_TYPE_LIST
