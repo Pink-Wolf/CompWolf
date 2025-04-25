@@ -18,6 +18,7 @@ namespace compwolf::vulkan
 		: public gpu_buffer<vulkan_graphics_environment, UsageType, ValueType>
 	{
 		using super = gpu_buffer<vulkan_graphics_environment, UsageType, ValueType>;
+
 	private:
 		internal::vulkan_gpu_buffer_internal _internal;
 

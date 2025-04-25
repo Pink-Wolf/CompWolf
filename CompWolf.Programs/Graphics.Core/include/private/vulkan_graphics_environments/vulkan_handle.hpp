@@ -81,6 +81,14 @@ namespace compwolf::vulkan
 		/** Represents a VkCommandPool-pointer */
 		using command_pool = command_pool_t*;
 
+		/** Dereference type of [[vulkan_handle::shader]]
+		 * @see vulkan_handle::shader
+		 * @hidden
+		 */
+		struct shader_t;
+		/** Represents a VkShaderModule-pointer */
+		using shader = shader_t*;
+
 
 		/** Dereference type of [[vulkan_handle::glfw_window]]
 		 * @see vulkan_handle::glfw_window
@@ -154,6 +162,7 @@ namespace compwolf::vulkan
 		struct memory_t;
 		/** Represents a VkDeviceMemory-pointer */
 		using memory = memory_t*;
+
 		/** Dereference type of [[vulkan_handle::buffer]]
 		 * @see vulkan_handle::buffer
 		 * @hidden
@@ -161,6 +170,7 @@ namespace compwolf::vulkan
 		struct buffer_t;
 		/** Represents a VkBuffer-pointer */
 		using buffer = buffer_t*;
+
 		/** Dereference type of [[vulkan_handle::image]]
 		 * @see vulkan_handle::image
 		 * @hidden

@@ -26,6 +26,7 @@ namespace compwolf::vulkan
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSemaphore, vulkan_handle::semaphore)
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkCommandBuffer, vulkan_handle::command)
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkCommandPool, vulkan_handle::command_pool)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkShaderModule, vulkan_handle::shader)
 
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, GLFWwindow*, vulkan_handle::glfw_window)
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkSurfaceKHR, vulkan_handle::surface)

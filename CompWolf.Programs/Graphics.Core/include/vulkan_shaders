@@ -1,0 +1,6 @@
+// Contains [[vulkan_shader]], a vulkan implementation of [[shader]].
+
+// Including this also includes [[shaders]].
+#include "shaders"
+
+#include "private/vulkan_shaders/vulkan_shader.hpp"

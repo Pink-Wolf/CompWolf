@@ -8,6 +8,9 @@ static void debug_callback(std::string_view s)
 	std::cout << s;
 }
 
+constexpr const char input_shader_path[] = "resources/vertex.spv";
+constexpr const char pixel_shader_path[] = "resources/pixel.spv";
+
 int main()
 {
 	{

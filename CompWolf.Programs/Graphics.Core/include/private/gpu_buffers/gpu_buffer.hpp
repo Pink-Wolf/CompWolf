@@ -20,10 +20,10 @@ namespace compwolf
 
 	 /** Represents some memory on a gpu.
 	  *
-		 * This class is abstract; a derived type should generally implement/override:
-		 * * [[gpu_buffer::data]]
-		 * * [[gpu_buffer::size]]
-		 * 
+	  * This class is abstract; a derived type should generally implement/override:
+	  * * [[gpu_buffer::data]]
+	  * * [[gpu_buffer::size]]
+	  * 
 	  * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this buffer works with.
 	  * @typeparam UsageType How the data is going to be used.
 	  * @typeparam ValueType The type of data in the buffer.
