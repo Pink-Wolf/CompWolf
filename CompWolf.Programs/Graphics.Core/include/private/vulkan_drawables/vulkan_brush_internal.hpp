@@ -10,6 +10,7 @@
 
 namespace compwolf::vulkan::internal
 {
+	/** @hidden */
 	struct vulkan_brush_info
 	{
 		const std::vector<vulkan_handle::format> input_primitive_formats;

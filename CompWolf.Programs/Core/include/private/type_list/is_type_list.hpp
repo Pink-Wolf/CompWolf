@@ -7,6 +7,7 @@ namespace compwolf
 {
 	namespace internal
 	{
+		/** @hidden */
 		struct type_list_base;
 	}
 

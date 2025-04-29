@@ -22,8 +22,8 @@ namespace compwolf
 	 * That is, when drawing an object, the shader used to determine the individual pixel colors of the drawing.
 	 */
 	template <typename GraphicsEnvironmentType, typename InputShaderType, typename PixelShaderType>
-		requires (std::same_as<InputShaderType::output_Type, PixelShaderType::input_type>
-			&& std::same_as<PixelShaderType::output_type, pixel_output_type>)
+		requires (std::same_as<typename InputShaderType::output_Type, typename PixelShaderType::input_type>
+			&& std::same_as<typename PixelShaderType::output_type, pixel_output_type>)
 	class brush
 	{
 	public:

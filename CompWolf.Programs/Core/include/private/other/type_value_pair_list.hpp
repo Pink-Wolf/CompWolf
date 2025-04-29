@@ -9,6 +9,7 @@ namespace compwolf
 {
 	namespace internal
 	{
+		/** @hidden */
 		template <typename PairList1, typename PairList2>
 		struct merge_type_value_pairs_by_value
 		{

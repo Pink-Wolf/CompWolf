@@ -56,8 +56,10 @@ namespace compwolf
 			using type = get_subrange_internal<StartIndex, EndIndex, Types...>::type;
 		};
 
+		/** @hidden */
 		struct type_list_base {};
 
+		/** @hidden */
 		template <typename TemplateInstance>
 		struct to_type_list
 		{

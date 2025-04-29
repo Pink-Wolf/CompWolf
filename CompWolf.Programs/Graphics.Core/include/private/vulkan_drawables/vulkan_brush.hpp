@@ -12,9 +12,11 @@ namespace compwolf::vulkan
 {
 	namespace internal
 	{
+		/** @hidden */
 		template <typename T>
 		using vulkan_brush_get_from_pair = T;
 
+		/** @hidden */
 		template <typename TypeList>
 		struct is_in
 		{

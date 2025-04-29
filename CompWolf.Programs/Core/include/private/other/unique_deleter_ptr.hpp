@@ -11,6 +11,7 @@ namespace compwolf
 {
 	namespace internal
 	{
+		/** @hidden */
 		template <typename Pointer>
 		class unique_deleter_ptr_deleter : public std::function<void(Pointer)>
 		{
