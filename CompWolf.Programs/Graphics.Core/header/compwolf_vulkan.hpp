@@ -42,6 +42,10 @@ namespace compwolf::vulkan
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkImage, vulkan_handle::image)
 		
 	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkPipelineLayout, vulkan_handle::pipeline_layout)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkDescriptorSetLayout, vulkan_handle::descriptor_set_layout)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkDescriptorPool, vulkan_handle::descriptor_pool)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkDescriptorSet, vulkan_handle::descriptor_set)
+	COMPWOLF_GRAPHICS_DEFINE_VULKAN_CONVERTERS(vulkan, VkPipeline, vulkan_handle::pipeline)
 
 	inline uint32_t to_vulkan(version_number a) { return VK_MAKE_API_VERSION(0, a.major, a.minor, a.patch); }
 

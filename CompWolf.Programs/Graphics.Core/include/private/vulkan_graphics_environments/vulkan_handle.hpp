@@ -183,8 +183,10 @@ namespace compwolf::vulkan
 		/** Represents a VkImage-pointer */
 		using image = image_t*;
 
+
 		/** Represents a VkFormat. */
 		using format = enum_type;
+
 
 		/** Dereference type of [[vulkan_handle::pipeline_layout]]
 		 * @see vulkan_handle::pipeline_layout
@@ -193,6 +195,38 @@ namespace compwolf::vulkan
 		struct pipeline_layout_t;
 		/** Represents a VkPipelineLayout-pointer */
 		using pipeline_layout = pipeline_layout_t*;
+
+		/** Dereference type of [[vulkan_handle::descriptor_set_layout]]
+		 * @see vulkan_handle::descriptor_set_layout
+		 * @hidden
+		 */
+		struct descriptor_set_layout_t;
+		/** Represents a VkDescriptorSetLayout-pointer */
+		using descriptor_set_layout = descriptor_set_layout_t*;
+
+		/** Dereference type of [[vulkan_handle::descriptor_set]]
+		 * @see vulkan_handle::descriptor_set
+		 * @hidden
+		 */
+		struct descriptor_set_t;
+		/** Represents a VkDescriptorSet-pointer */
+		using descriptor_set = descriptor_set_t*;
+
+		/** Dereference type of [[vulkan_handle::descriptor_pool]]
+		 * @see vulkan_handle::descriptor_pool
+		 * @hidden
+		 */
+		struct descriptor_pool_t;
+		/** Represents a VkDescriptorPool-pointer */
+		using descriptor_pool = descriptor_pool_t*;
+
+		/** Dereference type of [[vulkan_handle::pipeline]]
+		 * @see vulkan_handle::pipeline
+		 * @hidden
+		 */
+		struct pipeline_t;
+		/** Represents a VkPipeline-pointer */
+		using pipeline = pipeline_t*;
 	};
 }
 

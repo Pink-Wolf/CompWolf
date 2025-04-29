@@ -6,6 +6,7 @@
 #include <type_value_pair_lists>
 #include <utility>
 #include <concepts>
+#include <stdexcept>
 
 namespace compwolf
 {
@@ -49,15 +50,30 @@ namespace compwolf
 		
 
 	private:
-		environment_type::gpu_type* _gpu{};
+		input_shader_type* _input_shader{};
+		pixel_shader_type* _pixel_shader{};
 
 	public: // accessors
 		/** Returns the gpu that the brush is on.
 		 * @customoverload
 		 */
-		auto gpu() noexcept -> typename environment_type::gpu_type& { return *_gpu; }
-		/** Returns the gpu that the buffer is on. */
-		auto gpu() const noexcept -> const typename environment_type::gpu_type& { return *_gpu; }
+		auto gpu() noexcept -> typename environment_type::gpu_type& { return _input_shader->gpu(); }
+		/** Returns the gpu that the brush is on. */
+		auto gpu() const noexcept -> const typename environment_type::gpu_type& { return _input_shader->gpu(); }
+		
+		/** Returns the input [[shader]] that the brush uses.
+		 * @customoverload
+		 */
+		auto input_shader() noexcept -> typename input_shader_type& { return *_input_shader; }
+		/** Returns the input [[shader]] that the brush uses. */
+		auto input_shader() const noexcept -> const typename input_shader_type& { return *_input_shader; }
+		
+		/** Returns the pixel [[shader]] that the brush uses.
+		 * @customoverload
+		 */
+		auto pixel_shader() noexcept -> typename pixel_shader_type& { return *_pixel_shader; }
+		/** Returns the pixel [[shader]] that the brush uses. */
+		auto pixel_shader() const noexcept -> const typename pixel_shader_type& { return *_pixel_shader; }
 
 	public: // constructors
 		/** Constructs an invalid [[brush]].
@@ -69,8 +85,11 @@ namespace compwolf
 		auto operator=(brush&&) -> brush& = default;
 
 		/** Creates a brush on the given gpu. */
-		brush(environment_type::gpu_type& gpu) : _gpu(&gpu)
+		brush(input_shader_type& input_shader, pixel_shader_type& pixel_shader)
+			: _input_shader(&input_shader), _pixel_shader(&pixel_shader)
 		{
+			if (&input_shader.gpu() != pixel_shader.gpu())
+				throw std::invalid_argument("Brush was given shaders for different GPUs");
 		}
 	};
 }
