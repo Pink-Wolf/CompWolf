@@ -4,7 +4,7 @@
 namespace compwolf
 {
 	/** A compile-time pairing of a type and a value. */
-	template <typename Type, std::size_t Value>
+	template <typename Type, auto Value>
 	struct type_value_pair
 	{
 		using type = Type;
