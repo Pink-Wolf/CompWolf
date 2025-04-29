@@ -3,7 +3,7 @@
 // * float, float2, float3, float4
 // * double, double2, double3, double4
 // * [[shader_int]], shader_int2, shader_int3, shader_int4
-// * [[opague_color]], [[transparent_color]]
+// * [[opaque_color]], [[transparent_color]]
 
 #include "private/gpu_structs/gpu_struct_info.hpp"
 

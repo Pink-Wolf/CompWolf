@@ -10,7 +10,7 @@
 
 namespace compwolf
 {
-	/** A primary color whose mix makes up [[opague_color]] and [[transparent_color]]. */
+	/** A primary color whose mix makes up [[opaque_color]] and [[transparent_color]]. */
 	class color_element
 	{
 	private:
