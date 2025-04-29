@@ -1,6 +1,8 @@
 #ifndef COMPWOLF_VULKAN_HANDLE
 #define COMPWOLF_VULKAN_HANDLE
 
+#include <cstdint>
+
 namespace compwolf::vulkan
 {
 	/** Contains various types of pointers representing handlers from Vulkan.
@@ -8,6 +10,8 @@ namespace compwolf::vulkan
 	 */
 	struct vulkan_handle
 	{
+		using enum_type = uint32_t;
+
 		/** Dereference type of [[vulkan_handle::instance]]
 		 * @see vulkan_handle::instance
 		 * @hidden
@@ -178,6 +182,17 @@ namespace compwolf::vulkan
 		struct image_t;
 		/** Represents a VkImage-pointer */
 		using image = image_t*;
+
+		/** Represents a VkFormat. */
+		using format = enum_type;
+
+		/** Dereference type of [[vulkan_handle::pipeline_layout]]
+		 * @see vulkan_handle::pipeline_layout
+		 * @hidden
+		 */
+		struct pipeline_layout_t;
+		/** Represents a VkPipelineLayout-pointer */
+		using pipeline_layout = pipeline_layout_t*;
 	};
 }
 

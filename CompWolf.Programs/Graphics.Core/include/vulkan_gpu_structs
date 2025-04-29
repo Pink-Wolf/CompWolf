@@ -1,0 +1,6 @@
+// Contains vulkan-related functionality for [[gpu_struct_info]].
+
+// Including this also includes [[gpu_structs]].
+#include "gpu_structs"
+
+#include "private/vulkan_gpu_structs/vulkan_gpu_struct_info.hpp"

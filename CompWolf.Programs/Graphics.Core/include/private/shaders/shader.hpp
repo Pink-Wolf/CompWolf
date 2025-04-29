@@ -7,12 +7,16 @@
 
 namespace compwolf
 {
+	struct pixel_output_type;
+
 	/** Represents some code on a gpu.
 	 * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this shader works with.
 	 * @typeparam InputType The type of element that the shader takes as input.
 	 * @typeparam OutputType The type of element that the shader outputs.
 	 * @typeparam FieldTypes The fields that the shader has.
 	 * These must be [[type_value_pair]]s, denoting the type and position of the fields.
+	 * These must be sorted by position.
+	 * @warning It is undefined behaviour if the given FieldTypes are not sorted by position.
 	 */
 	template <typename GraphicsEnvironmentType, typename InputType, typename OutputType, typename... FieldTypes>
 	class shader

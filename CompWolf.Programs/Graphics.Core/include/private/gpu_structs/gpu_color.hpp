@@ -238,10 +238,8 @@ namespace compwolf
 	/** @hidden */
 	constexpr transparent_color::operator opaque_color() const noexcept { return opaque_color{ r(), g(), b() }; }
 
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(opaque_color);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(transparent_color);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(opaque_color);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(transparent_color);
 }
 
 #endif // ! COMPWOLF_GRAPHICS_GPU_COLOR

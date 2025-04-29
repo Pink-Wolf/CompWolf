@@ -26,7 +26,7 @@ namespace compwolf::vulkan
 
 	public: // vulkan-specific
 		/** Returns the [[vulkan_handle::shader]] that the shader represents. */
-		auto vulkan_shader() const noexcept -> vulkan_handle::shader { return _internal.vulkan_shader.get(); }
+		auto vulkan_shader_module() const noexcept -> vulkan_handle::shader { return _internal.vulkan_shader.get(); }
 
 	public: // constructors
 		/** Constructs an invalid [[vulkan_shader]].

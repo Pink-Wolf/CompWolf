@@ -1,0 +1,6 @@
+// Contains [[vulkan_drawable]], a vulkan implementation of [[drawable]].
+
+// Including this also includes [[drawables]].
+#include "drawables"
+
+#include "private/vulkan_drawables/vulkan_brush.hpp"

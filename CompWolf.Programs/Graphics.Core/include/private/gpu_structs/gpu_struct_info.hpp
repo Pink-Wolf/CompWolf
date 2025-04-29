@@ -2,8 +2,8 @@
 #define COMPWOLF_GRAPHICS_GPU_DATA_INFO
 
 #include <compwolf_type_traits>
-#include <type_list>
-#include <type_value_pair>
+#include <type_lists>
+#include <type_value_pairs>
 #include <utility>
 
 namespace compwolf

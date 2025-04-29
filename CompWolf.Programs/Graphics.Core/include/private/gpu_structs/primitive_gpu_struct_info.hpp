@@ -15,36 +15,23 @@ namespace compwolf
 		using primitives = type_list<type_value_pair<type, 0>>;					\
 	}																			\
 
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float2);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float3);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float4);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float2);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float3);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(float4);
 
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double2);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double3);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double4);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double2);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double3);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(double4);
 
 	/** The type of integer that can be used on the GPU. */
 	using shader_int = uint32_t;
-	/** @hidden */
-	COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(shader_int);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int2);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int3);
-	/** @hidden */
-	COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int4);
+	/** @hidden */ COMPWOLF_DEFINE_DIMENSIONAL_ARRAY_TYPES(shader_int);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int2);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int3);
+	/** @hidden */ COMPWOLF_GRAPHICS_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int4);
 }
 
 #endif // ! COMPWOLF_GRAPHICS_PRIMITIVE_GPU_STRUCT_INFO

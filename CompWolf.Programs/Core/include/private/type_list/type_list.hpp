@@ -31,6 +31,31 @@ namespace compwolf
 			using type = get_type_at_index_internal<Index, Types...>::type;
 		};
 
+		/** @hidden */
+		template <std::size_t StartIndex, std::size_t EndIndex, typename FrontType, typename... TailTypes>
+		struct get_subrange_internal
+		{
+			using type = get_subrange_internal<StartIndex - 1, EndIndex - 1, TailTypes...>::type;
+		};
+		template <std::size_t EndIndex, typename FrontType, typename... TailTypes>
+		struct get_subrange_internal<0, EndIndex, FrontType, TailTypes...>
+		{
+			using type = typename get_subrange_internal<0, EndIndex - 1, TailTypes...>::template and_types_at_front<FrontType>;
+		};
+		template <typename FrontType, typename... TailTypes>
+		struct get_subrange_internal<0, 0, FrontType, TailTypes...>
+		{
+			using type = type_list<>;
+		};
+		/** @hidden */
+		template <std::size_t StartIndex, std::size_t EndIndex, typename... Types>
+		struct get_subrange
+		{
+			static_assert(EndIndex < sizeof...(Types), "out of range! type_list::subrange was given an end index greater than the amount of elements");
+			static_assert(StartIndex <= EndIndex, "invalid argument! type_list::subrange was given an end index before the given start index");
+			using type = get_subrange_internal<StartIndex, EndIndex, Types...>::type;
+		};
+
 		struct type_list_base {};
 
 		template <typename TemplateInstance>
@@ -79,6 +104,16 @@ namespace compwolf
 		template <std::size_t Index>
 		using at = internal::get_type_at_index<Index, Ts...>::type;
 
+		/** Gets a [[type_list]] with the types at the given indices. */
+		template <std::size_t InclusiveStartIndex, std::size_t ExclusiveEndIndex>
+		using subrange = internal::get_subrange<InclusiveStartIndex, ExclusiveEndIndex, Ts...>::type;
+		/** Gets a [[type_list]] with the first N types. */
+		template <std::size_t N>
+		using front_subrange = subrange<0, N + 1>;
+		/** Gets a [[type_list]] with the last N types. */
+		template <std::size_t N>
+		using back_subrange = subrange<size - N, size>;
+
 		/** Whether the type list has the given type at any point. */
 		template <typename T>
 		static constexpr bool has = (std::is_same_v<Ts, T> || ...);
@@ -92,10 +127,18 @@ namespace compwolf
 		/** A copy of the [[type_list]] with the given [[type_list]]'s types appended to it. */
 		template <typelist TypeList>
 		using and_type_list = TypeList::template and_types_at_front<Ts...>;
+		/** A copy of the [[type_list]] with the given [[type_list]]'s types appended to it, in front of the original types. */
+		template <typelist TypeList>
+		using and_type_list_at_front = TypeList::template and_types<Ts...>;
 
 		/** A copy of the [[type_list]], but where each type T is replaced by Transformer<T>::type. */
 		template <template <typename> typename Transformer>
 		using transform = type_list<typename Transformer<Ts>::type...>;
+
+		/** Constructs the given type with the elements of the [[type_list]], but where each type T is replaced by Transformer<T>::value. */
+		template <template <typename> typename Transformer, typename Type>
+		static constexpr Type transform_to_value
+			= { Transformer<Ts>::value... };
 
 		/** The given template, instantiated with the types in the [[type_list]]. */
 		template <template <typename...> typename TypeList>
@@ -131,6 +174,10 @@ namespace compwolf
 		/** A copy of the [[type_list]], but where each type T is replaced by Transformer<T>::type. */
 		template <template <typename> typename Transformer>
 		using transform = type_list<>;
+
+		/** Constructs the given type with the elements of the [[type_list]], but where each type T is replaced by Transformer<T>::value. */
+		template <template <typename> typename Transformer, typename Type>
+		static constexpr Type transform_to_value{};
 
 		/** The given template, instantiated with the types in the [[type_list]]. */
 		template <template <typename...> typename TypeList>
