@@ -285,7 +285,7 @@ namespace CompWolf.Docs.Server.Data
                         entityDeclaration = string.Join(Newline,
                             entityDeclaration[declarationStart..]
                             .Split(Newline)
-                            .Select(x => x[indentionText.Length..])
+                            .Select(x => x.Length <= indentionText.Length ? string.Empty : x[indentionText.Length..])
                         );
                     }
                 }
