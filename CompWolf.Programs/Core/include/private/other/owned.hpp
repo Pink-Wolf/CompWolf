@@ -19,7 +19,6 @@ namespace compwolf
 			{
 				return T();
 			}
-			static constexpr T value = T();
 		};
 	}
 
