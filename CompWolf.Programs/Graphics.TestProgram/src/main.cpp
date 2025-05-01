@@ -46,7 +46,7 @@ int main()
 
 					using pixel_shader_type = compwolf::vulkan::vulkan_shader<
 						compwolf::float4, compwolf::pixel_output_type
-						, compwolf::type_value_pair<compwolf::opaque_color, 4>
+						, compwolf::type_value_pair<compwolf::float3, 4>
 					>;
 					pixel_shader_type pixel_shader(w.gpu(), compwolf::shader_code_from_file(pixel_shader_path));
 
@@ -77,7 +77,7 @@ int main()
 								data[5] = 3;
 							}
 
-							using color_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::field, compwolf::opaque_color>;
+							using color_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::field, compwolf::float3>;
 							color_buffer_type color_buffer(w.gpu(), 1);
 							color_buffer.data()[0] = { .75f, .125f, .5f };
 

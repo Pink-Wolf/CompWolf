@@ -39,11 +39,6 @@ namespace compwolf::vulkan
 	/** @hidden */ COMPWOLF_GRAPHICS_VULKAN_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int2, 102);
 	/** @hidden */ COMPWOLF_GRAPHICS_VULKAN_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int3, 105);
 	/** @hidden */ COMPWOLF_GRAPHICS_VULKAN_DEFINE_SIMPLE_GPU_PRIMITIVE(shader_int4, 108);
-
-	class color_element; class opaque_color; class transparent_color;
-	/** @hidden */ COMPWOLF_GRAPHICS_VULKAN_DEFINE_SIMPLE_GPU_PRIMITIVE(color_element, 14);
-	/** @hidden */ COMPWOLF_GRAPHICS_VULKAN_DEFINE_SIMPLE_GPU_PRIMITIVE(opaque_color, 28);
-	/** @hidden */ COMPWOLF_GRAPHICS_VULKAN_DEFINE_SIMPLE_GPU_PRIMITIVE(transparent_color, 42);
 }
 
 #endif // ! COMPWOLF_GRAPHICS_VULKAN_GPU_STRUCT_INFO
