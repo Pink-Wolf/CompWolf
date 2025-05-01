@@ -86,12 +86,12 @@ namespace compwolf
 		/** Returns the GPUs that the environment can use.
 		 * An item in this array may be representing multiple actual GPUs.
 		 */
-		virtual auto gpus() noexcept -> std::vector<typename gpu_type>& = 0;
+		virtual auto gpus() noexcept -> std::vector<gpu_type>& = 0;
 		/** Returns the GPUs that the environment can use.
 		 * An item in this array may be representing multiple actual GPUs.
 		 * @customoverload
 		 */
-		virtual auto gpus() const noexcept -> const std::vector<typename gpu_type>& = 0;
+		virtual auto gpus() const noexcept -> const std::vector<gpu_type>& = 0;
 
 		/** Returns whether this is valid, that is one not constructed by the default constructor. */
 		operator bool() const noexcept

@@ -28,7 +28,7 @@ namespace compwolf
 	private:
 		using super = std::unique_ptr<T, internal::unique_deleter_ptr_deleter<T*>>;
 	public: // constructors
-		using super::unique_ptr;
+		using typename super::unique_ptr;
 
 		constexpr unique_deleter_ptr() noexcept(std::is_nothrow_default_constructible_v<T*>)
 			: super(nullptr, nullptr)
@@ -40,8 +40,8 @@ namespace compwolf
 
 		template<typename DeleterArg>
 		constexpr unique_deleter_ptr(T* p, DeleterArg&& f)
-			noexcept(std::is_nothrow_constructible_v<super::deleter_type, DeleterArg&&>)
-			: super(p, super::deleter_type(std::forward<DeleterArg>(f)))
+			noexcept(std::is_nothrow_constructible_v<typename super::deleter_type, DeleterArg&&>)
+			: super(p, typename super::deleter_type(std::forward<DeleterArg>(f)))
 		{}
 
 		constexpr unique_deleter_ptr(const unique_deleter_ptr&) noexcept = default;
@@ -57,7 +57,7 @@ namespace compwolf
 	private:
 		using super = std::unique_ptr<T[], internal::unique_deleter_ptr_deleter<T*>>;
 	public: // constructors
-		using super::unique_ptr;
+		using typename super::unique_ptr;
 
 		constexpr unique_deleter_ptr() noexcept(std::is_nothrow_default_constructible_v<T*>)
 			: super(nullptr, nullptr)
@@ -69,8 +69,8 @@ namespace compwolf
 
 		template<typename DeleterArg>
 		constexpr unique_deleter_ptr(T* p, DeleterArg&& f)
-			noexcept(std::is_nothrow_constructible_v<super::deleter_type, DeleterArg&&>)
-			: super(p, super::deleter_type(std::forward<DeleterArg>(f)))
+			noexcept(std::is_nothrow_constructible_v<typename super::deleter_type, DeleterArg&&>)
+			: super(p, typename super::deleter_type(std::forward<DeleterArg>(f)))
 		{}
 
 		constexpr unique_deleter_ptr(const unique_deleter_ptr&) noexcept = default;

@@ -87,7 +87,7 @@ namespace compwolf::vulkan
 		auto get_window_data(vulkan_window& window) const -> internal::vulkan_window_brush
 		{
 			auto i = _window_data.find(&window);
-			if (i != _window_data.end()) return *i;
+			if (i != _window_data.end()) return i->second;
 			return *_window_data.emplace(window
 				, _internal_info, super::input_shader().vulkan_shader_module(), super::pixel_shader().vulkan_shader_module()
 				, _internal.vulkan_descriptor_set_layout, _internal.vulkan_pipeline_layout
@@ -95,10 +95,10 @@ namespace compwolf::vulkan
 		}
 	public:
 		/** Returns the [[vulkan_handle::pipeline_layout]] of the pipeline that the brush represents. */
-		auto vulkan_pipeline_layout() const noexcept -> vulkan_handle::pipeline_layout { return _internal.pipeline_layout.get(); }
+		auto vulkan_pipeline_layout() const noexcept -> vulkan_handle::pipeline_layout { return _internal.vulkan_pipeline_layout.get(); }
 
 		/** Returns the [[vulkan_handle::descriptor_set_layout]] of the pipeline that the brush represents. */
-		auto vulkan_descriptor_set_layout() const noexcept -> vulkan_handle::descriptor_set_layout { return _internal.descriptor_set_layout.get(); }
+		auto vulkan_descriptor_set_layout() const noexcept -> vulkan_handle::descriptor_set_layout { return _internal.vulkan_descriptor_set_layout.get(); }
 
 		/** Returns the [[vulkan_handle::descriptor_pool]] of the pipeline that the brush represents.
 		 * @param window the [[vulkan_window]] that the descriptor pool is for.

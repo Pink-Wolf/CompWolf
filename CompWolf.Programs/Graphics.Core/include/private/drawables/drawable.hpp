@@ -100,9 +100,9 @@ namespace compwolf
 		/** Returns the camera that the drawable is on.
 		 * @customoverload
 		 */
-		auto camera() noexcept -> typename camera_type& { return *_camera; }
+		auto camera() noexcept -> camera_type& { return *_camera; }
 		/** Returns the camera that the drawable is on. */
-		auto camera() const noexcept -> const typename camera_type& { return *_camera; }
+		auto camera() const noexcept -> const camera_type& { return *_camera; }
 
 		/** Returns the brush used to draw the drawable.
 		 * @customoverload
@@ -194,7 +194,7 @@ namespace compwolf
 		}
 		/** Creates a drawable using the given brush and data. */
 		template <typename... FieldBufferTypes>
-			requires (std::same_as<type_list<FieldBufferTypes...>, field_buffer_type>)
+			requires (std::same_as<type_list<FieldBufferTypes...>, field_buffer_types>)
 		drawable(camera_type& camera, brush_type& brush
 			, vertex_buffer_type& vertex_buffer, vertex_index_buffer_type& vertex_index_buffer
 			, FieldBufferTypes&... field_buffers)

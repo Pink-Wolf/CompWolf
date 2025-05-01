@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <optional>
 #include <algorithm>
+#include <cmath>
 
 namespace compwolf::vulkan
 {
@@ -135,7 +136,7 @@ namespace compwolf::vulkan
 			auto& info = info_container.value();
 
 			float extent_score = static_cast<float>(info.capabilities.maxImageExtent.width) * info.capabilities.maxImageExtent.height;
-			extent_score = std::log2(extent_score);
+			extent_score = std::log2f(extent_score);
 			float extent_score_step; // step is used to put format_score between steps
 			{
 				float min = 16.f; // 480i has a value of ~18.4

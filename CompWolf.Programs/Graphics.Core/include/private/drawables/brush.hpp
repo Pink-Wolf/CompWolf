@@ -71,16 +71,16 @@ namespace compwolf
 		/** Returns the input [[shader]] that the brush uses.
 		 * @customoverload
 		 */
-		auto input_shader() noexcept -> typename input_shader_type& { return *_input_shader; }
+		auto input_shader() noexcept -> input_shader_type& { return *_input_shader; }
 		/** Returns the input [[shader]] that the brush uses. */
-		auto input_shader() const noexcept -> const typename input_shader_type& { return *_input_shader; }
+		auto input_shader() const noexcept -> const input_shader_type& { return *_input_shader; }
 		
 		/** Returns the pixel [[shader]] that the brush uses.
 		 * @customoverload
 		 */
-		auto pixel_shader() noexcept -> typename pixel_shader_type& { return *_pixel_shader; }
+		auto pixel_shader() noexcept -> pixel_shader_type& { return *_pixel_shader; }
 		/** Returns the pixel [[shader]] that the brush uses. */
-		auto pixel_shader() const noexcept -> const typename pixel_shader_type& { return *_pixel_shader; }
+		auto pixel_shader() const noexcept -> const pixel_shader_type& { return *_pixel_shader; }
 		
 		/** Returns the brush's shaders' fields' positions, by value.
 		 * Returning by value allows this to be run at compile-time.
