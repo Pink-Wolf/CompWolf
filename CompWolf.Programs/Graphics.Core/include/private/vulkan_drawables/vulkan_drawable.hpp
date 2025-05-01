@@ -19,11 +19,12 @@ namespace compwolf::vulkan
 		/** @hidden */
 		void drawable_draw_code(const vulkan_draw_code_parameters&
 			, vulkan_handle::pipeline
+			, vulkan_handle::pipeline_layout
 			, shader_int vertex_index_count
 			, vulkan_handle::buffer vertex_buffer
 			, vulkan_handle::buffer vertex_index_buffer
 			, const vulkan_handle::buffer* field_buffers_data
-			, const std::vector<shader_int>& field_indices
+			, const std::vector<std::size_t>& field_indices
 			, const std::vector<vulkan_handle::descriptor_set>&
 		);
 	}
@@ -37,7 +38,7 @@ namespace compwolf::vulkan
 	class vulkan_drawable
 		: public drawable<BrushType, vulkan_camera, vulkan_gpu_buffer>
 	{
-		using super = drawable<BrushType, vulkan_window, vulkan_gpu_buffer>;
+		using super = drawable<BrushType, vulkan_camera, vulkan_gpu_buffer>;
 
 		vulkan_camera::draw_code_key _draw_key;
 
@@ -50,8 +51,8 @@ namespace compwolf::vulkan
 			if constexpr (Step < super::field_buffer_types::size)
 			{
 				auto& field = std::get<Step>(super::field_buffers());
-				_field_memories[Step] = field.vulkan_memory();
-				_field_buffer[Step] = field.vulkan_buffer();
+				_field_memories[Step] = field->vulkan_memory();
+				_field_buffer[Step] = field->vulkan_buffer();
 				setup_field_data<Step + 1>();
 			}
 		}
@@ -76,8 +77,10 @@ namespace compwolf::vulkan
 		/** The gpu-instructions used to draw this. */
 		void draw_program_code(const vulkan_draw_code_parameters& args)
 		{
-			drawable_draw_code(args
-				, super::brush().vulkan_pipeline()
+			internal::drawable_draw_code(args
+				, super::brush().vulkan_pipeline(super::camera().window())
+				, super::brush().vulkan_pipeline_layout()
+				, super::vertex_index_buffer().size()
 				, super::vertex_buffer().vulkan_buffer()
 				, super::vertex_index_buffer().vulkan_buffer()
 				, vulkan_field_buffers().data()
@@ -111,7 +114,7 @@ namespace compwolf::vulkan
 		}
 		/** Creates a drawable using the given brush and data. */
 		template <typename... FieldBufferTypes>
-			requires (std::same_as<type_list<FieldBufferTypes...>, typename super::field_buffer_type>)
+			requires (std::same_as<type_list<FieldBufferTypes...>, typename super::field_buffer_types>)
 		vulkan_drawable(super::camera_type& camera, super::brush_type& brush
 			, super::vertex_buffer_type& vertex_data, super::vertex_index_buffer_type& vertex_index_data
 			, FieldBufferTypes&... fields)

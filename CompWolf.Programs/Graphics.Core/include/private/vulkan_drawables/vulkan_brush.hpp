@@ -46,7 +46,7 @@ namespace compwolf::vulkan
 		using super = brush<vulkan_graphics_environment, InputShaderType, PixelShaderType>;
 
 	private:
-		static constexpr internal::vulkan_brush_info _internal_info
+		static inline internal::vulkan_brush_info _internal_info
 		{
 			.input_primitive_formats
 				= gpu_struct_info<typename super::input_shader_type::input_type>::primitives
@@ -54,13 +54,13 @@ namespace compwolf::vulkan
 				:: template transform_to_value<
 					get_vulkan_format,
 					std::vector<vulkan_handle::format>
-				>,
+				>(),
 			.input_primitive_offsets
 				= gpu_struct_info<typename super::input_shader_type::input_type>::primitives
 				:: template transform_to_value<
 					internal::vulkan_brush_get_from_pair,
 					std::vector<std::size_t>
-				>,
+				>(),
 			.input_stride
 				= sizeof(typename super::input_shader_type::input_type),
 
@@ -68,14 +68,14 @@ namespace compwolf::vulkan
 				= &super::field_positions(),
 			.field_is_input_field
 				= super::field_types::template transform_to_value<
-					internal::template is_in<typename super::input_shader_type::field_types>::transformer,
+					internal::template is_in<typename super::input_shader_type::field_types>::template transformer,
 					std::vector<bool>
-				>,
+				>(),
 			.field_is_pixel_field
 				= super::field_types::template transform_to_value<
-					internal::template is_in<typename super::pixel_shader_type::field_types>::transformer,
+					internal::template is_in<typename super::pixel_shader_type::field_types>::template transformer,
 					std::vector<bool>
-				>,
+				>(),
 		};
 		internal::vulkan_brush_internal _internal;
 		mutable std::map<vulkan_window*, internal::vulkan_window_brush> _window_data;
@@ -84,14 +84,18 @@ namespace compwolf::vulkan
 		/** Gets the data for the given window.
 		 * This creates the data if it is not already created.
 		 */
-		auto get_window_data(vulkan_window& window) const -> internal::vulkan_window_brush
+		auto get_window_data(vulkan_window& window) const -> internal::vulkan_window_brush&
 		{
 			auto i = _window_data.find(&window);
 			if (i != _window_data.end()) return i->second;
-			return *_window_data.emplace(window
-				, _internal_info, super::input_shader().vulkan_shader_module(), super::pixel_shader().vulkan_shader_module()
-				, _internal.vulkan_descriptor_set_layout, _internal.vulkan_pipeline_layout
-			).first;
+			return _window_data.emplace(&window
+				, internal::vulkan_window_brush(window, _internal_info
+					, super::input_shader().vulkan_shader_module()
+					, super::pixel_shader().vulkan_shader_module()
+					, _internal.vulkan_descriptor_set_layout.get()
+					, _internal.vulkan_pipeline_layout.get()
+				)
+			).first->second;
 		}
 	public:
 		/** Returns the [[vulkan_handle::pipeline_layout]] of the pipeline that the brush represents. */

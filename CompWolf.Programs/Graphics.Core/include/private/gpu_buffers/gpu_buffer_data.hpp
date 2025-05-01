@@ -62,7 +62,7 @@ namespace compwolf
 		~gpu_buffer_data()
 		{
 			if (_on_access_freed)
-				_on_access_freed(this);
+				_on_access_freed.value(this);
 		}
 
 		/** Creates access to the given buffer.

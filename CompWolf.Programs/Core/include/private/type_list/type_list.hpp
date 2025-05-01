@@ -139,8 +139,8 @@ namespace compwolf
 
 		/** Constructs the given type with the elements of the [[type_list]], but where each type T is replaced by Transformer<T>::value. */
 		template <template <typename> typename Transformer, typename Type>
-		static constexpr Type transform_to_value
-			= { Transformer<Ts>::value... };
+		static constexpr Type transform_to_value()
+			{ return Type{ Transformer<Ts>::value... }; }
 
 		/** The given template, instantiated with the types in the [[type_list]]. */
 		template <template <typename...> typename TypeList>
@@ -179,7 +179,7 @@ namespace compwolf
 
 		/** Constructs the given type with the elements of the [[type_list]], but where each type T is replaced by Transformer<T>::value. */
 		template <template <typename> typename Transformer, typename Type>
-		static constexpr Type transform_to_value{};
+		static constexpr Type transform_to_value() { return Type{}; };
 
 		/** The given template, instantiated with the types in the [[type_list]]. */
 		template <template <typename...> typename TypeList>

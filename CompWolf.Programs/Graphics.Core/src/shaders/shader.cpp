@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <fstream>
 
-namespace compwolf::vulkan::internal
+namespace compwolf
 {
 	auto shader_code_from_file(std::string path) -> std::vector<uint32_t>
 	{

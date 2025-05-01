@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <cmath>
 
 #include <vulkan_graphics_environments>
 #include <vulkan_windows>
@@ -58,10 +59,10 @@ int main()
 							vertex_buffer_type vertex_buffer(w.gpu(), 4);
 							{
 								auto data = vertex_buffer.data();
-								data[0] = compwolf::float2(-1, -1);
-								data[1] = compwolf::float2(-1, +1);
-								data[2] = compwolf::float2(+1, -1);
-								data[3] = compwolf::float2(+1, +1);
+								data[0] = { -1.f, -1.f };
+								data[1] = { -1.f, +1.f };
+								data[2] = { +1.f, -1.f };
+								data[3] = { +1.f, +1.f };
 							}
 
 							using index_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::input_index, compwolf::shader_int>;
@@ -81,7 +82,10 @@ int main()
 							color_buffer.data()[0] = { .75f, .125f, .5f };
 
 							{
-								compwolf::vulkan::vulkan_drawable<brush_type> square(camera, brush, vertex_buffer, index_buffer, color_buffer);
+								compwolf::vulkan::vulkan_drawable<brush_type> square(camera, brush
+									, vertex_buffer, index_buffer
+									, color_buffer
+								);
 
 								{
 									auto event_key = e.inputs().char_newly_down().subscribe([](const compwolf::input_key_state& key)

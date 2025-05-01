@@ -92,12 +92,12 @@ namespace compwolf
 				::template transform_to_value<
 					internal::vulkan_brush_get_from_pair,
 					std::vector<std::size_t>
-			>;
+			>();
 		}
 		/** Returns the brush's shaders' fields' positions. */
 		static auto field_positions() noexcept -> const std::vector<std::size_t>&
 		{
-			static constexpr auto position = field_positions_val();
+			static auto position = field_positions_val();
 			return position;
 		}
 
@@ -114,7 +114,7 @@ namespace compwolf
 		brush(input_shader_type& input_shader, pixel_shader_type& pixel_shader)
 			: _input_shader(&input_shader), _pixel_shader(&pixel_shader)
 		{
-			if (&input_shader.gpu() != pixel_shader.gpu())
+			if (&input_shader.gpu() != &pixel_shader.gpu())
 				throw std::invalid_argument("Brush was given shaders for different GPUs");
 		}
 	};

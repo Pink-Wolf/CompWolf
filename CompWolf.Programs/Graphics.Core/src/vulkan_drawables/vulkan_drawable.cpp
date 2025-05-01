@@ -12,7 +12,7 @@ namespace compwolf::vulkan::internal
 		, vulkan_handle::buffer vertex_buffer
 		, vulkan_handle::buffer vertex_index_buffer
 		, const vulkan_handle::buffer* field_buffers
-		, const std::vector<shader_int>& field_indices
+		, const std::vector<std::size_t>& field_indices
 		, const std::vector<vulkan_handle::descriptor_set>& descriptor_sets
 	)
 	{
@@ -72,7 +72,7 @@ namespace compwolf::vulkan::internal
 			VkWriteDescriptorSet writer{
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = descriptorSet,
-				.dstBinding = field_indices[i],
+				.dstBinding = static_cast<uint32_t>(field_indices[i]),
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

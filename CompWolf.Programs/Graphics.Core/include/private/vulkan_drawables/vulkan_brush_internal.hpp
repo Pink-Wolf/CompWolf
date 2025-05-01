@@ -3,6 +3,7 @@
 
 #include <vulkan_graphics_environments>
 #include <vulkan_shaders>
+#include <gpu_structs>
 #include <unique_deleter_ptr>
 #include <utility>
 #include <cstdint>

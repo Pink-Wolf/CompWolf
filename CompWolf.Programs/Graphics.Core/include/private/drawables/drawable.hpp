@@ -22,12 +22,12 @@ namespace compwolf
 			template <typename T>
 			struct transformer
 			{
-				using type = BufferType<T>;
+				using type = BufferType<typename T::type>;
 			};
 			template <typename T>
 			struct ptr_transformer
 			{
-				using type = BufferType<T>*;
+				using type = BufferType<typename T::type>*;
 			};
 		};
 	}
@@ -69,7 +69,7 @@ namespace compwolf
 		 */
 		using field_buffer_types = typename brush_type::field_types
 			::template transform<
-				internal::field_buffer<field_buffer_type>::transformer
+				internal::field_buffer<field_buffer_type>::template transformer
 			>
 		;
 		/** For each field of the drawable, the type of pointer to the buffer used to keep that data.
@@ -77,7 +77,7 @@ namespace compwolf
 		 */
 		using field_buffer_ptr_tuple = typename brush_type::field_types
 			::template transform<
-				internal::field_buffer<field_buffer_type>::ptr_transformer
+				internal::field_buffer<field_buffer_type>::template ptr_transformer
 			>
 			::template to_other_container<std::tuple>
 		;
@@ -126,7 +126,7 @@ namespace compwolf
 		auto vertex_index_buffer() const noexcept -> const vertex_index_buffer_type& { return *_vertex_index_buffer; }
 
 		/** Returns the drawable's uniform data, in a tuple. */
-		auto field_buffers() const noexcept -> const field_buffer_ptr_tuple& { return *_field_buffers; }
+		auto field_buffers() const noexcept -> const field_buffer_ptr_tuple& { return _field_buffers; }
 
 	private:
 		template <std::size_t Step>
@@ -190,8 +190,7 @@ namespace compwolf
 			: _camera(&camera), _brush(&brush)
 			, _vertex_buffer(&vertex_buffer), _vertex_index_buffer(&vertex_index_buffer)
 			, _field_buffers(std::move(field_ptrs))
-		{
-		}
+		{ }
 		/** Creates a drawable using the given brush and data. */
 		template <typename... FieldBufferTypes>
 			requires (std::same_as<type_list<FieldBufferTypes...>, field_buffer_types>)
