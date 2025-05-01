@@ -75,6 +75,7 @@ namespace compwolf
 			, ValueType* data, std::size_t size
 			, std::function<void(gpu_buffer_data*)> on_access_freed)
 			: super(data, size)
+			, _buffer(buffer)
 			, _on_access_freed(on_access_freed)
 		{
 		}

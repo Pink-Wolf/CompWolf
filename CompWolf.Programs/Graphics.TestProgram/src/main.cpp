@@ -34,7 +34,7 @@ int main()
 			{
 				compwolf::vulkan::vulkan_camera camera(w, compwolf::window_camera_settings
 					{
-						.background_color = {1, 0, .5f}
+						.background_color = {.25f, 0.25f, .5f}
 					}
 				);
 
@@ -46,7 +46,7 @@ int main()
 
 					using pixel_shader_type = compwolf::vulkan::vulkan_shader<
 						compwolf::float4, compwolf::pixel_output_type
-						, compwolf::type_value_pair<compwolf::opaque_color, 0>
+						, compwolf::type_value_pair<compwolf::opaque_color, 4>
 					>;
 					pixel_shader_type pixel_shader(w.gpu(), compwolf::shader_code_from_file(pixel_shader_path));
 
@@ -59,10 +59,10 @@ int main()
 							vertex_buffer_type vertex_buffer(w.gpu(), 4);
 							{
 								auto data = vertex_buffer.data();
-								data[0] = { -1.f, -1.f };
-								data[1] = { -1.f, +1.f };
-								data[2] = { +1.f, -1.f };
-								data[3] = { +1.f, +1.f };
+								data[0] = { -.5f, -.5f };
+								data[1] = { -.5f, +.5f };
+								data[2] = { +.5f, -.5f };
+								data[3] = { +.5f, +.5f };
 							}
 
 							using index_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::input_index, compwolf::shader_int>;
@@ -70,10 +70,10 @@ int main()
 							{
 								auto data = index_buffer.data();
 								data[0] = 0;
-								data[1] = 1;
-								data[2] = 2;
-								data[3] = 2;
-								data[4] = 1;
+								data[1] = 2;
+								data[2] = 1;
+								data[3] = 1;
+								data[4] = 2;
 								data[5] = 3;
 							}
 

@@ -133,6 +133,9 @@ namespace compwolf
 		 */
 		void unsubscribe(key_type&& observer_key) const noexcept
 		{
+			if (_observers.empty()) // the event was probably destructed without telling the observers
+				return;
+
 			_observers[observer_key.internal_key()] = value_type();
 		}
 
