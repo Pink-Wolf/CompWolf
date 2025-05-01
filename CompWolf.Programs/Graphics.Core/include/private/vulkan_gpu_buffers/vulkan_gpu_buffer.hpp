@@ -24,11 +24,11 @@ namespace compwolf::vulkan
 
 	public: // accessors
 		/** Returns cpu-access to the buffer's data. */
-		auto data() const final -> super::access_type
+		auto data() const -> super::access_type final
 		{
 			return super::access_type(
 				this,
-				_internal.get_data(gpu()), _internal.size,
+				_internal.get_data(super::gpu()), _internal.size,
 				[](super::access_type* accessor)
 				{
 					auto& buffer = *static_cast<vulkan_gpu_buffer*>(accessor.buffer_ptr());
@@ -37,7 +37,7 @@ namespace compwolf::vulkan
 			);
 		}
 		/** Returns the amount of data in this buffer. */
-		auto size() noexcept final -> std::size_t
+		auto size() noexcept -> std::size_t final
 		{
 			return _internal.size;
 		}
@@ -60,7 +60,7 @@ namespace compwolf::vulkan
 
 		/** Creates a buffer on the given gpu. */
 		vulkan_gpu_buffer(vulkan_gpu_connection& gpu, std::size_t size) : super(gpu)
-			, _internal(gpu, usage_type(), sizeof(super::value_type), size)
+			, _internal(gpu, super::usage_type(), sizeof(super::value_type), size)
 		{
 
 		}

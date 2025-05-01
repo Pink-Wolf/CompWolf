@@ -3,6 +3,8 @@
 
 #include <vulkan_graphics_environments>
 #include <vulkan_windows>
+#include <vulkan_shaders>
+#include <vulkan_gpu_buffers>
 #include <vulkan_drawables>
 
 static void debug_callback(std::string_view s)
@@ -36,36 +38,90 @@ int main()
 				);
 
 				{
-					auto event_key = e.inputs().char_newly_down().subscribe([](const compwolf::input_key_state& key)
-						{
-							std::cout << key.character();
-						}
-					);
+					using input_shader_type = compwolf::vulkan::vulkan_shader<
+						compwolf::float2, compwolf::float4
+					>;
+					input_shader_type input_shader(w.gpu(), compwolf::shader_code_from_file(input_shader_path));
 
-					auto clock = std::chrono::high_resolution_clock();
-					auto start_time = clock.now();
-					int frame_count = 0;
-					int frames_per_report = 60;
+					using pixel_shader_type = compwolf::vulkan::vulkan_shader<
+						compwolf::float4, compwolf::pixel_output_type
+						, compwolf::type_value_pair<compwolf::opaque_color, 0>
+					>;
+					pixel_shader_type pixel_shader(w.gpu(), compwolf::shader_code_from_file(pixel_shader_path));
 
-					while (w.running())
 					{
-						w.update_image();
-						e.update();
+						using brush_type = compwolf::vulkan::vulkan_brush<input_shader_type, pixel_shader_type>;
+						brush_type brush(input_shader, pixel_shader);
 
-						++frame_count;
-						if (frame_count >= frames_per_report) [[unlikely]]
 						{
-							auto elapsed_time = std::chrono::duration<double>(clock.now() - start_time).count();
-							auto framerate = frame_count / elapsed_time;
-							std::cout << "framerate: " << framerate << std::endl;
+							using vertex_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::input, compwolf::float2>;
+							vertex_buffer_type vertex_buffer(w.gpu(), 4);
+							{
+								auto data = vertex_buffer.data();
+								data[0] = compwolf::float2(-1, -1);
+								data[1] = compwolf::float2(-1, +1);
+								data[2] = compwolf::float2(+1, -1);
+								data[3] = compwolf::float2(+1, +1);
+							}
 
-							frames_per_report = std::ceil(framerate);
-							frame_count = 0;
-							start_time = clock.now();
+							using index_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::input_index, compwolf::shader_int>;
+							index_buffer_type index_buffer(w.gpu(), 6);
+							{
+								auto data = index_buffer.data();
+								data[0] = 0;
+								data[1] = 1;
+								data[2] = 2;
+								data[3] = 2;
+								data[4] = 1;
+								data[5] = 3;
+							}
+
+							using color_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::field, compwolf::opaque_color>;
+							color_buffer_type color_buffer(w.gpu(), 1);
+							color_buffer.data()[0] = { .75f, .125f, .5f };
+
+							{
+								compwolf::vulkan::vulkan_drawable<brush_type> square(camera, brush, vertex_buffer, index_buffer, color_buffer);
+
+								{
+									auto event_key = e.inputs().char_newly_down().subscribe([](const compwolf::input_key_state& key)
+										{
+											std::cout << key.character();
+										}
+									);
+
+									auto clock = std::chrono::high_resolution_clock();
+									auto start_time = clock.now();
+									int frame_count = 0;
+									int frames_per_report = 60;
+
+									while (w.running())
+									{
+										w.update_image();
+										e.update();
+
+										++frame_count;
+										if (frame_count >= frames_per_report) [[unlikely]]
+										{
+											auto elapsed_time = std::chrono::duration<double>(clock.now() - start_time).count();
+											auto framerate = frame_count / elapsed_time;
+											std::cout << "framerate: " << framerate << std::endl;
+
+											frames_per_report = std::ceil(framerate);
+											frame_count = 0;
+											start_time = clock.now();
+										}
+									}
+
+									std::cout << "\nEnding...\n";
+								}
+								std::cout << "destroying drawable\n";
+							}
+							std::cout << "destroying buffers\n";
 						}
+						std::cout << "destroying brush\n";
 					}
-
-					std::cout << "\nEnding...\n";
+					std::cout << "destroying shaders\n";
 				}
 				std::cout << "destroying camera\n";
 			}

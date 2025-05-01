@@ -7,9 +7,17 @@
 #include <utility>
 #include <concepts>
 #include <stdexcept>
+#include <vector>
 
 namespace compwolf
 {
+	namespace internal
+	{
+		/** @hidden */
+		template <typename T>
+		using vulkan_brush_get_from_pair = T;
+	}
+
 	/** Represents some code that can be used to draw objects on a window.
 	 * This code is a pipeline made out of shaders.
 	 *
@@ -23,7 +31,7 @@ namespace compwolf
 	 * That is, when drawing an object, the shader used to determine the individual pixel colors of the drawing.
 	 */
 	template <typename GraphicsEnvironmentType, typename InputShaderType, typename PixelShaderType>
-		requires (std::same_as<typename InputShaderType::output_Type, typename PixelShaderType::input_type>
+		requires (std::same_as<typename InputShaderType::output_type, typename PixelShaderType::input_type>
 			&& std::same_as<typename PixelShaderType::output_type, pixel_output_type>)
 	class brush
 	{
@@ -47,7 +55,6 @@ namespace compwolf
 			typename input_shader_type::field_types,
 			typename pixel_shader_type::field_types
 		>;
-		
 
 	private:
 		input_shader_type* _input_shader{};
@@ -74,6 +81,25 @@ namespace compwolf
 		auto pixel_shader() noexcept -> typename pixel_shader_type& { return *_pixel_shader; }
 		/** Returns the pixel [[shader]] that the brush uses. */
 		auto pixel_shader() const noexcept -> const typename pixel_shader_type& { return *_pixel_shader; }
+		
+		/** Returns the brush's shaders' fields' positions, by value.
+		 * Returning by value allows this to be run at compile-time.
+		 * @see brush::field_position
+		 */
+		static constexpr auto field_positions_val() noexcept -> std::vector<std::size_t>
+		{
+			return field_types
+				::template transform_to_value<
+					internal::vulkan_brush_get_from_pair,
+					std::vector<std::size_t>
+			>;
+		}
+		/** Returns the brush's shaders' fields' positions. */
+		static auto field_positions() noexcept -> const std::vector<std::size_t>&
+		{
+			static constexpr auto position = field_positions_val();
+			return position;
+		}
 
 	public: // constructors
 		/** Constructs an invalid [[brush]].

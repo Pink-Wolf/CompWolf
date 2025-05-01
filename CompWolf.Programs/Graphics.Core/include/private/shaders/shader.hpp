@@ -4,10 +4,17 @@
 #include <type_value_pairs>
 #include <type_lists>
 #include <utility>
+#include <string>
+#include <vector>
 
 namespace compwolf
 {
 	struct pixel_output_type;
+
+	/** Gets the SPIR-V code from the given file. SPIR-V code is used to construct a shader.
+	 * @throws std::runtime_error if the given file could not be found or opened.
+	 */
+	auto shader_code_from_file(std::string) -> std::vector<uint32_t>;
 
 	/** Represents some code on a gpu.
 	 * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this shader works with.
@@ -25,9 +32,9 @@ namespace compwolf
 		/** The type of [[graphics_environment]] that this shader works with. */
 		using environment_type = GraphicsEnvironmentType;
 		/** The type of element that the shader takes as input. */
-		using input_Type = InputType;
+		using input_type = InputType;
 		/** The type of element that the shader outputs. */
-		using output_Type = OutputType;
+		using output_type = OutputType;
 		/** The type and position of the shader's fields, in a [[type_list]]. */
 		using field_types = type_list<FieldTypes...>;
 

@@ -62,6 +62,7 @@ namespace compwolf::vulkan
 
 							vulkan_draw_code_parameters draw_code_args{
 								code_args,
+								&window(),
 								draw_args.target_frame,
 								draw_args.target_frame_index
 							};

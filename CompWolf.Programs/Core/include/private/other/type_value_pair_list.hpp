@@ -16,7 +16,7 @@ namespace compwolf
 			using types = typename PairList1::template and_type_list<PairList2>;
 		};
 		template <typename PairList1, typename PairList2>
-			requires ((PairList1::empty && PairList2::empty) == false)
+			requires ((PairList1::empty || PairList2::empty) == false)
 		struct merge_type_value_pairs_by_value<PairList1, PairList2>
 		{
 			using types = std::conditional_t<(PairList1::template at<0>::value < PairList2::template at<0>::value)

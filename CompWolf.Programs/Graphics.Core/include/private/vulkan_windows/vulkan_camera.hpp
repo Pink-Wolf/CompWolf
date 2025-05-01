@@ -15,6 +15,10 @@ namespace compwolf::vulkan
 	/** Aggregate type containing data passed by [[vulkan_gpu_program]], which are created by [[vulkan_camera]] for drawing, to its code. */
 	struct vulkan_draw_code_parameters : public vulkan_code_parameters
 	{
+		/** The window to draw onto.
+		 * @see vulkan_window
+		 */
+		const vulkan_window* window;
 		/** The window's frame to draw onto.
 		 * @see swapchain_frame
 		 */

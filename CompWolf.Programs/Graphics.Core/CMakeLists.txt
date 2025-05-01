@@ -9,6 +9,8 @@ set(DEPENDENT_COMPWOLF_TARGETS
     "Core"
 )
 set(SOURCES
+    "src/shaders/shader.cpp"
+
     "src/vulkan_graphics_environments/vulkan_gpu_connection.cpp"
     "src/vulkan_graphics_environments/glfw_environment.cpp"
     "src/vulkan_graphics_environments/vulkan_environment.cpp"
@@ -25,6 +27,7 @@ set(SOURCES
     "src/vulkan_shaders/vulkan_shader_internal.cpp"
     "src/vulkan_gpu_buffers/vulkan_gpu_buffer_internal.cpp"
     "src/vulkan_drawables/vulkan_brush_internal.cpp"
+    "src/vulkan_drawables/vulkan_drawable.cpp"
 )
 set(RESOURCES
     "resources/CompWolf.Graphics.simple_vertex_shader.vert"

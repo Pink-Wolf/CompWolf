@@ -18,7 +18,7 @@ namespace compwolf::vulkan::internal
 		const std::vector<std::size_t> input_primitive_offsets;
 		std::size_t input_stride;
 
-		std::vector<std::size_t> field_primitive_indices;
+		const std::vector<std::size_t>* field_indices;
 		std::vector<bool> field_is_input_field;
 		std::vector<bool> field_is_pixel_field;
 	};

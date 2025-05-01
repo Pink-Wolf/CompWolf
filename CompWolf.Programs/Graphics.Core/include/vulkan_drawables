@@ -4,3 +4,4 @@
 #include "drawables"
 
 #include "private/vulkan_drawables/vulkan_brush.hpp"
+#include "private/vulkan_drawables/vulkan_drawable.hpp"

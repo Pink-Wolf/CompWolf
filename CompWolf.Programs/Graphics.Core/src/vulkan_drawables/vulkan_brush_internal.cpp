@@ -19,11 +19,11 @@ namespace compwolf::vulkan::internal
 		VkDescriptorSetLayout descriptorSetLayout;
 		{
 			std::vector<VkDescriptorSetLayoutBinding> uniformBindings;
-			uniformBindings.reserve(info.field_primitive_indices.size() * 2);
-			for (std::size_t i = 0; i < info.field_primitive_indices.size(); ++i)
+			uniformBindings.reserve(info.field_indices->size() * 2);
+			for (std::size_t i = 0; i < info.field_indices->size(); ++i)
 			{
 				VkDescriptorSetLayoutBinding layoutBinding{
-					.binding = static_cast<uint32_t>(info.field_primitive_indices[i]),
+					.binding = static_cast<uint32_t>(info.field_indices->at(i)),
 					.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 					.descriptorCount = 1,
 				};

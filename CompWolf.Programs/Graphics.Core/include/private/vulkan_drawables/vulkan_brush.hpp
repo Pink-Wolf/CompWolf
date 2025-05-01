@@ -25,7 +25,7 @@ namespace compwolf::vulkan
 			template <typename T>
 			struct transformer
 			{
-				static constexpr bool value = TypeList::template contains<T>;
+				static constexpr bool value = TypeList::template has<T>;
 			};
 		};
 	}
@@ -50,33 +50,30 @@ namespace compwolf::vulkan
 		{
 			.input_primitive_formats
 				= gpu_struct_info<typename super::input_shader_type::input_type>::primitives
+				:: template transform<internal::vulkan_brush_get_from_pair>
 				:: template transform_to_value<
 					get_vulkan_format,
 					std::vector<vulkan_handle::format>
 				>,
 			.input_primitive_offsets
 				= gpu_struct_info<typename super::input_shader_type::input_type>::primitives
-				::template transform_to_value<
+				:: template transform_to_value<
 					internal::vulkan_brush_get_from_pair,
 					std::vector<std::size_t>
 				>,
 			.input_stride
 				= sizeof(typename super::input_shader_type::input_type),
 
-			.field_primitive_indices
-				= super::field_types
-				::template transform_to_value<
-					internal::vulkan_brush_get_from_pair,
-					std::vector<std::size_t>
-				>,
+			.field_indices
+				= &super::field_positions(),
 			.field_is_input_field
 				= super::field_types::template transform_to_value<
-					internal::template is_in<typename super::input_shader_type>::transformer,
+					internal::template is_in<typename super::input_shader_type::field_types>::transformer,
 					std::vector<bool>
 				>,
 			.field_is_pixel_field
 				= super::field_types::template transform_to_value<
-					internal::template is_in<typename super::pixel_shader_type>::transformer,
+					internal::template is_in<typename super::pixel_shader_type::field_types>::transformer,
 					std::vector<bool>
 				>,
 		};
