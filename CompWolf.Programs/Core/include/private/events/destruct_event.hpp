@@ -27,14 +27,14 @@ namespace compwolf
 		 * @overload
 		 */
 		destruct_event() noexcept = default;
-		destruct_event(const event<ParameterType>& other) : event<>(other) {}
-		auto operator=(const event<ParameterType>& other) -> destruct_event&
+		destruct_event(const destruct_event<ParameterType>& other) : event<>(other) {}
+		auto operator=(const destruct_event<ParameterType>& other) -> destruct_event&
 		{
 			invoke(data());
 			event<ParameterType>::operator=(other);
 		}
-		destruct_event(event<ParameterType>&& other) : event<>(std::move(other)) {}
-		auto operator=(event<ParameterType>&& other) -> destruct_event&
+		destruct_event(destruct_event<ParameterType>&& other) : event<>(std::move(other)) {}
+		auto operator=(destruct_event<ParameterType>&& other) -> destruct_event&
 		{
 			invoke(data());
 			event<ParameterType>::operator=(std::move(other));
@@ -53,15 +53,15 @@ namespace compwolf
 	{
 	public: // constructors
 		destruct_event() noexcept = default;
-		destruct_event(const event<>& other) : event<>(other) {}
-		auto operator=(const event<>& other) -> destruct_event&
+		destruct_event(const destruct_event<>& other) : event<>(other) {}
+		auto operator=(const destruct_event<>& other) -> destruct_event&
 		{
 			invoke();
 			event<>::operator=(other);
 			return *this;
 		}
-		destruct_event(event<>&& other) : event<>(std::move(other)) {}
-		auto operator=(event<>&& other) -> destruct_event&
+		destruct_event(destruct_event<>&& other) : event<>(std::move(other)) {}
+		auto operator=(destruct_event<>&& other) -> destruct_event&
 		{
 			invoke();
 			event<>::operator=(std::move(other));

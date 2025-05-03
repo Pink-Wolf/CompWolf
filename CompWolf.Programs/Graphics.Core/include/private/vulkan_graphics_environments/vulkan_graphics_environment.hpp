@@ -21,6 +21,14 @@ namespace compwolf::vulkan
 
 		static std::vector<vulkan_gpu_connection> _gpus;
 
+		static destruct_event<> _destruct_event;
+
+	public: // events
+		auto destructing() const noexcept -> const destruct_event<>& final
+		{
+			return _destruct_event;
+		}
+
 	public: // constructors
 		/** Constructs an invalid [[vulkan_graphics_environment]].
 		 * Using this environment is undefined behaviour.

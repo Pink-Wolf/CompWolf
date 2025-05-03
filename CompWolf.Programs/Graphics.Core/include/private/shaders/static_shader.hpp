@@ -29,10 +29,17 @@ namespace compwolf
 		/** The type and position of the shader's fields, in a [[type_list]]. */
 		using field_types = typename shader_type::field_types;
 
-
 	private:
-		static inline std::map<typename environment_type::gpu_type*, shader_type> _shaders;
-		static inline std::vector<uint32_t> _code = shader_code_from_file(CodePath);
+		struct element_constructor
+		{
+			static auto func(void* mapPtr, typename environment_type::gpu_type& gpu)
+			{
+				auto code = shader_code_from_file(CodePath);
+				return shader_type(gpu, code);
+			}
+		};
+		using map_type = gpu_map<ShaderType, element_constructor>;
+		static inline map_type _shaders;
 
 	public: // accessors
 		/** Returns the path to the shader file. */
@@ -41,12 +48,15 @@ namespace compwolf
 		/** Returns the shader instance for the given gpu. */
 		static auto get(typename environment_type::gpu_type& gpu) noexcept -> shader_type&
 		{
-			auto key = &gpu;
-			auto i = _shaders.find(key);
-			if (i != _shaders.end()) return i->second;
-			return _shaders.emplace(key
-				, shader_type(gpu, _code)
-			).first->second;
+			if (!_shaders.is_valid())
+			{
+				auto code = shader_code_from_file(CodePath);
+				// in-place construction so assignment does not break pointers
+				_shaders.~map_type();
+				new (&_shaders)map_type(gpu, code);
+			}
+
+			return _shaders.get(gpu);
 		}
 	};
 }

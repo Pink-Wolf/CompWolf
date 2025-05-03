@@ -11,6 +11,7 @@ namespace compwolf::vulkan
 	vulkan_environment vulkan_graphics_environment::_vulkan_environment;
 	vulkan_debug_environment vulkan_graphics_environment::_vulkan_debug_environment;
 	std::vector<vulkan_gpu_connection> vulkan_graphics_environment::_gpus{};
+	destruct_event<> vulkan_graphics_environment::_destruct_event{};
 
 	static int _instanceCount{0};
 
@@ -74,6 +75,7 @@ namespace compwolf::vulkan
 		auto newInstanceCount = --_instanceCount;
 		if (newInstanceCount == 0)
 		{
+			_destruct_event = destruct_event<>();
 			_gpus.clear();
 			_vulkan_debug_environment = vulkan_debug_environment();
 			_vulkan_environment = vulkan_environment();

@@ -2,6 +2,7 @@
 #include "private/graphics_environments/gpu_work_type.hpp"
 #include "private/graphics_environments/gpu_work_type_set.hpp"
 #include "private/graphics_environments/gpu_connection.hpp"
+#include "private/graphics_environments/gpu_map.hpp"
 
 #include "private/graphics_environments/input_state.hpp"
 #include "private/graphics_environments/graphics_environment_settings.hpp"

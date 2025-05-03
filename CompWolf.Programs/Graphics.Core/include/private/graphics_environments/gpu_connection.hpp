@@ -2,6 +2,7 @@
 #define COMPWOLF_GPU_CONNECTION
 
 #include "graphics_environment.hpp"
+#include <events>
 
 namespace compwolf
 {
@@ -19,6 +20,14 @@ namespace compwolf
 		environment_type* _environment;
 
 		gpu_work_type_set _work_types{};
+
+		const destruct_event<>* _destruct_event;
+
+	public: // events
+		auto destructing() const noexcept -> const destruct_event<>&
+		{
+			return *_destruct_event;
+		}
 
 	public: // accessors
 		/** Returns the environment that the gpu is on.
@@ -63,6 +72,7 @@ namespace compwolf
 		 */
 		gpu_connection(environment_type& environment, gpu_work_type_set work_types)
 			: _environment(&environment), _work_types(work_types)
+			, _destruct_event(&environment.destructing())
 		{}
 	};
 }

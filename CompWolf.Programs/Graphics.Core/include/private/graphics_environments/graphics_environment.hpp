@@ -15,6 +15,7 @@ namespace compwolf
 	 * This class is abstract; a derived type should generally implement/override:
 	 * * [[graphics_environment::gpus]],
 	 * * [[graphics_environment::update]].
+	 * * [[graphics_environment::destructing]],
 	 * 
 	 * The term "main graphics thread" refers to the thread this was constructed on.
 	 * @typeparam GpuType The boundary class representing one or more GPUs on a machine.
@@ -34,6 +35,9 @@ namespace compwolf
 		std::thread::id _main_graphics_thread;
 
 		event<> _updating;
+
+	public: // events
+		virtual auto destructing() const noexcept -> const destruct_event<> & = 0;
 
 	public: // constructors
 		/** Constructs an invalid [[graphics_environment]].
