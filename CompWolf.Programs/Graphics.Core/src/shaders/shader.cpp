@@ -2,15 +2,16 @@
 
 #include <stdexcept>
 #include <fstream>
+#include <string>
 
 namespace compwolf
 {
-	auto shader_code_from_file(std::string path) -> std::vector<uint32_t>
+	auto shader_code_from_file(const char* path) -> std::vector<uint32_t>
 	{
 		// file is read in individual bytes to keep little-endian.
 
 		std::ifstream stream(path, std::ios::binary | std::ios::in | std::ios::ate);
-		if (!stream.is_open()) throw std::runtime_error("Could not open \"" + path + "\".");
+		if (!stream.is_open()) throw std::runtime_error("Could not open \"" + std::string(path) + "\".");
 
 		std::vector<uint32_t> data;
 		data.resize(stream.tellg() / 4);

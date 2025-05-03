@@ -4,7 +4,6 @@
 #include <type_value_pairs>
 #include <type_lists>
 #include <utility>
-#include <string>
 #include <vector>
 
 namespace compwolf
@@ -14,7 +13,7 @@ namespace compwolf
 	/** Gets the SPIR-V code from the given file. SPIR-V code is used to construct a shader.
 	 * @throws std::runtime_error if the given file could not be found or opened.
 	 */
-	auto shader_code_from_file(std::string) -> std::vector<uint32_t>;
+	auto shader_code_from_file(const char*) -> std::vector<uint32_t>;
 
 	/** Represents some code on a gpu.
 	 * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this shader works with.

@@ -14,7 +14,14 @@ static void debug_callback(std::string_view s)
 }
 
 constexpr const char input_shader_path[] = "resources/vertex.spv";
+using input_shader_type = compwolf::static_shader<input_shader_path, compwolf::vulkan::vulkan_shader<
+	compwolf::float2, compwolf::float4
+>>;
 constexpr const char pixel_shader_path[] = "resources/pixel.spv";
+using pixel_shader_type = compwolf::static_shader<pixel_shader_path, compwolf::vulkan::vulkan_shader<
+	compwolf::float4, compwolf::pixel_output_type,
+	compwolf::type_value_pair<compwolf::float3, 4>
+>>;
 
 int main()
 {
@@ -39,19 +46,11 @@ int main()
 				);
 
 				{
-					using input_shader_type = compwolf::vulkan::vulkan_shader<
-						compwolf::float2, compwolf::float4
-					>;
-					input_shader_type input_shader(w.gpu(), compwolf::shader_code_from_file(input_shader_path));
-
-					using pixel_shader_type = compwolf::vulkan::vulkan_shader<
-						compwolf::float4, compwolf::pixel_output_type
-						, compwolf::type_value_pair<compwolf::float3, 4>
-					>;
-					pixel_shader_type pixel_shader(w.gpu(), compwolf::shader_code_from_file(pixel_shader_path));
+					auto& input_shader = input_shader_type::get(w.gpu());
+					auto& pixel_shader = pixel_shader_type::get(w.gpu());
 
 					{
-						using brush_type = compwolf::vulkan::vulkan_brush<input_shader_type, pixel_shader_type>;
+						using brush_type = compwolf::vulkan::vulkan_brush<input_shader_type::shader_type, pixel_shader_type::shader_type>;
 						brush_type brush(input_shader, pixel_shader);
 
 						{

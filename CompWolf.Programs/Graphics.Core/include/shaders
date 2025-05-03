@@ -1,3 +1,4 @@
 // Contains [[shader]], which represents some code on the gpu.
 
 #include "private/shaders/shader.hpp"
+#include "private/shaders/static_shader.hpp"
