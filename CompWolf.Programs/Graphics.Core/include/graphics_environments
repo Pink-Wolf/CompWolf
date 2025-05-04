@@ -7,3 +7,5 @@
 #include "private/graphics_environments/input_state.hpp"
 #include "private/graphics_environments/graphics_environment_settings.hpp"
 #include "private/graphics_environments/graphics_environment.hpp"
+
+#include "private/graphics_environments/ImplementationType.hpp"

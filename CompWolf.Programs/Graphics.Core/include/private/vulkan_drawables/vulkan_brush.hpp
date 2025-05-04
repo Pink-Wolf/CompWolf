@@ -41,9 +41,9 @@ namespace compwolf::vulkan
 	 */
 	template <typename InputShaderType, typename PixelShaderType>
 	class vulkan_brush
-		: public brush<vulkan_graphics_environment, InputShaderType, PixelShaderType>
+		: public brush<InputShaderType, PixelShaderType>
 	{
-		using super = brush<vulkan_graphics_environment, InputShaderType, PixelShaderType>;
+		using super = brush<InputShaderType, PixelShaderType>;
 
 	private:
 		static inline internal::vulkan_brush_info _internal_info

@@ -2,11 +2,10 @@
 #include <chrono>
 #include <cmath>
 
-#include <vulkan_graphics_environments>
-#include <vulkan_windows>
-#include <vulkan_shaders>
-#include <vulkan_gpu_buffers>
-#include <vulkan_drawables>
+#include <simple_drawables>
+#include <vulkan_graphics>
+
+using graphics_types = compwolf::vulkan_types;
 
 static void debug_callback(std::string_view s)
 {
@@ -25,112 +24,82 @@ using pixel_shader_type = compwolf::static_shader<pixel_shader_path, compwolf::v
 
 int main()
 {
-	{
-		compwolf::vulkan::vulkan_graphics_environment_settings es{
-			.internal_debug_callback = &debug_callback
-		};
-		compwolf::vulkan::vulkan_graphics_environment e(es);
+	compwolf::vulkan::vulkan_graphics_environment_settings environment_settings{
+		.internal_debug_callback = &debug_callback
+	};
+	graphics_types::environment environment(environment_settings);
 
-		{
-			compwolf::window_settings ws{
-				.name = "Window1",
+	graphics_types::window window(environment, compwolf::window_settings{
+				.name = "Hello Window!",
 				.pixel_size = {640, 480},
-			};
-			compwolf::vulkan::vulkan_window w(e, ws);
+	});
+	auto& gpu = window.gpu();
 
-			{
-				compwolf::vulkan::vulkan_camera camera(w, compwolf::window_camera_settings
-					{
-						.background_color = {.25f, 0.25f, .5f}
-					}
-				);
-
-				{
-					auto& input_shader = input_shader_type::get(w.gpu());
-					auto& pixel_shader = pixel_shader_type::get(w.gpu());
-
-					{
-						using brush_type = compwolf::vulkan::vulkan_brush<input_shader_type::shader_type, pixel_shader_type::shader_type>;
-						brush_type brush(input_shader, pixel_shader);
-
-						{
-							using vertex_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::input, compwolf::float2>;
-							vertex_buffer_type vertex_buffer(w.gpu(), 4);
-							{
-								auto data = vertex_buffer.data();
-								data[0] = { -.5f, -.5f };
-								data[1] = { -.5f, +.5f };
-								data[2] = { +.5f, -.5f };
-								data[3] = { +.5f, +.5f };
-							}
-
-							using index_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::input_index, compwolf::shader_int>;
-							index_buffer_type index_buffer(w.gpu(), 6);
-							{
-								auto data = index_buffer.data();
-								data[0] = 0;
-								data[1] = 2;
-								data[2] = 1;
-								data[3] = 1;
-								data[4] = 2;
-								data[5] = 3;
-							}
-
-							using color_buffer_type = compwolf::vulkan::vulkan_gpu_buffer<compwolf::gpu_buffer_usage::field, compwolf::float3>;
-							color_buffer_type color_buffer(w.gpu(), 1);
-							color_buffer.data()[0] = { .75f, .125f, .5f };
-
-							{
-								compwolf::vulkan::vulkan_drawable<brush_type> square(camera, brush
-									, vertex_buffer, index_buffer
-									, color_buffer
-								);
-
-								{
-									auto event_key = e.inputs().char_newly_down().subscribe([](const compwolf::input_key_state& key)
-										{
-											std::cout << key.character();
-										}
-									);
-
-									auto clock = std::chrono::high_resolution_clock();
-									auto start_time = clock.now();
-									int frame_count = 0;
-									int frames_per_report = 60;
-
-									while (w.running())
-									{
-										w.update_image();
-										e.update();
-
-										++frame_count;
-										if (frame_count >= frames_per_report) [[unlikely]]
-										{
-											auto elapsed_time = std::chrono::duration<double>(clock.now() - start_time).count();
-											auto framerate = frame_count / elapsed_time;
-											std::cout << "framerate: " << framerate << std::endl;
-
-											frames_per_report = std::ceil(framerate);
-											frame_count = 0;
-											start_time = clock.now();
-										}
-									}
-
-									std::cout << "\nEnding...\n";
-								}
-								std::cout << "destroying drawable\n";
-							}
-							std::cout << "destroying buffers\n";
-						}
-						std::cout << "destroying brush\n";
-					}
-					std::cout << "destroying shaders\n";
-				}
-				std::cout << "destroying camera\n";
-			}
-			std::cout << "destroying window\n";
+	graphics_types::camera camera(window, compwolf::window_camera_settings
+		{
+			.background_color = {.25f, 0.25f, .5f}
 		}
-		std::cout << "destroying environment\n";
+	);
+
+	compwolf::simple_shape<graphics_types>::vertex_buffer_type
+		vertices(window.gpu(), 4);
+	{
+		auto data = vertices.data();
+		data[0] = { -.5f, -.5f };
+		data[1] = { -.5f, +.5f };
+		data[2] = { +.5f, -.5f };
+		data[3] = { +.5f, +.5f };
 	}
-	std::cout << "everything is destroyed\n";
+
+	compwolf::simple_shape<graphics_types>::vertex_index_buffer_type
+		indices(window.gpu(), 6);
+	{
+		auto data = indices.data();
+		data[0] = 0;
+		data[1] = 2;
+		data[2] = 1;
+		data[3] = 1;
+		data[4] = 2;
+		data[5] = 3;
+	}
+
+	compwolf::simple_brush<graphics_types> brush(camera);
+	compwolf::simple_shape<graphics_types> square(camera, brush, vertices, indices
+		, { .25f, .25f }, { .75f, .125f, .5f }
+	);
+
+
+	auto event_key = environment.inputs().char_newly_down().subscribe([&square](const compwolf::input_key_state& key)
+		{
+			if (key.lowercase_character() == 'w') square.position().data()[0].y() -= .1f;
+			if (key.lowercase_character() == 'a') square.position().data()[0].x() -= .1f;
+			if (key.lowercase_character() == 's') square.position().data()[0].y() += .1f;
+			if (key.lowercase_character() == 'd') square.position().data()[0].x() += .1f;
+		}
+	);
+
+	auto clock = std::chrono::high_resolution_clock();
+	auto start_time = clock.now();
+	int frame_count = 0;
+	int frames_per_report = 60;
+
+	while (window.running())
+	{
+		window.update_image();
+		environment.update();
+
+		++frame_count;
+		if (frame_count >= frames_per_report) [[unlikely]]
+		{
+			auto elapsed_time = std::chrono::duration<double>(clock.now() - start_time).count();
+			auto framerate = frame_count / elapsed_time;
+			std::cout << "framerate: " << framerate << std::endl;
+
+			frames_per_report = std::ceil(framerate);
+			frame_count = 0;
+			start_time = clock.now();
+		}
+	}
+
+	std::cout << "\nEnding...\n";
 }

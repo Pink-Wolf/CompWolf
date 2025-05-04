@@ -1,0 +1,3 @@
+// Contains [[vulkan_types]], which contains a Vulkan implementation of [[Graphics.Core]].
+
+#include "private/vulkan_graphics/vulkan_types.hpp"

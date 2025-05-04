@@ -55,6 +55,12 @@ namespace compwolf
 		auto window() noexcept -> window_type& { return *_window; };
 		/** The [[window]] that this image is on. */
 		auto window() const noexcept -> const window_type& { return *_window; };
+		/** Returns the gpu that the camera is on.
+		 * @customoverload
+		 */
+		auto gpu() noexcept -> typename window_type::environment_type::gpu_type& { return window().gpu(); }
+		/** Returns the gpu that the camera is on. */
+		auto gpu() const noexcept -> const typename window_type::environment_type::gpu_type& { return window().gpu(); }
 
 		/** How far towards the window's left border that the camera will be displayed.
 		 * -1 is the window's right border, 1 is the window's left border.

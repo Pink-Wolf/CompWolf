@@ -55,6 +55,11 @@ namespace compwolf
 			static_assert(StartIndex <= EndIndex, "invalid argument! type_list::subrange was given an end index before the given start index");
 			using type = get_subrange_internal<StartIndex, EndIndex, Types...>::type;
 		};
+		template <std::size_t Index, typename... Types>
+		struct get_subrange<Index, Index, Types...>
+		{
+			using type = type_list<>;
+		};
 
 		/** @hidden */
 		struct type_list_base {};
@@ -106,7 +111,9 @@ namespace compwolf
 		template <std::size_t Index>
 		using at = internal::get_type_at_index<Index, Ts...>::type;
 
-		/** Gets a [[type_list]] with the types at the given indices. */
+		/** Gets a [[type_list]] with the types at the given indices.
+		 * If (InclusiveStartIndex == ExclusiveEndIndex), then returns an empty [[type_list]].
+		 */
 		template <std::size_t InclusiveStartIndex, std::size_t ExclusiveEndIndex>
 		using subrange = internal::get_subrange<InclusiveStartIndex, ExclusiveEndIndex, Ts...>::type;
 		/** Gets a [[type_list]] with the first N types. */

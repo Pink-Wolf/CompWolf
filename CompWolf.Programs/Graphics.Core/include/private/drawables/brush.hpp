@@ -24,20 +24,19 @@ namespace compwolf
 	 * This class is abstract; a derived type should generally implement/override:
 	 * * [[brush::draw]]
 	 *
-	 * @typeparam GraphicsEnvironmentType The type of [[graphics_environment]] that this buffer works with.
 	 * @typeparam InputShaderType The type of vertex shader used by the brush.
 	 * That is, when drawing an object, the shader used to modify the object's elements/vertices.
 	 * @typeparam PixelShaderType The type of fragment shader used by the brush.
 	 * That is, when drawing an object, the shader used to determine the individual pixel colors of the drawing.
 	 */
-	template <typename GraphicsEnvironmentType, typename InputShaderType, typename PixelShaderType>
+	template <typename InputShaderType, typename PixelShaderType>
 		requires (std::same_as<typename InputShaderType::output_type, typename PixelShaderType::input_type>
 			&& std::same_as<typename PixelShaderType::output_type, pixel_output_type>)
 	class brush
 	{
 	public:
 		/** The type of [[graphics_environment]] that this brush works with. */
-		using environment_type = GraphicsEnvironmentType;
+		using environment_type = typename InputShaderType::environment_type;
 		/** The type of vertex shader used by the brush.
 		 * That is, when drawing an object, the shader used to modify the object's elements/vertices.
 		 */
