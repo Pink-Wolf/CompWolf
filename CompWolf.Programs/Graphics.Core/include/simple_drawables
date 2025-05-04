@@ -4,3 +4,5 @@
 #include "private/simple_drawables/single_color_pixel_shader.hpp"
 #include "private/simple_drawables/simple_brush.hpp"
 #include "private/simple_drawables/simple_shape.hpp"
+
+#include "private/simple_drawables/simple_square.hpp"

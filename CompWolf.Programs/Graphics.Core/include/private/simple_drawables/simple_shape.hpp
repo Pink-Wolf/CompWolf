@@ -74,6 +74,13 @@ namespace compwolf
 		/** Returns the color of the shape. */
 		auto color() const noexcept -> const position_buffer_type& { return _color; }
 
+		/** Returns the gpu that the shape is on.
+		 * @customoverload
+		 */
+		auto gpu() noexcept -> typename Implementation::gpu& { return vertices().gpu(); }
+		/** Returns the gpu that the shape is on. */
+		auto gpu() const noexcept -> const typename Implementation::gpu& { return vertices().gpu(); }
+
 	public: // constructors
 		/** Constructs an invalid [[simple_shape]].
 		 * Using this shape is undefined behaviour.

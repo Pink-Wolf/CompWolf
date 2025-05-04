@@ -41,30 +41,8 @@ int main()
 		}
 	);
 
-	compwolf::simple_shape<graphics_types>::vertex_buffer_type
-		vertices(window.gpu(), 4);
-	{
-		auto data = vertices.data();
-		data[0] = { -.5f, -.5f };
-		data[1] = { -.5f, +.5f };
-		data[2] = { +.5f, -.5f };
-		data[3] = { +.5f, +.5f };
-	}
-
-	compwolf::simple_shape<graphics_types>::vertex_index_buffer_type
-		indices(window.gpu(), 6);
-	{
-		auto data = indices.data();
-		data[0] = 0;
-		data[1] = 2;
-		data[2] = 1;
-		data[3] = 1;
-		data[4] = 2;
-		data[5] = 3;
-	}
-
 	compwolf::simple_brush<graphics_types> brush(camera);
-	compwolf::simple_shape<graphics_types> square(camera, brush, vertices, indices
+	compwolf::simple_square<graphics_types> square(camera, brush
 		, { .25f, .25f }, { .75f, .125f, .5f }
 	);
 
