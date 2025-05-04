@@ -12,28 +12,16 @@ static void debug_callback(std::string_view s)
 	std::cout << s;
 }
 
-constexpr const char input_shader_path[] = "resources/vertex.spv";
-using input_shader_type = compwolf::static_shader<input_shader_path, compwolf::vulkan::vulkan_shader<
-	compwolf::float2, compwolf::float4
->>;
-constexpr const char pixel_shader_path[] = "resources/pixel.spv";
-using pixel_shader_type = compwolf::static_shader<pixel_shader_path, compwolf::vulkan::vulkan_shader<
-	compwolf::float4, compwolf::pixel_output_type,
-	compwolf::type_value_pair<compwolf::float3, 4>
->>;
-
 int main()
 {
-	compwolf::vulkan::vulkan_graphics_environment_settings environment_settings{
+	graphics_types::environment environment(compwolf::vulkan::vulkan_graphics_environment_settings{
 		.internal_debug_callback = &debug_callback
-	};
-	graphics_types::environment environment(environment_settings);
+	});
 
 	graphics_types::window window(environment, compwolf::window_settings{
-				.name = "Hello Window!",
-				.pixel_size = {640, 480},
+		.name = "Hello Window!",
+		.pixel_size = {640, 640},
 	});
-	auto& gpu = window.gpu();
 
 	graphics_types::camera camera(window, compwolf::window_camera_settings
 		{
@@ -43,17 +31,12 @@ int main()
 
 	compwolf::simple_brush<graphics_types> brush(camera);
 	compwolf::simple_square<graphics_types> square(camera, brush
-		, { .25f, .25f }, { .75f, .125f, .5f }
-	);
-
-
-	auto event_key = environment.inputs().char_newly_down().subscribe([&square](const compwolf::input_key_state& key)
+		, compwolf::simple_transform_data
 		{
-			if (key.lowercase_character() == 'w') square.position().data()[0].y() -= .1f;
-			if (key.lowercase_character() == 'a') square.position().data()[0].x() -= .1f;
-			if (key.lowercase_character() == 's') square.position().data()[0].y() += .1f;
-			if (key.lowercase_character() == 'd') square.position().data()[0].x() += .1f;
+			.position = { .0f, .0f },
+			.scale = { .25f, .25f },
 		}
+		, {.75f, .125f, .5f}
 	);
 
 	auto clock = std::chrono::high_resolution_clock();
@@ -65,6 +48,11 @@ int main()
 	{
 		window.update_image();
 		environment.update();
+
+		if (environment.inputs().state_for('w').down()) square.transform().data()[0].position.y() -= .0005f;
+		if (environment.inputs().state_for('a').down()) square.transform().data()[0].position.x() -= .0005f;
+		if (environment.inputs().state_for('s').down()) square.transform().data()[0].position.y() += .0005f;
+		if (environment.inputs().state_for('d').down()) square.transform().data()[0].position.x() += .0005f;
 
 		++frame_count;
 		if (frame_count >= frames_per_report) [[unlikely]]

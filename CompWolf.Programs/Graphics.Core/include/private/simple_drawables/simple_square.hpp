@@ -44,10 +44,10 @@ namespace compwolf
 			};
 			{
 				auto v = data.vertices.data();
-				v[0] = { -.5f, -.5f };
-				v[1] = { -.5f, +.5f };
-				v[2] = { +.5f, -.5f };
-				v[3] = { +.5f, +.5f };
+				v[0] = { -1.f, -1.f };
+				v[1] = { -1.f, +1.f };
+				v[2] = { +1.f, -1.f };
+				v[3] = { +1.f, +1.f };
 			}
 			{
 				auto i = data.indices.data();
@@ -79,13 +79,13 @@ namespace compwolf
 		 * Note that this data is stored outside of the [[simple_square]].
 		 * @param indices The indices making up this shape.
 		 * Note that this data is stored outside of the [[simple_square]].
-		 * @param position The position of the shape.
+		 * @param transform The position and scale of the shape.
 		 * @param color The color of the shape.
 		 */
 		simple_square(Implementation::camera& camera
 			, simple_brush<Implementation>& brush
-			, float2 position = float2(), float3 color = float3())
-			: super(camera, brush, get_gpu_data(camera.gpu()).vertices, get_gpu_data(camera.gpu()).indices, position, color)
+			, simple_transform_data transform = simple_transform_data(), float3 color = float3())
+			: super(camera, brush, get_gpu_data(camera.gpu()).vertices, get_gpu_data(camera.gpu()).indices, transform, color)
 		{
 			++get_gpu_data(super::gpu()).instance_count;
 		}

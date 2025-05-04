@@ -29,9 +29,9 @@ namespace compwolf
 			shader_int
 		>;
 
-		using position_buffer_type = typename Implementation::template buffer<
+		using transform_buffer_type = typename Implementation::template buffer<
 			gpu_buffer_usage::field,
-			float2
+			simple_transform_data
 		>;
 		using color_buffer_type = typename Implementation::template buffer<
 			gpu_buffer_usage::field,
@@ -43,7 +43,7 @@ namespace compwolf
 	private:
 		vertex_buffer_type* _vertices;
 		vertex_index_buffer_type* _indices;
-		position_buffer_type _position;
+		transform_buffer_type _transform;
 		color_buffer_type _color;
 		drawable_type _drawable;
 
@@ -61,18 +61,18 @@ namespace compwolf
 		/** Returns the index of the vertices making up the shape. */
 		auto vertex_indices() const noexcept -> const vertex_index_buffer_type& { return *_indices; }
 
-		/** Returns the position of the shape.
+		/** Returns the position and scale of the shape.
 		 * @customoverload
 		 */
-		auto position() noexcept -> position_buffer_type& { return _position; }
-		/** Returns the position of the shape. */
-		auto position() const noexcept -> const position_buffer_type& { return _position; }
+		auto transform() noexcept -> transform_buffer_type& { return _transform; }
+		/** Returns the position and scale of the shape. */
+		auto transform() const noexcept -> const transform_buffer_type& { return _transform; }
 		/** Returns the color of the shape.
 		 * @customoverload
 		 */
-		auto color() noexcept -> position_buffer_type& { return _color; }
+		auto color() noexcept -> color_buffer_type& { return _color; }
 		/** Returns the color of the shape. */
-		auto color() const noexcept -> const position_buffer_type& { return _color; }
+		auto color() const noexcept -> const color_buffer_type& { return _color; }
 
 		/** Returns the gpu that the shape is on.
 		 * @customoverload
@@ -103,13 +103,13 @@ namespace compwolf
 		simple_shape(Implementation::camera& camera
 			, simple_brush<Implementation>& brush
 			, vertex_buffer_type& vertices, vertex_index_buffer_type& indices
-			, float2 position = float2(), float3 color = float3())
+			, simple_transform_data transform = simple_transform_data(), float3 color = float3())
 			: _vertices(&vertices), _indices(&indices)
-			, _position(camera.gpu(), 1)
+			, _transform(camera.gpu(), 1)
 			, _color(camera.gpu(), 1)
-			, _drawable(camera, brush, vertices, indices, _position, _color)
+			, _drawable(camera, brush, vertices, indices, _transform, _color)
 		{
-			if (position != float2()) _position.data()[0] = position;
+			if (transform != simple_transform_data()) _transform.data()[0] = transform;
 			if (color != float3()) _color.data()[0] = color;
 		}
 	};
