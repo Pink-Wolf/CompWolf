@@ -404,6 +404,16 @@ namespace CompWolf.Docs.Server.Data
                                     processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, parameterEnd)].TrimEnd();
                                     if (processedDeclaration.EndsWith("noexcept")) // paranthesis were parameterized noexcept
                                         processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, processedDeclaration.LastIndexOf(')'))].TrimEnd();
+                                    // a require statement can also be here, in which case we have to run the above again to get to the right spot
+                                    if (processedDeclaration.EndsWith("requires"))
+                                    {
+                                        parameterEnd = processedDeclaration.LastIndexOf(')');
+                                        declEnding = processedDeclaration[parameterEnd..];
+
+                                        processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, parameterEnd)].TrimEnd();
+                                        if (processedDeclaration.EndsWith("noexcept")) // paranthesis were parameterized noexcept
+                                            processedDeclaration = processedDeclaration[..GetEndOfBracketIndexInCodeReversed('(', ')', processedDeclaration, processedDeclaration.LastIndexOf(')'))].TrimEnd();
+                                    }
                                 }
 
                                 entityName = processedDeclaration;
