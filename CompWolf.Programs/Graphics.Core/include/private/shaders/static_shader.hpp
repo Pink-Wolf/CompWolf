@@ -13,7 +13,7 @@ namespace compwolf
 	 * @see shader
 	 */
 	template <const char* const CodePath, typename ShaderType>
-		requires std::constructible_from<ShaderType, typename ShaderType::environment_type::gpu_type&, std::vector<uint32_t>&>
+		requires (std::constructible_from<ShaderType, typename ShaderType::environment_type::gpu_type&, std::vector<uint32_t>&>)
 	class static_shader
 	{
 	public:
