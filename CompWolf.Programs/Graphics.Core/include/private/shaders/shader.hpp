@@ -5,6 +5,7 @@
 #include <type_lists>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 namespace compwolf
 {

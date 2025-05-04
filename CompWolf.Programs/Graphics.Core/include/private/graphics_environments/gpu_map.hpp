@@ -80,8 +80,8 @@ namespace compwolf
 		 * @param environment This gets replaced by a gpu before the arguments are forwarded to the element's constructor.
 		 * @overload
 		 */
-		template <typename Args>
-		gpu_map(environment_type& environment, Args&& args...)
+		template <typename... Args>
+		gpu_map(environment_type& environment, Args&&... args)
 			: gpu_map(environment.gpus()[0], args...)
 		{ }
 	};
