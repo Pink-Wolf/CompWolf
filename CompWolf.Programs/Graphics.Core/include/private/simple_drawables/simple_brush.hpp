@@ -15,7 +15,7 @@ namespace compwolf
 	 * * The object's RGB color, as a [[float3]].
 	 * @typeparam Implementation The implementation of [[CompWolf.Graphics]] to use.
 	 */
-	template <ImplementationType Implementation>
+	template <ImplementationType Implementation = default_implementation>
 	class simple_brush : public Implementation::template brush<
 		typename simple_vertex_shader<Implementation>::shader_type,
 		typename single_color_pixel_shader<Implementation>::shader_type

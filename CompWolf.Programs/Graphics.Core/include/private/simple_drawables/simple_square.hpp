@@ -13,7 +13,7 @@ namespace compwolf
 	 * * The square's RGB color, as a [[float3]].
 	 * @typeparam Implementation The implementation of [[CompWolf.Graphics]] to use.
 	 */
-	template <ImplementationType Implementation>
+	template <ImplementationType Implementation = default_implementation>
 	class simple_square : public simple_shape<Implementation>
 	{
 		using super = simple_shape<Implementation>;

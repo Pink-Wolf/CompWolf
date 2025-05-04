@@ -5,7 +5,8 @@
 #include <simple_drawables>
 #include <vulkan_graphics>
 
-using graphics_types = compwolf::vulkan_types;
+struct compwolf::default_implementation : compwolf::vulkan_types {};
+using graphics_types = compwolf::default_implementation;
 
 static void debug_callback(std::string_view s)
 {
@@ -29,8 +30,8 @@ int main()
 		}
 	);
 
-	compwolf::simple_brush<graphics_types> brush(camera);
-	compwolf::simple_square<graphics_types> square(camera, brush
+	compwolf::simple_brush<> brush(camera);
+	compwolf::simple_square<> square(camera, brush
 		, compwolf::simple_transform_data
 		{
 			.position = { .0f, .0f },

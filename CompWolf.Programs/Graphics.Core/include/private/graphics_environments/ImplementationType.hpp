@@ -10,7 +10,7 @@ namespace compwolf
 	/** @hidden */
 	enum class gpu_buffer_usage;
 
-	/** A container for the the set of types */
+	/** A container for the the set of types implementing [[Graphics.Core]]. */
 	template <typename T>
 	concept ImplementationType = requires (T t)
 	{
@@ -46,6 +46,9 @@ namespace compwolf
 			typename T::template shader<int, pixel_output_type>
 		>>;
 	};
+
+	/** Define this to denote what implementation of [[Graphics.Core]] you want to use by default. */
+	struct default_implementation;
 }
 
 #endif // ! COMPWOLF_GRAPHICS_IMPLEMENTATION_TYPE

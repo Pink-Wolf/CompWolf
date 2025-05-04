@@ -39,7 +39,7 @@ namespace compwolf
 	 * It also has a 2D-position as a field, denoting the objects position.
 	 * @typeparam Implementation The implementation of [[CompWolf.Graphics]] to use.
 	 */
-	template <ImplementationType Implementation>
+	template <ImplementationType Implementation = default_implementation>
 	using simple_vertex_shader = static_shader<internal::simple_vertex_shader_path,
 		typename Implementation::template shader<
 			float2, float4, type_value_pair<simple_transform_data, 0>
