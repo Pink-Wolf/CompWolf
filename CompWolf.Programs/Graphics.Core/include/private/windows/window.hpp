@@ -120,7 +120,7 @@ namespace compwolf
 		 * @overload sets the window to not have a gpu.
 		 * [[window::set_gpu]] must be called afterwards to set the gpu!
 		 */
-		window(environment_type& environment, window_settings& settings) noexcept
+		window(environment_type&, window_settings& settings) noexcept
 			: window(nullptr, settings) {}
 
 		/** Constructs a window on the given gpu, with the given settings.

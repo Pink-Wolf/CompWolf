@@ -54,10 +54,10 @@ int main()
 		window.update_image();
 		environment.update();
 
-		if (environment.inputs().state_for('w').down()) square.transform().data()[0].position.y() -= delta_time;
-		if (environment.inputs().state_for('a').down()) square.transform().data()[0].position.x() -= delta_time;
-		if (environment.inputs().state_for('s').down()) square.transform().data()[0].position.y() += delta_time;
-		if (environment.inputs().state_for('d').down()) square.transform().data()[0].position.x() += delta_time;
+		if (environment.inputs().state_for('w').down()) square.transform().data()[0].position.y() -= static_cast<float>(delta_time);
+		if (environment.inputs().state_for('a').down()) square.transform().data()[0].position.x() -= static_cast<float>(delta_time);
+		if (environment.inputs().state_for('s').down()) square.transform().data()[0].position.y() += static_cast<float>(delta_time);
+		if (environment.inputs().state_for('d').down()) square.transform().data()[0].position.x() += static_cast<float>(delta_time);
 
 		// get new time
 		auto old_time = elapsed_time;

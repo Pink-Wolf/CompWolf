@@ -90,7 +90,7 @@ namespace compwolf
         constexpr enum_bitset() noexcept = default;
         /** @overload compwolf::enum_bitset can be constructed the same ways std::bitset can be constructed. */
         using super::bitset;
-        constexpr enum_bitset(EnumType element) : super(1l << to_pos(element)) {}
+        constexpr enum_bitset(EnumType element) : super(1z << to_pos(element)) {}
         /** @overload This ignores additional instances of the same element in std::initializer_list. */
         constexpr enum_bitset(std::initializer_list<EnumType> elements)
         {

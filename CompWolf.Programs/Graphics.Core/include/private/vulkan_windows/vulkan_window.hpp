@@ -59,11 +59,6 @@ namespace compwolf::vulkan
 			return *new(this)vulkan_window(std::move(other));
 		}
 
-		~vulkan_window()
-		{
-			int test = 3;
-		}
-
 	private:
 		vulkan_window(vulkan_graphics_environment*, vulkan_gpu_connection*, window_settings settings);
 	public:

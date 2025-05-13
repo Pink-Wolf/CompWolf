@@ -14,10 +14,10 @@ namespace compwolf
 		if (!stream.is_open()) throw std::runtime_error("Could not open \"" + std::string(path) + "\".");
 
 		std::vector<uint32_t> data;
-		data.resize(stream.tellg() / 4);
+		data.resize(static_cast<std::size_t>(stream.tellg() / 4));
 
 		stream.seekg(0);
-		stream.read(static_cast<char*>(static_cast<void*>(data.data())), data.size() * 4);
+		stream.read(static_cast<char*>(static_cast<void*>(data.data())), static_cast<std::streamsize>(data.size() * 4));
 
 		return data;
 	}

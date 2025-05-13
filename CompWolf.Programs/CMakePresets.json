@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "generator": "Ninja",
+      "environment": {
+        "Vulkan_LIBRARY": "${sourceDir}/extern/VulkanSDK/Lib/vulkan-1.lib",
+        "Vulkan_INCLUDE_DIR": "${sourceDir}/extern/VulkanSDK/Include"
+      }
+    },
+    {
+      "name": "debug",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "debug_gcc",
+      "inherits": "debug",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -pendantic"
+      }
+    },
+    {
+      "name": "debug_msvc",
+      "inherits": "debug",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_INIT": "/W4"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "inherits": [
+        "base"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "release_gcc",
+      "inherits": "release",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -pendantic"
+      }
+    },
+    {
+      "name": "release_msvc",
+      "inherits": "release",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_INIT": "/W4"
+      }
+    }
+  ]
+}

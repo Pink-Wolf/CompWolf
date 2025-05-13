@@ -81,7 +81,7 @@ namespace compwolf
 	private:
 		/** This treats uppercase and lowercase as the same character. */
 		static auto sanatize_char(char c) -> char
-			{ return std::tolower(c); }
+			{ return static_cast<char>(std::tolower(c)); }
 
 	public: // accessors
 		/** Gets the state for the key representing the given character.

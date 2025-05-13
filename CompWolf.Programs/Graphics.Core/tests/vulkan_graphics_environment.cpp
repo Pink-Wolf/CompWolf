@@ -1,4 +1,6 @@
+#pragma warning(push, 0)
 #include <gtest/gtest.h>
+#pragma warning(pop)
 #include <vulkan_graphics_environments>
 #include <private/vulkan_graphics_environments/vulkan_graphics_environment.hpp>
 

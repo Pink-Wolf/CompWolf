@@ -32,7 +32,7 @@ namespace compwolf
 	private:
 		struct element_constructor
 		{
-			static auto func(void* mapPtr, typename environment_type::gpu_type& gpu)
+			static auto func(void*, typename environment_type::gpu_type& gpu)
 			{
 				auto code = shader_code_from_file(CodePath);
 				return shader_type(gpu, code);

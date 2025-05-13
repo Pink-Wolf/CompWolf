@@ -7,8 +7,10 @@
 #include <concepts>
 #include <version_numbers>
 
+#pragma warning(push, 0)
 #define GLFW_INCLUDE_VULKAN
 #include <glfw3.h>
+#pragma warning(disable)
 
 namespace compwolf::vulkan
 {

@@ -80,7 +80,7 @@ namespace compwolf::vulkan
 			internal::drawable_draw_code(args
 				, super::brush().vulkan_pipeline(super::camera().window())
 				, super::brush().vulkan_pipeline_layout()
-				, super::vertex_index_buffer().size()
+				, static_cast<shader_int>(super::vertex_index_buffer().size())
 				, super::vertex_buffer().vulkan_buffer()
 				, super::vertex_index_buffer().vulkan_buffer()
 				, vulkan_field_buffers().data()
