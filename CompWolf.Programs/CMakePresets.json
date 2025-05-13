@@ -10,7 +10,6 @@
       "name": "base",
       "hidden": true,
       "binaryDir": "${sourceDir}/build/${presetName}",
-      "generator": "Ninja",
       "environment": {
         "Vulkan_LIBRARY": "${sourceDir}/extern/VulkanSDK/Lib/vulkan-1.lib",
         "Vulkan_INCLUDE_DIR": "${sourceDir}/extern/VulkanSDK/Include"
@@ -27,13 +26,15 @@
     {
       "name": "debug_gcc",
       "inherits": "debug",
+      "generator": "Unix Makefiles",
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -pendantic"
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -pedantic -Wno-unknown-pragmas"
       }
     },
     {
       "name": "debug_msvc",
       "inherits": "debug",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_CXX_FLAGS_INIT": "/W4"
       }
@@ -51,13 +52,15 @@
     {
       "name": "release_gcc",
       "inherits": "release",
+      "generator": "Unix Makefiles",
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -pendantic"
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -pedantic -Wno-unknown-pragmas"
       }
     },
     {
       "name": "release_msvc",
       "inherits": "release",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_CXX_FLAGS_INIT": "/W4"
       }

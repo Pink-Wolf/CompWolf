@@ -17,6 +17,8 @@ namespace compwolf
 	class simple_square : public simple_shape<Implementation>
 	{
 		using super = simple_shape<Implementation>;
+		using super_vertex_buffer_type = typename super::vertex_buffer_type;
+		using super_vertex_index_buffer_type = typename super::vertex_index_buffer_type;
 
 		struct gpu_data
 		{
@@ -39,8 +41,8 @@ namespace compwolf
 			gpu_data data
 			{
 				.instance_count = 0,
-				.vertices = super::vertex_buffer_type(gpu, 4),
-				.indices = super::vertex_index_buffer_type(gpu, 6),
+				.vertices = super_vertex_buffer_type(gpu, 4),
+				.indices = super_vertex_index_buffer_type(gpu, 6),
 			};
 			{
 				auto v = data.vertices.data();

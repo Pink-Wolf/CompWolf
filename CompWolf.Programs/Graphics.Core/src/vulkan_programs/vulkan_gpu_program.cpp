@@ -102,8 +102,6 @@ namespace compwolf::vulkan
 
 	auto vulkan_gpu_program::execute() -> const fence_type&
 	{
-		auto& gpu_device = gpu();
-
 		auto& thread = manager().thread();
 		auto queue = to_vulkan(thread.queue);
 

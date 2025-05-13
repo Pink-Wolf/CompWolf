@@ -8,9 +8,9 @@
 template <auto T>
 struct test_type {};
 template <auto T1, auto T2>
-static bool operator==(test_type<T1> lhs, test_type<T2> rhs) { return T1 == T2; }
+static bool operator==(test_type<T1>, test_type<T2>) { return T1 == T2; }
 template <auto T1, auto T2>
-static bool operator!=(test_type<T1> lhs, test_type<T2> rhs) { return T1 != T2; }
+static bool operator!=(test_type<T1>, test_type<T2>) { return T1 != T2; }
 
 TEST(TypeList, size) {
 	EXPECT_EQ((compwolf::type_list<int, float>::size), std::size_t(2));

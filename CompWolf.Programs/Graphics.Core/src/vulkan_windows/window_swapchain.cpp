@@ -13,7 +13,6 @@ namespace compwolf::vulkan
 	{
 		auto glfwWindow = to_vulkan(window);
 
-		auto instance = to_vulkan(gpu().vulkan_instance());
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 
 		auto vkSurface = to_vulkan(surface.vulkan_surface());
@@ -35,7 +34,7 @@ namespace compwolf::vulkan
 				glfwGetFramebufferSize(glfwWindow, &width, &height);
 				surfaceExtent = {
 					.width = std::clamp<uint32_t>(width, surface_format.capabilities.minImageExtent.width, surface_format.capabilities.maxImageExtent.width),
-					.height = static_cast<uint32_t>(height, surface_format.capabilities.minImageExtent.height, surface_format.capabilities.maxImageExtent.height),
+					.height = std::clamp<uint32_t>(height, surface_format.capabilities.minImageExtent.height, surface_format.capabilities.maxImageExtent.height),
 				};
 			}
 			uint32_t swapchain_image_count = surface_format.present_mode == VK_PRESENT_MODE_MAILBOX_KHR ? 3 : 2;
@@ -106,8 +105,6 @@ namespace compwolf::vulkan
 			_frames = std::vector<swapchain_frame>(images.size());
 			for (std::size_t i = 0; i < images.size(); ++i)
 			{
-				auto& image = images;
-
 				VkImageViewCreateInfo createInfo{
 					.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 					.image = images[i],

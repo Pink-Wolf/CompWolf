@@ -66,7 +66,6 @@ namespace compwolf::vulkan
 	static auto find_family(gpu_program_manager_settings& settings, const std::vector<vulkan_gpu_connection>& gpus) noexcept
 		-> std::optional<std::pair<size_t, std::size_t>>
 	{
-		vulkan_gpu_connection* best_gpu = nullptr;
 		std::size_t best_gpu_index = 0;
 		std::size_t best_family_index = 0;
 		float best_score = std::numeric_limits<float>::lowest();

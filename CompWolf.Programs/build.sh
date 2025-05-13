@@ -1,7 +1,3 @@
 #!/bin/sh
 
-if [ ! -d "build" ]; then
-    mkdir build
-fi
-
-cd build && cmake .. && make
+cmake --preset debug_gcc && cd build/debug_gcc && make

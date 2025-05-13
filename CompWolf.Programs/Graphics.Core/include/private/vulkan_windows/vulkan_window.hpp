@@ -24,7 +24,7 @@ namespace compwolf::vulkan
 
 	public: // vulkan-related
 		/** Returns the surface's [[vulkan_handle::glfw_window]], representing a GLFWwindow-pointer. */
-		auto glfw_window() const noexcept -> const vulkan_handle::glfw_window { return _glfw_window.get(); }
+		auto glfw_window() const noexcept -> vulkan_handle::glfw_window { return _glfw_window.get(); }
 
 		/** Returns the surface of the window, as in the actual area that can display a dynamic image. */
 		auto surface() noexcept -> window_surface& { return _surface; }

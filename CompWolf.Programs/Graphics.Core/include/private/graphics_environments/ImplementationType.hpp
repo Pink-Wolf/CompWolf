@@ -7,8 +7,13 @@ namespace compwolf
 {
 	/** @hidden */
 	struct pixel_output_type;
-	/** @hidden */
-	enum class gpu_buffer_usage;
+	/** The different types of buffers, in terms of how they can be used. */
+	enum class gpu_buffer_usage
+	{
+		input,
+		input_index,
+		field,
+	};
 
 	/** A container for the the set of types implementing [[Graphics.Core]]. */
 	template <typename T>

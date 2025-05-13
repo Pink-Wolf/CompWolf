@@ -12,7 +12,6 @@ namespace compwolf::vulkan::internal
 		, std::size_t stride, std::size_t size)
 		: stride(stride), size(size)
 	{
-		auto instance = to_vulkan(gpu.vulkan_instance());
 		auto logicDevice = to_vulkan(gpu.vulkan_device());
 		auto physicalDevice = to_vulkan(gpu.vulkan_physical_device());
 

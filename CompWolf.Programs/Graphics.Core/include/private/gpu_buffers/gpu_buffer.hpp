@@ -7,14 +7,6 @@
 
 namespace compwolf
 {
-	/** The different types of buffers, in terms of how they can be used. */
-	enum class gpu_buffer_usage
-	{
-		input,
-		input_index,
-		field,
-	};
-
 	template <typename GraphicsEnvironmentType, gpu_buffer_usage UsageType, typename ValueType>
 	class gpu_buffer_data;
 

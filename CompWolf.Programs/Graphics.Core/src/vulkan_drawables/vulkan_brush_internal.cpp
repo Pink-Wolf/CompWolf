@@ -12,9 +12,7 @@ namespace compwolf::vulkan::internal
 	vulkan_brush_internal::vulkan_brush_internal(vulkan_gpu_connection& gpu
 		, vulkan_brush_info& info
 	) {
-		auto instance = to_vulkan(gpu.vulkan_instance());
 		auto logicDevice = to_vulkan(gpu.vulkan_device());
-		auto physicalDevice = to_vulkan(gpu.vulkan_physical_device());
 
 		VkDescriptorSetLayout descriptorSetLayout;
 		{
@@ -99,9 +97,7 @@ namespace compwolf::vulkan::internal
 		auto renderpass = to_vulkan(window.surface().vulkan_render_pass());
 
 		auto& gpu = window.gpu();
-		auto instance = to_vulkan(gpu.vulkan_instance());
 		auto logicDevice = to_vulkan(gpu.vulkan_device());
-		auto physicalDevice = to_vulkan(gpu.vulkan_physical_device());
 		auto descriptorSetLayout = to_vulkan(descriptor_set_layout);
 		auto pipelineLayout = to_vulkan(pipeline_layout);
 

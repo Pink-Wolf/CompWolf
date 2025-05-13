@@ -40,7 +40,7 @@ namespace compwolf::vulkan
 		/** Returns the surface's [[vulkan_handle::surface]], representing a VkSurfaceKHR. */
 		auto vulkan_surface() const noexcept -> vulkan_handle::surface { return _vulkan_surface.get(); }
 		/** Returns the surface's [[vulkan_handle::surface_format_handle]]-pointer. */
-		auto vulkan_format() const noexcept -> const vulkan_handle::surface_format_info { return _format.get(); }
+		auto vulkan_format() const noexcept -> vulkan_handle::surface_format_info { return _format.get(); }
 		/** Returns the surface's [[vulkan_handle::render_pass]], representing a VkRenderPass. */
 		auto vulkan_render_pass() const noexcept -> vulkan_handle::render_pass { return _render_pass.get(); }
 

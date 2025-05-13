@@ -16,7 +16,11 @@ static void debug_callback(std::string_view s)
 int main()
 {
 	graphics_types::environment environment(compwolf::vulkan::vulkan_graphics_environment_settings{
-		.internal_debug_callback = &debug_callback
+		{
+			.program_name = "Hello Program!",
+			.program_version = { 2, 5, 8 }, // Random numbers selected for testing
+		},
+		&debug_callback,
 	});
 
 	graphics_types::window window(environment, compwolf::window_settings{

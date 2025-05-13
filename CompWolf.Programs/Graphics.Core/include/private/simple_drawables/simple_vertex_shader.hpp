@@ -29,9 +29,9 @@ namespace compwolf
 			return !this->operator==(other);
 		}
 	};
-	template<> struct compwolf::gpu_struct_info<simple_transform_data> : public compwolf::new_gpu_struct_info<
-		compwolf::type_value_pair<compwolf::float2, offsetof(simple_transform_data, position)>,
-		compwolf::type_value_pair<compwolf::float2, offsetof(simple_transform_data, scale)>
+	template<> struct gpu_struct_info<simple_transform_data> : public new_gpu_struct_info<
+		type_value_pair<float2, offsetof(simple_transform_data, position)>,
+		type_value_pair<float2, offsetof(simple_transform_data, scale)>
 	> { };
 
 	/** A simple input shader for drawing objects.

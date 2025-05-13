@@ -10,9 +10,7 @@ namespace compwolf::vulkan::internal
 	vulkan_shader_internal::vulkan_shader_internal(vulkan_gpu_connection& gpu
 		, const std::vector<uint32_t>& spirvCode
 	) {
-		auto instance = to_vulkan(gpu.vulkan_instance());
 		auto logicDevice = to_vulkan(gpu.vulkan_device());
-		auto physicalDevice = to_vulkan(gpu.vulkan_physical_device());
 
 		VkShaderModule shaderModule;
 		{

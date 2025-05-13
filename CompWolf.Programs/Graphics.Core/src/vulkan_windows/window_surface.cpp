@@ -70,7 +70,7 @@ namespace compwolf::vulkan
 		}
 		auto logicDevice = to_vulkan(gpu().vulkan_device());
 
-		VkRenderPass renderPass, backgroundRenderPass;
+		VkRenderPass renderPass;
 		{
 			VkAttachmentDescription colorAttachment{
 				.format = surface_format.format.format,
@@ -122,7 +122,7 @@ namespace compwolf::vulkan
 		}
 	}
 
-	static auto find_best_gpu(vulkan_graphics_environment& environment, window_settings& settings,
+	static auto find_best_gpu(vulkan_graphics_environment& environment, window_settings&,
 		vulkan_handle::surface surface, vulkan_handle::surface_format_info out_info) -> vulkan_gpu_connection*
 	{
 		auto vkSurface = to_vulkan(surface);
@@ -363,7 +363,7 @@ namespace compwolf::vulkan
 		}
 
 		bool is_srgb_space = false;
-		switch (surface_format.format)
+		switch (surface_format.colorSpace)
 		{
 		case VK_COLOR_SPACE_SRGB_NONLINEAR_KHR:
 		case VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT:
