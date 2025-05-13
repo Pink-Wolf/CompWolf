@@ -47,8 +47,12 @@ add_compwolf_target(${COMPWOLF_TARGET} ${COMPWOLF_TARGET_TYPE}
     RESOURCES ${RESOURCES}
 )
 compwolf_target_get_target_name(TARGET_FULLNAME ${COMPWOLF_TARGET})
-target_compile_options(${TARGET_FULLNAME} PRIVATE -Wno-missing-field-initializers)
 
+if (MSVC)
+else()
+    target_compile_options(${TARGET_FULLNAME} PRIVATE -Wno-missing-field-initializers)
+endif()
+    
 target_link_compwolf_target(${TARGET_FULLNAME} ${DEPENDENT_COMPWOLF_TARGETS})
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
