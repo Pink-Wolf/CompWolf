@@ -22,7 +22,7 @@ jobs:
         ./build.sh
 
     - name: Test
-      working-directory: "CompWolf.Programs/Core/build/"
+      working-directory: "CompWolf.Programs/Core/build/debug_gcc/"
       run: ./CompWolf.Core.Tests
   graphics-core:
     name: Test CompWolf.Graphics.Core
@@ -67,5 +67,5 @@ jobs:
         ./build.sh
 
     - name: Test
-      working-directory: "CompWolf.Programs/Graphics.Core/build/"
+      working-directory: "CompWolf.Programs/Graphics.Core/build/debug_gcc/"
       run: ./CompWolf.Graphics.Core.Tests
