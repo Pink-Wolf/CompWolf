@@ -3,22 +3,15 @@ import Link from "next/link"
 export default function Home() {
     return (
         <div>
-            <h1>!!! CompWolf is currently early in development !!!</h1>
             <h1>Welcome to the official CompWolf website.</h1>
-            <section>CompWolf is a set of decoupled C++ libraries that aims to allow game developers to create the technical foundation of their game, where the foundation prioritizes (in the given order):
-                <ol>
-                    <li>correctness and readability,</li>
-                    <li>time-to-develop,</li>
-                    <li>performance.</li>
-                </ol>
-            </section>
-            <section>Compared to engines like Unity and Unreal, CompWolf aims to be less restrictive for your game&apos;s architecture.
-                CompWolf is also build to work with the C++ standard library and other general C++ tools, instead of only tools specifically made for CompWolf.
-            </section>
+            <section> CompWolf is a bachelor project, which has the minimal viable product for a C++ library used to create windows and objects shown on the windows.
+                It currently contains the capacity for drawing squares. It can also take shaders created by you, to draw more complex objects. </section>
+            <section> The project also includes a library with general logic like a type list and implementation of the observer pattern. </section>
+            <section> The project finally includes this website, containing <Link href="/api/">api documentation</Link> loaded directly from the C++ code.
+                This website is made using a React frontend and ASP.NET backend. </section>
             <h1>Links</h1>
-            <p>To learn how to use the CompWolf libraries, consider going through <Link href="/tutorial">these tutorials</Link>.</p>
-            <p>If you wish to find specific information about CompWolf, consider checking out <Link href="/api/">its api documentation.</Link>.</p>
-            <p>If you wish to see CompWolf&apos;s source code, check out its <Link href="https://github.com/Pink-Wolf/BachelorProject">GitHub repository</Link>.</p>
+            <p><Link href="/api/">API Documentation.</Link>.</p>
+            <p><Link href="https://github.com/Pink-Wolf/CompWolf">GitHub Repository</Link>.</p>
         </div>
     )
 }
